@@ -10,12 +10,12 @@ matrix compress(const matrix &m) {
 	std::unordered_map<int, int> newrow, newcol;
 	for (int r = 0; r < m.R; ++r) {
 		if (m[ROW][r].size() > 0) {
-			newrow[r] = (int)newrow.size();
+			newrow.emplace(r, (int)newrow.size());
 		}
 	}
 	for (int c = 0; c < m.C; ++c) {
 		if (m[COL][c].size() > 0) {
-			newcol[c] = (int)newcol.size();
+			newcol.emplace(c, (int)newcol.size());
 		}
 	}
 	

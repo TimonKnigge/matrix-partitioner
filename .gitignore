@@ -1,4 +1,4 @@
-*.swp		# VIM swap file
-*.mtx		# Matrix
-*.o		# GCC object file
-*.out		# Executable
+*.swp
+*.mtx
+*.o
+*.out

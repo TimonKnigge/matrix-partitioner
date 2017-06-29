@@ -1,10 +1,14 @@
 #include "./output.h"
 
-void print_matrix(ostream &stream, const matrix &m) {
+#include <iostream>
+
+#include "../matrix/matrix.h"
+
+void print_matrix(std::ostream &stream, const matrix &m) {
 	for (int r = 0; r < m.R; ++r) {
 		size_t j = 0;
 		for (int i = 0; i < m.C; ++i) {
-			if (j < m[ROW].size() && m[ROW][j].c == i) {
+			if (j < m[ROW][r].size() && m[ROW][r][j].c == i) {
 				stream << '#';
 				++j;
 			} else	stream << '.';

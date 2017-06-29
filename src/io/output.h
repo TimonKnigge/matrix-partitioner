@@ -5,6 +5,6 @@
 
 #include "../matrix/matrix.h"
 
-void print_matrix(ostream &stream, const matrix &m);
+void print_matrix(std::ostream &stream, const matrix &m);
 
 #endif

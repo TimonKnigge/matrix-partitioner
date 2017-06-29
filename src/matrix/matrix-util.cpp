@@ -27,7 +27,8 @@ matrix compress(const matrix &m) {
 			new_nonzeros.push_back({newrow[row[i].r], newcol[row[i].c]});
 		}
 	}
-	return matrix((int)newrow.size(), (int)newcol.size(), new_nonzeros);
+	return matrix((int)newrow.size(), (int)newcol.size(),
+		std::move(new_nonzeros));
 }
 
 inline int inv_rc(int row_or_column) { return 1 - row_or_column; }

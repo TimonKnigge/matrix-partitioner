@@ -7,30 +7,31 @@
 #include <utility>
 #include <vector>
 
-matrix error(const string &reason) {
+#include "../matrix/matrix.h"
+
+matrix error(const std::string &reason) {
 	std::cerr << "Error reading matrix: " << reason << '\n';
-	return matrix(0, 0, {});
+	return matrix(0, 0, std::vector<std::pair<int, int>>());
+}
 
 // Split a string on whitespace.
-std::vector<string> tokenize(const string &line) {
+std::vector<std::string> tokenize(const std::string &line) {
 	std::istringstream iss(line);
-	return std::vector<string>{
-		std::istream_iterator<string>{iss},
-		std::istream_iterator<string>{}};
+	return std::vector<std::string>{
+		std::istream_iterator<std::string>{iss},
+		std::istream_iterator<std::string>{}};
 }
 
 matrix read_matrix(std::istream &stream) {
-	string line;
+	std::string line;
 	
 	// First line contains a typecode of the form:
 	// %%MatrixMarket matrix [coordinate|array] <...>
 	int elements = 1;		// [0, 2] (elements per index).
 	bool symmetric = false;	// Whether (i, j) implies (j, i).
 	{
-		if (!getline(stream, line)) {
-			std::cerr << "Error reading matrix, no typecode found.\n";
-			return matrix(0, 0, {});
-		}
+		if (!getline(stream, line))
+			return error("no typecode found.");
 
 		const auto &tokens = tokenize(line);
 
@@ -62,9 +63,9 @@ matrix read_matrix(std::istream &stream) {
 		const auto &tokens = tokenize(line);
 		if (tokens.size() != 3)
 			return error("Could not find matrix dimensions/nonzeros.");
-		r = stoi(token[0]);
-		c = stoi(token[1]);
-		nz = stoi(token[2]);
+		r = stoi(tokens[0]);
+		c = stoi(tokens[1]);
+		nz = stoi(tokens[2]);
 	}
 
 	// Read the nonzeros of the matrix.
@@ -75,6 +76,9 @@ matrix read_matrix(std::istream &stream) {
 			int j, k;
 			if (!(stream >> j >> k))
 				return error("Could not read nonzeros.");
+
+			j -= 1;
+			k -= 1;
 
 			nonzeros.push_back({j, k});
 			if (symmetric) nonzeros.push_back({k, j});
@@ -87,5 +91,5 @@ matrix read_matrix(std::istream &stream) {
 		}
 	}
 
-	return matrix(r, c, nonzeros);
+	return matrix(r, c, std::move(nonzeros));
 }

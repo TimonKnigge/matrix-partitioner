@@ -9,7 +9,7 @@ Library should support the following bounds:
 Runs should be configurable by bounds and deadline.
 
 Tasks:
- - [ ] Matrix representation and utils.
+ - [X] Matrix representation and utils.
  - [ ] IO.
  - [ ] Interface for solver.
  - [ ] Simple solver (only trivial bounds).

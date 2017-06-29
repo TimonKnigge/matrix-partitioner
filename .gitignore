@@ -1,4 +1,10 @@
+# VIM
 *.swp
+
+# Matrix files
 *.mtx
+
+# GCC
 *.o
+*.d
 *.out

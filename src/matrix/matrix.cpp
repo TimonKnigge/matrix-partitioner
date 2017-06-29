@@ -2,11 +2,16 @@
 
 #include <algorithm>
 
+#include "../io/output.h"
+
 explicit matrix::matrix(int _R, int _C,
 	std::vector<std::pair<int, int>> &nonzeros) {
 	R = _R;
 	C = _C;
 	NZ = (int)nonzeros.size();
+
+	rows.assign(R, std::vector<entry>());
+	cols.assign(C, std::vector<entry>());
 
 	std::sort(nonzeros.begin(), nonzeros.end());
 	for (std::pair<int, int> nz : nonzeros) {
@@ -23,16 +28,7 @@ explicit matrix::matrix(int _R, int _C,
 }
 
 std::ostream &operator<<(std::ostream &stream, const matrix &m) const {
-	for (int r = 0; r < m.R; ++r) {
-		size_t j = 0;
-		for (int i = 0; i < m.C; ++i) {
-			if (j < m[ROW].size() && m[ROW][j].c == i) {
-				stream << '#';
-				++j;
-			} else	stream << '.';
-		}
-		stream << '\n';
-	}
+	print_matrix(stream, m);
 	return stream;
 }
 

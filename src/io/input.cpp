@@ -77,7 +77,7 @@ matrix read_matrix(std::istream &stream) {
 				return error("Could not read nonzeros.");
 
 			nonzeros.push_back({j, k});
-			if (symmetric) nonzeros.push_back({j, k});
+			if (symmetric) nonzeros.push_back({k, j});
 
 			for (int l = 0; l < elements; ++l) {
 				double val;

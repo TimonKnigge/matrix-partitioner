@@ -16,3 +16,7 @@ src/%.o: src/%.cpp
 
 clean:
 	rm -rf src/*.o
+	rm -rf src/*.d
+
+CFLAGS+=-MMD
+-include $(OBJ_FILES:.o:.d)

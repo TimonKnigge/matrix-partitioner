@@ -20,6 +20,7 @@ matrix compress(const matrix &m) {
 	}
 	
 	std::vector<std::pair<int, int>> new_nonzeros;
+	new_nonzeros.reserve(m.NZ);
 	for (int r = 0; r < m.R; ++r) {
 		const auto &row = m[ROW][r];
 		for (size_t i = 0; i < row.size(); ++i) {

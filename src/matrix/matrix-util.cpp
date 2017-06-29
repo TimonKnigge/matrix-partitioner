@@ -28,3 +28,5 @@ matrix compress(const matrix &m) {
 	}
 	return matrix((int)newrow.size(), (int)newcol.size(), new_nonzeros);
 }
+
+inline int inv_rc(int row_or_column) { return 1 - row_or_column; }

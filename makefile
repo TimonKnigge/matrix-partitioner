@@ -9,10 +9,10 @@ OBJECTS=$(SOURCES:.cpp=.o)
 all: $(SOURCES) $(EXEC)
 
 $(EXEC): $(OBJECTS)
-	$(CC) $(LFLAGS) $(OBJECTS) -o $@
+	$(CC) $(LFLAGS) -o $@ $^
 
-.cpp.o:
-	$(CC) $(CFLAGS) $< -o $@
+src/%.o: src/%.cpp
+	$(CC) $(CFLAGS) -o $@ $<
 
 clean:
 	rm -rf src/*.o

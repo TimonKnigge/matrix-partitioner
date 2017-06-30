@@ -6,16 +6,18 @@
 
 #include "./matrix.h"
 
-matrix compress(const matrix &m) {
+matrix compress(const matrix &m, std::vector<int> &rm, std::vector<int> &cm) {
 	std::unordered_map<int, int> newrow, newcol;
 	for (int r = 0; r < m.R; ++r) {
 		if (m[ROW][r].size() > 0) {
 			newrow.emplace(r, (int)newrow.size());
+			rm.push_back(r);
 		}
 	}
 	for (int c = 0; c < m.C; ++c) {
 		if (m[COL][c].size() > 0) {
 			newcol.emplace(c, (int)newcol.size());
+			cm.push_back(c);
 		}
 	}
 	

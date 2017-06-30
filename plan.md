@@ -10,7 +10,7 @@ Runs should be configurable by bounds and deadline.
 
 Tasks:
  - [X] Matrix representation and utils.
- - [ ] IO.
+ - [X] IO.
  - [ ] Interface for solver.
  - [ ] Simple solver (only trivial bounds).
  - [ ] Flow bound.

@@ -1,0 +1,19 @@
+#ifndef PARTITIONER_H
+#define PARTITIONER_H
+
+#include <chrono>
+#include <vector>
+
+#include "./partition-util.h"
+#include "../matrix/matrix.h"
+
+// An interface describing a matrix partitioner.
+class partitioner {
+  public:
+	// Partition a given matrix, and store the assignment in row and col.
+	// Returns true upon succes, false upon failure.
+	virtual bool partition(const matrix &m, std::vector<status> &row,
+		std::vector<status> &col, std::clock_t clocks) = 0;
+};
+
+#endif

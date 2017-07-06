@@ -7,6 +7,8 @@
 #include "./partition-util.h"
 #include "../matrix/matrix.h"
 
+namespace mp {
+
 // An interface describing a matrix partitioner.
 class partitioner {
   public:
@@ -15,5 +17,7 @@ class partitioner {
 	virtual bool partition(const matrix &m, std::vector<status> &row,
 		std::vector<status> &col, std::clock_t clocks) = 0;
 };
+
+}
 
 #endif

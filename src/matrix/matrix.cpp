@@ -4,6 +4,8 @@
 
 #include "../io/output.h"
 
+namespace mp {
+
 matrix::matrix(int _R, int _C,
 	std::vector<std::pair<int, int>> &&nonzeros) {
 	R = _R;
@@ -45,4 +47,6 @@ std::ostream &operator<<(std::ostream &stream, const matrix &m) {
 
 const std::vector<std::vector<entry>> &matrix::operator[](int index) const {
 	return adj[index];
+}
+
 }

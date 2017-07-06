@@ -5,6 +5,8 @@
 #include <utility>
 #include <vector>
 
+namespace mp {
+
 constexpr int ROW = 0, COL = 1;
 
 // A nonzero entry in a matrix.
@@ -40,5 +42,7 @@ public:
 	// Index the matrix by [row/col][index].
 	const std::vector<std::vector<entry>> &operator[](int index) const;
 };
+
+}
 
 #endif

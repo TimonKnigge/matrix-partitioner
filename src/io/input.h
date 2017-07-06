@@ -5,7 +5,11 @@
 
 #include "../matrix/matrix.h"
 
+namespace mp {
+
 // Reads a matrix in MM format.
 matrix read_matrix(std::istream &stream);
+
+}
 
 #endif

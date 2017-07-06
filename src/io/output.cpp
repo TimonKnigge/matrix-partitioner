@@ -4,6 +4,8 @@
 
 #include "../matrix/matrix.h"
 
+namespace mp {
+
 void print_matrix(std::ostream &stream, const matrix &m) {
 	for (int r = 0; r < m.R; ++r) {
 		size_t j = 0;
@@ -15,4 +17,6 @@ void print_matrix(std::ostream &stream, const matrix &m) {
 		}
 		stream << '\n';
 	}
+}
+
 }

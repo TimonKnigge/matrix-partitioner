@@ -9,6 +9,8 @@
 
 #include "../matrix/matrix.h"
 
+namespace mp {
+
 matrix error(const std::string &reason) {
 	std::cerr << "Error reading matrix: " << reason << '\n';
 	return matrix(0, 0, std::vector<std::pair<int, int>>());
@@ -92,4 +94,6 @@ matrix read_matrix(std::istream &stream) {
 	}
 
 	return matrix(r, c, std::move(nonzeros));
+}
+
 }

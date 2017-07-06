@@ -6,6 +6,8 @@
 
 #include "./matrix.h"
 
+namespace mp {
+
 matrix compress(const matrix &m, std::vector<int> &rm, std::vector<int> &cm) {
 	std::unordered_map<int, int> newrow, newcol;
 	for (int r = 0; r < m.R; ++r) {
@@ -34,3 +36,5 @@ matrix compress(const matrix &m, std::vector<int> &rm, std::vector<int> &cm) {
 }
 
 inline int inv_rc(int row_or_column) { return 1 - row_or_column; }
+
+}

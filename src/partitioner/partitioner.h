@@ -16,6 +16,8 @@ class partitioner {
 	// Returns true upon succes, false upon failure.
 	virtual bool partition(const matrix &m, std::vector<status> &row,
 		std::vector<status> &col, float epsilon, std::clock_t clocks) = 0;
+
+	virtual ~partitioner {};
 };
 
 }

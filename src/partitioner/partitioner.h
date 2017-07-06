@@ -17,7 +17,7 @@ class partitioner {
 	virtual bool partition(const matrix &m, std::vector<status> &row,
 		std::vector<status> &col, float epsilon, std::clock_t clocks) = 0;
 
-	virtual ~partitioner {};
+	virtual ~partitioner() {};
 };
 
 }

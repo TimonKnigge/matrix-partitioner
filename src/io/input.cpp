@@ -13,7 +13,8 @@ namespace mp {
 
 matrix error(const std::string &reason) {
 	std::cerr << "Error reading matrix: " << reason << '\n';
-	return matrix(0, 0, std::vector<std::pair<int, int>>());
+	std::vector<std::pair<int, int>> tmp;
+	return matrix(0, 0, tmp);
 }
 
 // Split a string on whitespace.
@@ -92,8 +93,8 @@ matrix read_matrix(std::istream &stream) {
 			}
 		}
 	}
-
-	return matrix(r, c, std::move(nonzeros));
+	std::cerr << "Calling with " << r << ' ' << c << std::endl;
+	return matrix(r, c, nonzeros);
 }
 
 }

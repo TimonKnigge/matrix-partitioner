@@ -8,9 +8,10 @@ namespace mp {
 
 void print_matrix(std::ostream &stream, const matrix &m) {
 	for (int r = 0; r < m.R; ++r) {
+		const auto &row = m[r];
 		size_t j = 0;
 		for (int i = 0; i < m.C; ++i) {
-			if (j < m[ROW][r].size() && m[ROW][r][j].c == i) {
+			if (j < row.size() && row[j].rc == i) {
 				stream << '#';
 				++j;
 			} else	stream << '.';

@@ -6,37 +6,27 @@
 
 namespace mp {
 
-matrix::matrix(int _R, int _C,
-	std::vector<std::pair<int, int>> &&nonzeros) {
+matrix::matrix(int _R, int _C, std::vector<std::pair<int, int>> &nonzeros) {
+	std::cerr << "Constructed with " << R << ' ' << C << std::endl;
 	R = _R;
 	C = _C;
 	NZ = (int)nonzeros.size();
 
-	// We need to do some early scanning to allocate the right amount of
-	// memory. This is because we don't want to reallocate during
-	// construction, since the entry's contain references which would be
-	// lost.
-	std::vector<int> rowsize(R, 0), colsize(C, 0);
-	for (std::pair<int, int> nz : nonzeros)
-		++rowsize[nz.first], ++colsize[nz.second];
-
-	rows.resize(R);
-	cols.resize(C);
-	for (int r = 0; r < R; ++r) rows[r].reserve(rowsize[r]);
-	for (int c = 0; c < C; ++c) cols[c].reserve(colsize[c]);
+	adj.resize(R + C);
 
 	std::sort(nonzeros.begin(), nonzeros.end());
 	for (std::pair<int, int> nz : nonzeros) {
-		int _r = nz.first, _c = nz.second;
-		int _ri = (int)rows[nz.first ].size();
-		int _ci = (int)cols[nz.second].size();
+		// Identifiers [0, R) are reserved for rows, [R, R+C) for the columns.
+		int _r = nz.first, _c = R + nz.second;
+		int _ri = (int)adj[_r].size();
+		int _ci = (int)adj[_c].size();
 
-		rows[_r].emplace_back(_r, _c, _ri, _ci);
-		cols[_c].emplace_back(_r, _c, _ri, _ci);
+		adj[_r].emplace_back(entry{_c, _ci});
+		adj[_c].emplace_back(entry{_r, _ri});
 		
 		Cmax = std::max(Cmax, std::max(
-			(int)rows[_r].size(),
-			(int)cols[_c].size()));
+			(int)adj[_r].size(),
+			(int)adj[_c].size()));
 	}
 }
 
@@ -45,7 +35,7 @@ std::ostream &operator<<(std::ostream &stream, const matrix &m) {
 	return stream;
 }
 
-const std::vector<std::vector<entry>> &matrix::operator[](int index) const {
+const std::vector<entry> &matrix::operator[](int index) const {
 	return adj[index];
 }
 

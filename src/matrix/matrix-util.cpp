@@ -8,33 +8,27 @@
 
 namespace mp {
 
-matrix compress(const matrix &m, std::vector<int> &rm, std::vector<int> &cm) {
-	std::unordered_map<int, int> newrow, newcol;
-	for (int r = 0; r < m.R; ++r) {
-		if (m[ROW][r].size() > 0) {
-			newrow.emplace(r, (int)newrow.size());
-			rm.push_back(r);
+matrix compress(const matrix &m, std::vector<int> &idm) {
+	std::unordered_map<int, int> newid;
+	int nR = 0, nC = 0;
+	for (int id = 0; id < m.R + m.C; ++id) {
+		if (m[id].size() > 0) {
+			newid.emplace(id, (int)newid.size());
+			idm.push_back(id);
+			(id < m.R ? nR : nC)++;
 		}
 	}
-	for (int c = 0; c < m.C; ++c) {
-		if (m[COL][c].size() > 0) {
-			newcol.emplace(c, (int)newcol.size());
-			cm.push_back(c);
-		}
-	}
-	
+
 	std::vector<std::pair<int, int>> new_nonzeros;
 	new_nonzeros.reserve(m.NZ);
+	// We iterate only over the rows, this way we cover all nonzeros.
 	for (int r = 0; r < m.R; ++r) {
-		const auto &row = m[ROW][r];
+		const auto &row = m[r];
 		for (size_t i = 0; i < row.size(); ++i) {
-			new_nonzeros.push_back({newrow[row[i].r], newcol[row[i].c]});
+			new_nonzeros.push_back({newid[r], newid[row[i].rc]});
 		}
 	}
-	return matrix((int)newrow.size(), (int)newcol.size(),
-		std::move(new_nonzeros));
+	return matrix(nR, nC, new_nonzeros);
 }
-
-inline int inv_rc(int row_or_column) { return 1 - row_or_column; }
 
 }

@@ -25,7 +25,7 @@ matrix compress(const matrix &m, std::vector<int> &idm) {
 	for (int r = 0; r < m.R; ++r) {
 		const auto &row = m[r];
 		for (size_t i = 0; i < row.size(); ++i) {
-			new_nonzeros.push_back({newid[r], newid[row[i].rc]});
+			new_nonzeros.push_back({newid[r], newid[row[i].rc] - nR});
 		}
 	}
 	return matrix(nR, nC, new_nonzeros);

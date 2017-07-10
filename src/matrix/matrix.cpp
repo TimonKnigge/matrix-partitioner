@@ -7,7 +7,6 @@
 namespace mp {
 
 matrix::matrix(int _R, int _C, std::vector<std::pair<int, int>> &nonzeros) {
-	std::cerr << "Constructed with " << R << ' ' << C << std::endl;
 	R = _R;
 	C = _C;
 	NZ = (int)nonzeros.size();

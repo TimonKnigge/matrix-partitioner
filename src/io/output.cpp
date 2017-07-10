@@ -11,7 +11,7 @@ void print_matrix(std::ostream &stream, const matrix &m) {
 		const auto &row = m[r];
 		size_t j = 0;
 		for (int i = 0; i < m.C; ++i) {
-			if (j < row.size() && row[j].rc == i) {
+			if (j < row.size() && row[j].rc == m.R+i) {
 				stream << '#';
 				++j;
 			} else	stream << '.';

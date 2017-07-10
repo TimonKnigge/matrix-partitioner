@@ -93,7 +93,6 @@ matrix read_matrix(std::istream &stream) {
 			}
 		}
 	}
-	std::cerr << "Calling with " << r << ' ' << c << std::endl;
 	return matrix(r, c, nonzeros);
 }
 

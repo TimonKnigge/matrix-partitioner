@@ -15,8 +15,8 @@ src/%.o: src/%.cpp
 	$(CC) $(CFLAGS) -o $@ $<
 
 clean:
-	rm -rf src/*.o
-	rm -rf src/*.d
+	find ./ -type f -name '*.o' -delete
+	find ./ -type f -name '*.d' -delete
 
 CFLAGS+=-MMD
 -include $(OBJ_FILES:.o:.d)

@@ -12,7 +12,7 @@ Tasks:
  - [X] Matrix representation and utils.
  - [X] IO.
  - [X] Interface for solver.
- - [ ] Simple solver (only trivial bounds).
+ - [X] Simple solver (only trivial bounds).
  - [ ] Flow bound.
  - [ ] Matching bound.
  - [ ] Packing bound.

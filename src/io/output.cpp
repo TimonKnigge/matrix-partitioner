@@ -25,12 +25,12 @@ void print_partitioned_compressed_matrix(std::ostream &stream, const matrix &m,
 		std::vector<status> &col) {
 	stream << "  ";
 	for (int c = 0; c < m.C; ++c) {
-		auto it = idm.find(c);
+		auto it = idm.find(m.R+c);
 		if (it == idm.end())
 			stream << IO_NONE_TEXT << '-';
-		else if (col[it->second-m.R] == status::cut)
+		else if (col[it->second-(int)row.size()] == status::cut)
 			stream << IO_YELLOW_TEXT << 'C';
-		else if (col[it->second-m.R] == status::red)
+		else if (col[it->second-(int)row.size()] == status::red)
 			stream << IO_RED_TEXT << 'R';
 		else
 			stream << IO_BLUE_TEXT << 'B';
@@ -55,10 +55,10 @@ void print_partitioned_compressed_matrix(std::ostream &stream, const matrix &m,
 			if (e < rw.size() && m.R + c == rw[e].rc) {
 				++e;
 				if (row[it->second] == status::red ||
-					col[idm[c]-m.R] == status::red)
+					col[idm[c+m.R]-(int)row.size()] == status::red)
 					stream << IO_RED_TEXT;
 				else if (row[it->second] == status::blue ||
-					col[idm[c]-m.R] == status::blue)
+					col[idm[c+m.R]-(int)row.size()] == status::blue)
 					stream << IO_BLUE_TEXT;
 				else
 					stream << IO_YELLOW_TEXT;

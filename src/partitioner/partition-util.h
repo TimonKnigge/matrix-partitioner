@@ -47,4 +47,6 @@ inline status color_to_partial_status(int c) {
 	return c == 0 ? status::partial_red : status::partial_blue;
 }
 
+}
+
 #endif

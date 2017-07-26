@@ -1,13 +1,13 @@
-#include "./partial-partitioner.h"
+#include "./partial-partition.h"
 
 namespace mp {
 
 partial_partition::partial_partition(const matrix &_m, bbparameters _param,
 		int _max_partition_size) :
-			m(_m),
 			param(_param),
 			max_partition_size(_max_partition_size),
-			stat(m.R + m.C, status::unassigned) {
+			stat(m.R + m.C, status::unassigned),
+			m(_m) {
 	color_count[0].assign(m.R + m.C, 0);
 	color_count[1].assign(m.R + m.C, 0);
 }
@@ -83,7 +83,7 @@ void partial_partition::assign(int rc, status s) {
 			break;
 		}
 		default: {
-			std::cerr << "Error, trying to assign status " << s << endl;
+			std::cerr << "Error, trying to assign status " << s << std::endl;
 			break;
 		}
 	}
@@ -153,7 +153,7 @@ int partial_partition::lower_bound() const {
 }
 
 status partial_partition::get_status(int rc) const {
-	return status[rc];
+	return stat[rc];
 }
 
 }

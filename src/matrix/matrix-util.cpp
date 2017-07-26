@@ -8,13 +8,11 @@
 
 namespace mp {
 
-matrix compress(const matrix &m, std::vector<int> &idm) {
-	std::unordered_map<int, int> newid;
+matrix compress(const matrix &m, std::unordered_map<int, int> &idm) {
 	int nR = 0, nC = 0;
 	for (int id = 0; id < m.R + m.C; ++id) {
 		if (m[id].size() > 0) {
-			newid.emplace(id, (int)newid.size());
-			idm.push_back(id);
+			idm.emplace(id, (int)idm.size());
 			(id < m.R ? nR : nC)++;
 		}
 	}
@@ -25,7 +23,7 @@ matrix compress(const matrix &m, std::vector<int> &idm) {
 	for (int r = 0; r < m.R; ++r) {
 		const auto &row = m[r];
 		for (size_t i = 0; i < row.size(); ++i) {
-			new_nonzeros.push_back({newid[r], newid[row[i].rc] - nR});
+			new_nonzeros.push_back({idm[r], idm[row[i].rc] - nR});
 		}
 	}
 	return matrix(nR, nC, new_nonzeros);

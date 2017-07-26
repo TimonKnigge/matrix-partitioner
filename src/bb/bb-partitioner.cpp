@@ -36,6 +36,8 @@ bool bbpartitioner::partition(const matrix &m, std::vector<status> &row,
 
 	// Optimal partition sofar.
 	std::vector<status> optimal_status(m.R + m.C, status::unassigned);
+	row.assign(m.R, status::unassigned);
+	col.assign(m.C, status::unassigned);
 
 	// Solve and store optimal status.
 	int optimal_value = solve(recursion_order, pp, optimal_status);

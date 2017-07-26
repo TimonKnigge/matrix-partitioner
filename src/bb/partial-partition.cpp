@@ -6,7 +6,7 @@ partial_partition::partial_partition(const matrix &_m, bbparameters _param,
 		int _max_partition_size) :
 			param(_param),
 			max_partition_size(_max_partition_size),
-			stat(m.R + m.C, status::unassigned),
+			stat(_m.R + _m.C, status::unassigned),
 			m(_m) {
 	color_count[0].assign(m.R + m.C, 0);
 	color_count[1].assign(m.R + m.C, 0);

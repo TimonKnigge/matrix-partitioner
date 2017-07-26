@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "bbparameters.h"
+#include "bb-parameters.h"
 #include "../matrix/matrix.h"
 #include "../partitioner/partition-util.h"
 

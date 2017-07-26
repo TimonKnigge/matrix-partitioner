@@ -23,21 +23,33 @@ class partial_partition {
 	// Status of each row/column.
 	std::vector<status> stat;
 
+	// Number of nonzeros of each color in each row/column.
+	std::vector<int> color_count[2];
+
   public:
 	// The matrix partitioned.
 	const matrix &m;
 
-	explicit partial_partition(const matrix &_m, bbparameters _param,
+	partial_partition(const matrix &_m, bbparameters _param,
 		int _max_partition_size);
 
 	// Whether or not a status can be assigned to the given row/column.
 	bool can_assign(int rc, status s) const;
 
-	// Assign a status to the given row/column.
+	// Assign a status to the given row/column. Note that you can not fill in
+	// an arbitrary status for the second argument. Only status changes
+	// naturally occurring during B&B are supported. See the implementation of
+	// can_assign for details.
 	void assign(int rc, status s);
 
 	// Undo the assignment of a status to the given row/column. Requires the
-	// old status as a hint.
+	// old status as a hint. For example:
+	//	if (pp.can_assign(rc, new_status)) {
+	//		auto old_status = pp.get_status(rc);
+	//		pp.assign(rc, new_status);
+	//		<use pp, e.g. recurse>
+	//		pp.undo(rc, old_status)
+	//	}
 	void undo(int rc, status os);
 
 	// Lower bound on the size of any extension of this partial partition.

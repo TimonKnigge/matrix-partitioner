@@ -20,6 +20,29 @@ void print_matrix(std::ostream &stream, const matrix &m) {
 	}
 }
 
+void print_partitioned_compressed_mm(std::ostream &stream, const matrix &m,
+		std::unordered_map<int, int> &idm, std::vector<status> &row,
+		std::vector<status> &col) {
+	stream << "%%MatrixMarket matrix coordinate integer general" << std::endl;
+	stream << m.R << ' ' << m.C << ' ' << m.NZ << std::endl;
+	for (int r = 0; r < m.R; ++r) {
+		const auto &rw = m[r];
+		for (const auto &e : rw) {
+			int c = e.rc - m.R;
+			stream << r+1 << ' ' << c+1 << ' ';
+			if (row[idm[r]] == status::red ||
+				col[idm[c+m.R]-(int)row.size()] == status::red)
+				stream << "1\n";
+			else if (row[idm[r]] == status::blue ||
+				col[idm[c+m.R]-(int)row.size()] == status::blue)
+				stream << "2\n";
+			else
+				stream << "3\n";
+		}
+	}
+	stream << std::flush;
+}
+
 void print_partitioned_compressed_matrix(std::ostream &stream, const matrix &m,
 		std::unordered_map<int, int> &idm, std::vector<status> &row,
 		std::vector<status> &col) {

@@ -16,7 +16,13 @@ const std::string
 	IO_NONE_TEXT = "\033[39m";
 const char ZERO = '.', NONZERO = '#';
 
+// Print a matrix as a grid.
 void print_matrix(std::ostream &stream, const matrix &m);
+
+// Print a partitioned and compressed matrix in MM format.
+void print_partitioned_compressed_mm(std::ostream &stream, const matrix &m,
+	std::unordered_map<int, int> &idm, std::vector<status> &row,
+	std::vector<status> &col);
 
 // Print a partitioned and compressed matrix. Input the *uncompressed* matrix.
 void print_partitioned_compressed_matrix(std::ostream &stream, const matrix &m,

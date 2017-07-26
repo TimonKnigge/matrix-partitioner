@@ -17,7 +17,8 @@ bool bbpartitioner::partition(const matrix &m, std::vector<status> &row,
 		return false;
 	}
 
-	int max_partition_size = static_cast<int>((1.0f + epsilon) * m.NZ / 2.0f);
+	int max_partition_size = static_cast<int>(
+		(1.0f + epsilon) * ((m.NZ + 1) / 2));
 	if (2 * max_partition_size < m.NZ) {
 		std::cerr << "No valid partitioning exists with this value of epsilon."
 			<< std::endl;

@@ -12,7 +12,6 @@ partial_partition::partial_partition(const matrix &_m, bbparameters _param,
 	color_count[1].assign(m.R + m.C, 0);
 }
 
-// TODO: implement partition size checking.
 bool partial_partition::can_assign(int rc, status s) const {
 	switch (s) {
 		case status::red: {

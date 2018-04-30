@@ -1,6 +1,7 @@
 #include "./bb-partitioner.h"
 
 #include <algorithm>
+#include <numeric>
 
 #include "../matrix/matrix.h"
 #include "../matrix/matrix-util.h"

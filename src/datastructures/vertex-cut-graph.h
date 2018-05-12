@@ -42,8 +42,8 @@ private:
 	std::vector<int> prv, nxt;
 
 	// Flow manipulation.
-	void push(int s, std::unordered_set<std::pair<int, int>> &T, int max = -1);
-	void pull(int t, std::unordered_set<std::pair<int, int>> &S, int max = -1);
+	void push(int s, std::unordered_set<std::pair<int, int>> &T, int mx = -1);
+	void pull(int t, std::unordered_set<std::pair<int, int>> &S, int mx = -1);
 };
 
 }

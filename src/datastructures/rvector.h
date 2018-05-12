@@ -1,6 +1,7 @@
 #ifndef RVECTOR_H
 #define RVECTOR_H
 
+#include <limits>
 #include <vector>
 
 namespace mp {

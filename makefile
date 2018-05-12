@@ -1,6 +1,6 @@
 CC=g++
-CFLAGS=-std=gnu++11 -Wall -Wfatal-errors -O2 -c
-LFLAGS=-std=gnu++11 -Wall -Wfatal-errors -O2
+CFLAGS=-std=gnu++14 -Wall -Wfatal-errors -O2 -c
+LFLAGS=-std=gnu++14 -Wall -Wfatal-errors -O2
 EXEC=a.out
 
 SOURCES=$(wildcard src/*.cpp) $(wildcard src/*/*.cpp)

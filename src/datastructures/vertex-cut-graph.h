@@ -33,7 +33,7 @@ public:
 	vertex_cut_graph(const matrix &m);
 
 	// Toggle vertex activity.
-	bool set_activity(int u, vertex_state s);
+	void set_activity(int u, vertex_state s);
 	vertex_state get_activity(int u) const;
 
 	// Retrieve maximal vertex cut.

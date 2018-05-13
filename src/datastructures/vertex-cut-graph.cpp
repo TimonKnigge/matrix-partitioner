@@ -97,7 +97,7 @@ void vertex_cut_graph::set_activity(int u, vertex_state s) {
 		while (debit > 0 && pull(uo, sources, 1) > 0) --debit;
 
 		// Whatever is left we need to pull back to the sinks.
-		while (debit > 0 && pull(uo, sinks, -1) > 0) --debit, --flow;
+		while (debit > 0 && pull(uo, sinks, -1) < 0) --debit, --flow;
 	}
 	// active => sink
 	else if (get_activity(u) == vertex_state::active
@@ -122,7 +122,7 @@ void vertex_cut_graph::set_activity(int u, vertex_state s) {
 		while (debit > 0 && push(ui, sinks, 1) > 0) --debit;
 
 		// Whatever is left we need to push back to the sources.
-		while (debit > 0 && push(ui, sources, -1) > 0) --debit, --flow;
+		while (debit > 0 && push(ui, sources, -1) < 0) --debit, --flow;
 	}
 	// else 'this should not happen :-)'
 }

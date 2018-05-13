@@ -7,8 +7,6 @@
 #include <utility>
 #include <vector>
 
-#include "../matrix/matrix.h"
-
 namespace mp {
 
 matrix error(const std::string &reason) {

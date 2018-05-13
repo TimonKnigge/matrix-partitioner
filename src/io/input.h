@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include "../matrix/matrix.h"
+#include "../datastructures/matrix.h"
 
 namespace mp {
 

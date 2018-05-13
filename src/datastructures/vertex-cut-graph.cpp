@@ -3,9 +3,6 @@
 #include <algorithm>
 #include <queue>
 
-#include "../matrix/matrix.h"
-#include "./rvector.h"
-
 namespace mp {
 
 vertex_cut_graph::vertex_cut_graph(const matrix &m) : V(2 * (m.R + m.C)),

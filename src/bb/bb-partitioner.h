@@ -4,7 +4,7 @@
 #include <stack>
 
 #include "./bb-parameters.h"
-#include "../matrix/matrix.h"
+#include "../datastructures/matrix.h"
 #include "./partial-partition.h"
 #include "../partitioner/partitioner.h"
 #include "../partitioner/partition-util.h"

@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../matrix/matrix.h"
+#include "./matrix.h"
 #include "./rvector.h"
 
 namespace mp {

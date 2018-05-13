@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#include "../matrix/matrix.h"
-
 namespace mp {
 
 void print_matrix(std::ostream &stream, const matrix &m) {

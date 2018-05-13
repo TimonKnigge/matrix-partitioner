@@ -6,8 +6,8 @@
 #include "bb/bb-partitioner.h"
 #include "io/input.h"
 #include "io/output.h"
-#include "matrix/matrix.h"
-#include "matrix/matrix-util.h"
+#include "datastructures/matrix.h"
+#include "datastructures/matrix-util.h"
 #include "partitioner/partition-util.h"
 
 constexpr float eps = 0.03f;

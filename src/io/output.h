@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-#include "../matrix/matrix.h"
+#include "../datastructures/matrix.h"
 #include "../partitioner/partition-util.h"
 
 namespace mp {

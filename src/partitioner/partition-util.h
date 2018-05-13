@@ -1,7 +1,7 @@
 #ifndef PARTITION_UTIL_H
 #define PARTITION_UTIL_H
 
-#include "../matrix/matrix-util.h"
+#include "../datastructures/matrix-util.h"
 
 namespace mp {
 

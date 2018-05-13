@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "bb-parameters.h"
-#include "../matrix/matrix.h"
+#include "../datastructures/matrix.h"
 #include "../partitioner/partition-util.h"
 
 namespace mp {

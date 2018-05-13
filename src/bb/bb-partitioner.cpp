@@ -3,8 +3,7 @@
 #include <algorithm>
 #include <numeric>
 
-#include "../matrix/matrix.h"
-#include "../matrix/matrix-util.h"
+#include "../datastructures/matrix-util.h"
 
 namespace mp {
 

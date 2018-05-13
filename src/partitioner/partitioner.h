@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "./partition-util.h"
-#include "../matrix/matrix.h"
+#include "../datastructures/matrix.h"
 
 namespace mp {
 

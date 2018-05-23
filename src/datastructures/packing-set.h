@@ -23,9 +23,11 @@ public:
 	// Retrieve the size of the packing set.
 	int get_minimum_packing_set_size() const;
 
+	int total_sum() const;
+
 private:
 	std::map<int, int> values;
-	int C = 0, ps_size = -1;
+	int C = 0, ps_size = -1, total = 0;
 
 	void recompute();
 };

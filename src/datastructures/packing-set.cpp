@@ -7,6 +7,7 @@ namespace mp {
 void packing_set::add(int c) {
 	values[c]++;
 	ps_size = -1;
+	total += c;
 }
 
 void packing_set::remove(int c) {
@@ -15,6 +16,7 @@ void packing_set::remove(int c) {
 	if (it->second == 0)
 		values.erase(it);
 	ps_size = -1;
+	total -= c;
 }
 
 void packing_set::set_lower_bound(int nC) {
@@ -36,6 +38,10 @@ void packing_set::recompute() {
 		ps_size += use;
 		ps += use * it->first;
 	}
+}
+
+void packing_set::total_size() const {
+	return total;
 }
 
 }

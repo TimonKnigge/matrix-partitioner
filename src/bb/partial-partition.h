@@ -57,6 +57,9 @@ class partial_partition {
 
 	// Status of the given row/column.
 	status get_status(int rc) const;
+
+	// Retrieve the size of one side of the partition.
+	int get_partition_size(int side) const;
 };
 
 }

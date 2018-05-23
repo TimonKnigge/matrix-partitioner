@@ -75,7 +75,10 @@ void bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
 		if (current_rcs < rcs.size() && pp.lower_bound() < upper_bound) {
 			recurse(rcs[current_rcs], status::cut, call_stack, pp);
 			recurse(rcs[current_rcs], status::red, call_stack, pp);
-			recurse(rcs[current_rcs], status::blue, call_stack, pp);
+			if (pp.get_partition_size(0) > 0)
+				recurse(rcs[current_rcs], status::blue, call_stack, pp);
+			// Note that we only recurse into 'blue' if a red row/column
+			// already exists, this is to break symmetry.
 		}
 	} else { // step.rt == recursion_type::ascend
 		pp.undo(step.rc, step.s);

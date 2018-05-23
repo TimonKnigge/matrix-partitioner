@@ -155,4 +155,8 @@ status partial_partition::get_status(int rc) const {
 	return stat[rc];
 }
 
+int partial_partition::get_partition_size(int side) const {
+	return partition_size[side];
+}
+
 }

@@ -100,7 +100,7 @@ int bbpartitioner::solve(std::vector<int> &rcs, partial_partition &pp,
 
 	// Now we manually apply recursion steps until the call stack is empty,
 	// effectively traversing the B&B tree.
-	int optimal_value = pp.m.R + pp.m.C + 2;
+	int optimal_value = std::min(pp.m.R, pp.m.C) + 2;
 	while (!call_stack.empty()) {
 		make_step(call_stack, current_rcs, rcs, pp, optimal_value);
 		if (current_rcs == rcs.size()) {

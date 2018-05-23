@@ -82,7 +82,8 @@ matrix read_matrix(std::istream &stream) {
 			k -= 1;
 
 			nonzeros.push_back({j, k});
-			if (symmetric) nonzeros.push_back({k, j});
+			if (symmetric && j != k)
+				nonzeros.push_back({k, j});
 
 			for (int l = 0; l < elements; ++l) {
 				double val;

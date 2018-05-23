@@ -5,6 +5,7 @@
 
 #include "bb-parameters.h"
 #include "../datastructures/matrix.h"
+#include "../datastructures/packing-set.h"
 #include "../partitioner/partition-util.h"
 
 namespace mp {
@@ -25,6 +26,11 @@ class partial_partition {
 
 	// Number of nonzeros of each color in each row/column.
 	std::vector<int> color_count[2];
+
+	// Packing sets to maintain the first packing bound for
+	// rows and columns individually, for each color.
+	// [R/C][R/B]
+	mp::packing_set simple_packing_set[2][2];
 
   public:
 	// The matrix partitioned.
@@ -53,7 +59,7 @@ class partial_partition {
 	void undo(int rc, status os);
 
 	// Lower bound on the size of any extension of this partial partition.
-	int lower_bound() const;
+	int lower_bound();
 
 	// Status of the given row/column.
 	status get_status(int rc) const;

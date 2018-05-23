@@ -40,11 +40,24 @@ bool partial_partition::can_assign(int rc, status s) const {
 
 void partial_partition::assign(int rc, status s) {
 	status os = stat[rc];
-	if (os == status::implicitly_cut)
-		--implicitly_cut;
+
+	// Adjust the simple packing sets if necessary. Assignment will certainly
+	// remove 'partialness' so just remove the counts.
+	if (param.pb) {
+		for (status cs : {status::partial_red, status::partial_blue}) {
+			if (os != cs) continue;
+
+			int color = get_color(cs);
+			int free = m[rc].size() - color_count[color][rc];
+
+			simple_packing_set[rc < m.R ? 0 : 1][color].remove(free);
+		}
+	}
 
 	switch (s) {
 		case status::cut: {
+			if (os == status::implicitly_cut)
+				--implicitly_cut;
 			++cut;
 			break;
 		}
@@ -59,6 +72,19 @@ void partial_partition::assign(int rc, status s) {
 				// If the intersecting row/column is already colored, there is
 				// nothing to do.
 				if (is == s) continue;
+
+				// Check how many nonzeros are still free.
+				int free = m[e.rc].size()
+					- color_count[0][e.rc]
+					- color_count[1][e.rc];
+				// If using the simple packing bound, remove from packing set.
+				if (param.pb && is_partial(is)) {
+					int ocolor = get_color(is);
+					simple_packing_set[e.rc < m.R ? 0 : 1][ocolor]
+						.remove(free);
+				}
+				// Certainly this nonzero is no longer free.
+				--free;
 
 				// Otherwise, this entry is certainly not colored, so we color
 				// it.
@@ -78,6 +104,11 @@ void partial_partition::assign(int rc, status s) {
 				if (is == status::unassigned) {
 					stat[e.rc] = color_to_partial_status(color);
 				}
+
+				// If the simple packing bound is enabled, add again.
+				if (param.pb && is_partial(stat[e.rc])) {
+					simple_packing_set[e.rc < m.R ? 0 : 1][color].add(free);
+				}
 			}
 			break;
 		}
@@ -96,6 +127,8 @@ void partial_partition::undo(int rc, status os) {
 	switch (s) {
 		case status::cut: {
 			--cut;
+			if (os == status::implicitly_cut)
+				++implicitly_cut;
 			break;
 		}
 		case status::red:
@@ -109,6 +142,18 @@ void partial_partition::undo(int rc, status os) {
 				// If the intersecting row/column is already colored, there is
 				// nothing to do.
 				if (is == s) continue;
+
+				// Check how many nonzeros are still free.
+				int free = m[e.rc].size()
+					- color_count[0][e.rc]
+					- color_count[1][e.rc];
+				// If using the simple packing bound, remove from packing set.
+				if (param.pb && is_partial(is)) {
+					simple_packing_set[e.rc < m.R ? 0 : 1][color]
+						.remove(free);
+				}
+				// Certainly this nonzero is free again.
+				++free;
 
 				// Otherwise, this entry was certainly not colored, so we
 				// uncolor it.
@@ -132,6 +177,12 @@ void partial_partition::undo(int rc, status os) {
 						color_count[color][e.rc] == 0) {
 					stat[e.rc] = status::unassigned;
 				}
+
+				// If the simple packing bound is enabled, add again.
+				if (param.pb && is_partial(stat[e.rc])) {
+					int ocolor = get_color(stat[e.rc]);
+					simple_packing_set[e.rc < m.R ? 0 : 1][ocolor].add(free);
+				}
 			}
 			break;
 		}
@@ -142,13 +193,42 @@ void partial_partition::undo(int rc, status os) {
 		}
 	}
 
-	if (os == status::implicitly_cut)
-		++implicitly_cut;
+	// Adjust the simple packing sets if necessary. Assignment will certainly
+	// remove 'partialness' so just add the counts.
+	if (param.pb) {
+		for (status cs : {status::partial_red, status::partial_blue}) {
+			if (os != cs) continue;
+
+			int color = get_color(cs);
+			int free = m[rc].size() - color_count[color][rc];
+
+			simple_packing_set[rc < m.R ? 0 : 1][color].add(free);
+		}
+	}
+
 	stat[rc] = os;
 }
 
-int partial_partition::lower_bound() const {
-	return cut + implicitly_cut;
+int partial_partition::lower_bound() {
+	int lb = cut + implicitly_cut;
+
+	// Simple packing bound.
+	if (param.pb) {
+		for (int rc = 0; rc < 2; ++rc) {
+			for (int c = 0; c < 2; ++c) {
+				int max_allowed = max_partition_size - partition_size[c];
+				int available = simple_packing_set[rc][c].total_sum();
+				if (max_allowed >= available) continue;
+
+				// Cut as few rows/columns as necessary.
+				int min_remove = available - max_allowed;
+				simple_packing_set[rc][c].set_lower_bound(min_remove);
+				lb += simple_packing_set[rc][c].get_minimum_packing_set_size();
+			}
+		}
+	}
+
+	return lb;
 }
 
 status partial_partition::get_status(int rc) const {

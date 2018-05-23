@@ -21,7 +21,7 @@ public:
 	void set_lower_bound(int nC);
 
 	// Retrieve the size of the packing set.
-	int get_minimum_packing_set_size() const;
+	int get_minimum_packing_set_size();
 
 	int total_sum() const;
 

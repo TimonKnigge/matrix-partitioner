@@ -24,7 +24,7 @@ void packing_set::set_lower_bound(int nC) {
 	ps_size = -1;
 }
 
-int packing_set::get_minimum_packing_set_size() const {
+int packing_set::get_minimum_packing_set_size() {
 	if (ps_size == -1)
 		recompute();
 	return ps_size;
@@ -40,7 +40,7 @@ void packing_set::recompute() {
 	}
 }
 
-void packing_set::total_size() const {
+int packing_set::total_sum() const {
 	return total;
 }
 

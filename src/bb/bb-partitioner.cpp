@@ -63,16 +63,19 @@ void bbpartitioner::recurse(int rc, status stat,
 			rc, stat});
 }
 
-void bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
+int bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
 		size_t &current_rcs, std::vector<int> &rcs, partial_partition &pp,
 		int upper_bound) {
 	recursion_step step = call_stack.top();
 	call_stack.pop();
 	
+	int lb = -1;
 	if (step.rt == recursion_type::descend) {
 		pp.assign(step.rc, step.s);
+		lb = pp.lower_bound();
+
 		++current_rcs;
-		if (current_rcs < rcs.size() && pp.lower_bound() < upper_bound) {
+		if (current_rcs < rcs.size() && lb < upper_bound) {
 			recurse(rcs[current_rcs], status::cut, call_stack, pp);
 			recurse(rcs[current_rcs], status::red, call_stack, pp);
 			if (pp.get_partition_size(0) > 0)
@@ -84,6 +87,8 @@ void bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
 		pp.undo(step.rc, step.s);
 		--current_rcs;
 	}
+
+	return lb;
 }
 
 int bbpartitioner::solve(std::vector<int> &rcs, partial_partition &pp,
@@ -102,14 +107,13 @@ int bbpartitioner::solve(std::vector<int> &rcs, partial_partition &pp,
 	// effectively traversing the B&B tree.
 	int optimal_value = std::min(pp.m.R, pp.m.C) + 2;
 	while (!call_stack.empty()) {
-		make_step(call_stack, current_rcs, rcs, pp, optimal_value);
+		int lb = make_step(call_stack, current_rcs, rcs, pp, optimal_value);
 		if (current_rcs == rcs.size()) {
-			int cost = pp.lower_bound();
-			if (optimal_value > cost) {
-				optimal_value = cost;
+			if (optimal_value > lb) {
+				optimal_value = lb;
 				for (size_t i = 0; i < optimal_status.size(); ++i)
 					optimal_status[i] = pp.get_status(i);
-				std::cerr << "Improved solution found with cost " << cost
+				std::cerr << "Improved solution found with cost " << lb
 					<< std::endl;
 			}
 		}

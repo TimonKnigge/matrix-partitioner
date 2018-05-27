@@ -27,7 +27,8 @@ class bbpartitioner : public partitioner {
 	int solve(std::vector<int> &rcs, partial_partition &pp,
 		std::vector<status> &optimal_status);
 
-	void make_step(std::stack<recursion_step> &call_stack, size_t &current_rcs,
+	// Returns the lower bound after a descend, -1 for an ascend.
+	int make_step(std::stack<recursion_step> &call_stack, size_t &current_rcs,
 		std::vector<int> &rcs, partial_partition &pp, int upper_bound);
 
 	void recurse(int rc, status stat, std::stack<recursion_step> &call_stack,

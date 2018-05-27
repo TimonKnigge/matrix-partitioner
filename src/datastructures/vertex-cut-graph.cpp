@@ -121,7 +121,7 @@ void vertex_cut_graph::set_activity(int u, vertex_state s) {
 		// Whatever is left we need to push back to the sources.
 		while (debit > 0 && push(ui, sources, -1) < 0) --debit, --flow;
 	}
-	// else 'this should not happen :-)'
+	// else nothing interesting changes in the flow graph.
 }
 
 //bool vertex_cut_graph::set_activity(int u, vertex_state s) { }
@@ -134,6 +134,7 @@ int vertex_cut_graph::get_maximum_vertex_cut() const {
 }
 
 int vertex_cut_graph::push(int s, std::unordered_map<int, int> &T, int c) {
+	if (T.empty()) return 0;
 	std::queue<int> q;
 	par.reset_all();
 	pari.reset_all();
@@ -180,6 +181,7 @@ int vertex_cut_graph::push(int s, std::unordered_map<int, int> &T, int c) {
 }
 
 int vertex_cut_graph::pull(int t, std::unordered_map<int, int> &S, int c) {
+	if (S.empty()) return 0;
 	std::queue<int> q;
 	par.reset_all();
 	pari.reset_all();

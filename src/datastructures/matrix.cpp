@@ -34,6 +34,7 @@ matrix::matrix(int _R, int _C) {
 	C = _C;
 	NZ = 0;
 	Cmax = 0;
+	adj.resize(R + C);
 }
 
 std::ostream &operator<<(std::ostream &stream, const matrix &m) {

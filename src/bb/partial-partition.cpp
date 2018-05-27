@@ -221,6 +221,7 @@ void partial_partition::undo(int rc, status os) {
 			vcg.set_activity(rc, vertex_state::active);
 			for (const entry &e : m[rc]) {
 				if (stat[e.rc] != status::implicitly_cut
+						&& stat[e.rc] != status::cut
 						&& vcg.get_activity(e.rc) == vertex_state::inactive) {
 					vcg.set_activity(e.rc, vertex_state::active);
 				}

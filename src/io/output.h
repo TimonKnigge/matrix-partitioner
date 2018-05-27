@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 
+#include "../bb/partial-partition.h"
 #include "../datastructures/matrix.h"
 #include "../partitioner/partition-util.h"
 
@@ -28,6 +29,9 @@ void print_partitioned_compressed_mm(std::ostream &stream, const matrix &m,
 void print_partitioned_compressed_matrix(std::ostream &stream, const matrix &m,
 	std::unordered_map<int, int> &idm, std::vector<status> &row,
 	std::vector<status> &col);
+
+// Print a ppmatrix for debugging.
+void print_ppmatrix(std::ostream &stream, const partial_partition &pp);
 
 }
 

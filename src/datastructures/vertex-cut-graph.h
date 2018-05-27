@@ -37,7 +37,7 @@ public:
 	vertex_state get_activity(int u) const;
 
 	// Retrieve maximal vertex cut.
-	int get_maximum_vertex_cut() const;
+	int get_minimum_vertex_cut() const;
 
 private:
 	// Current state of each vertex, in external terms.

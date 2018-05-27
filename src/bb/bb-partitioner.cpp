@@ -71,8 +71,7 @@ int bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
 	
 	int lb = -1;
 	if (step.rt == recursion_type::descend) {
-		pp.assign(step.rc, step.s);
-		lb = pp.lower_bound();
+		lb = pp.assign(step.rc, step.s, upper_bound);
 
 		++current_rcs;
 		if (current_rcs < rcs.size() && lb < upper_bound) {

@@ -91,4 +91,68 @@ void print_partitioned_compressed_matrix(std::ostream &stream, const matrix &m,
 	}
 }
 
+void print_ppmatrix(std::ostream &stream, const partial_partition &pp) {
+	stream << "  ";
+	for (int c = 0; c < pp.m.C; ++c) {
+		status stat = pp.get_status(pp.m.R+c);
+		if (stat == status::cut)
+			stream << IO_YELLOW_TEXT << 'C';
+		else if (stat == status::implicitly_cut)
+			stream << IO_YELLOW_TEXT << 'c';
+		else if (stat == status::red)
+			stream << IO_RED_TEXT << 'R';
+		else if (stat == status::partial_red)
+			stream << IO_NONE_TEXT << 'r';
+		else if (stat == status::blue)
+			stream << IO_BLUE_TEXT << 'B';
+		else if (stat == status::partial_blue)
+			stream << IO_NONE_TEXT << 'b';
+		else
+			stream << IO_NONE_TEXT << 'U';
+	}
+	stream << IO_NONE_TEXT << '\n';
+	for (int r = 0; r < pp.m.R; ++r) {
+		status stat = pp.get_status(r);
+		if (stat == status::cut)
+			stream << IO_YELLOW_TEXT << 'C';
+		else if (stat == status::implicitly_cut)
+			stream << IO_YELLOW_TEXT << 'c';
+		else if (stat == status::red)
+			stream << IO_RED_TEXT << 'R';
+		else if (stat == status::partial_red)
+			stream << IO_NONE_TEXT << 'r';
+		else if (stat == status::blue)
+			stream << IO_BLUE_TEXT << 'B';
+		else if (stat == status::partial_blue)
+			stream << IO_NONE_TEXT << 'b';
+		else
+			stream << IO_NONE_TEXT << 'U';
+		stream << ' ';
+		size_t e = 0;
+		const auto &rw = pp.m[r];
+		for (int c = 0; c < pp.m.C; ++c) {
+			if (e < rw.size() && pp.m.R + c == rw[e].rc) {
+				++e;
+				if (pp.get_status(r) == status::red ||
+					pp.get_status(pp.m.R+c) == status::red)
+					stream << IO_RED_TEXT;
+				else if (pp.get_status(r) == status::blue ||
+					pp.get_status(pp.m.R+c) == status::blue)
+					stream << IO_BLUE_TEXT;
+				else if (pp.get_status(r) == status::cut ||
+					pp.get_status(pp.m.R+c) == status::cut)
+					stream << IO_YELLOW_TEXT;
+				else stream << IO_NONE_TEXT;
+				stream << NONZERO;
+			} else
+				stream << IO_NONE_TEXT << ZERO;
+		}
+		stream << IO_NONE_TEXT << '\n';
+	}
+	std::cerr << "cut: " << pp.cut;
+	std::cerr << ", impcut: " << pp.implicitly_cut;
+	std::cerr << ", vcg: " << pp.vcg.get_minimum_vertex_cut() << std::endl;
 }
+
+}
+

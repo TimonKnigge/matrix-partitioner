@@ -1,11 +1,13 @@
 #ifndef PARTIAL_PARTITION_H
 #define PARTIAL_PARTITION_H
 
+#include <iostream>
 #include <vector>
 
 #include "bb-parameters.h"
 #include "../datastructures/matrix.h"
 #include "../datastructures/packing-set.h"
+#include "../datastructures/vertex-cut-graph.h"
 #include "../partitioner/partition-util.h"
 
 namespace mp {
@@ -32,6 +34,13 @@ class partial_partition {
 	// [R/C][R/B]
 	mp::packing_set simple_packing_set[2][2];
 
+	// A vertex cut graph for computing flows/minimal vertex cuts.
+	mp::vertex_cut_graph vcg;
+
+	// Compute a lower bound on the size of any extension of this partial
+	// partition. Called by assign.
+	int incremental_lower_bound(int rc, status s, int ub);
+
   public:
 	// The matrix partitioned.
 	const matrix &m;
@@ -46,7 +55,10 @@ class partial_partition {
 	// an arbitrary status for the second argument. Only status changes
 	// naturally occurring during B&B are supported. See the implementation of
 	// can_assign for details.
-	void assign(int rc, status s);
+	// If the lower bound on the solution size is less than the upperbound it
+	// will be returned exactly, otherwise we will return a lowerbound on the
+	// lowerbound.
+	int assign(int rc, status s, int ub);
 
 	// Undo the assignment of a status to the given row/column. Requires the
 	// old status as a hint. For example:
@@ -58,14 +70,15 @@ class partial_partition {
 	//	}
 	void undo(int rc, status os);
 
-	// Lower bound on the size of any extension of this partial partition.
-	int lower_bound();
-
 	// Status of the given row/column.
 	status get_status(int rc) const;
 
 	// Retrieve the size of one side of the partition.
 	int get_partition_size(int side) const;
+
+	// Friend for debugging.
+	friend void print_ppmatrix(std::ostream &stream,
+		const partial_partition &pp);
 };
 
 }

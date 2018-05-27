@@ -1,5 +1,7 @@
 #include "./partial-partition.h"
 
+#include "../io/output.h"
+
 namespace mp {
 
 partial_partition::partial_partition(const matrix &_m, bbparameters _param,
@@ -7,6 +9,7 @@ partial_partition::partial_partition(const matrix &_m, bbparameters _param,
 			param(_param),
 			max_partition_size(_max_partition_size),
 			stat(_m.R + _m.C, status::unassigned),
+			vcg(_param.fb ? _m : matrix(_m.R, _m.C)),
 			m(_m) {
 	color_count[0].assign(m.R + m.C, 0);
 	color_count[1].assign(m.R + m.C, 0);
@@ -38,7 +41,7 @@ bool partial_partition::can_assign(int rc, status s) const {
 	}
 }
 
-void partial_partition::assign(int rc, status s) {
+int partial_partition::assign(int rc, status s, int ub) {
 	status os = stat[rc];
 
 	// Adjust the simple packing sets if necessary. Assignment will certainly
@@ -119,6 +122,9 @@ void partial_partition::assign(int rc, status s) {
 	}
 	
 	stat[rc] = s;
+
+	// We start adjusting the lower bound to see if it exceeds ub.
+	return incremental_lower_bound(rc, s, ub);
 }
 
 void partial_partition::undo(int rc, status os) {
@@ -206,29 +212,77 @@ void partial_partition::undo(int rc, status os) {
 		}
 	}
 
-	stat[rc] = os;
-}
-
-int partial_partition::lower_bound() {
-	int lb = cut + implicitly_cut;
-
-	// Simple packing bound.
-	if (param.pb) {
-		for (int rc = 0; rc < 2; ++rc) {
-			for (int c = 0; c < 2; ++c) {
-				int max_allowed = max_partition_size - partition_size[c];
-				int available = simple_packing_set[rc][c].total_sum();
-				if (max_allowed >= available) continue;
-
-				// Cut as few rows/columns as necessary.
-				int min_remove = available - max_allowed;
-				simple_packing_set[rc][c].set_lower_bound(min_remove);
-				lb += simple_packing_set[rc][c].get_minimum_packing_set_size();
+	// Undo the flow bound.
+	if (param.fb) {
+		if (s == status::cut && os != status::implicitly_cut) {
+			vcg.set_activity(rc, vertex_state::active);
+		}
+		if (s == status::red || s == status::blue) {
+			vcg.set_activity(rc, vertex_state::active);
+			for (const entry &e : m[rc]) {
+				if (stat[e.rc] != status::implicitly_cut
+						&& vcg.get_activity(e.rc) == vertex_state::inactive) {
+					vcg.set_activity(e.rc, vertex_state::active);
+				}
 			}
 		}
 	}
 
-	return lb;
+	stat[rc] = os;
+}
+
+int partial_partition::incremental_lower_bound(int rc, status s, int ub) {
+	int lb_base = cut + implicitly_cut, lb_incr = 0;
+	if (lb_base + lb_incr >= ub) return lb_base + lb_incr;
+
+	// Simple packing bound.
+	if (param.pb) {
+		int pbv = 0;
+		for (int roc = 0; roc < 2; ++roc) {
+			for (int c = 0; c < 2; ++c) {
+				int max_allowed = max_partition_size - partition_size[c];
+				int available = simple_packing_set[roc][c].total_sum();
+				if (max_allowed >= available) continue;
+
+				// Cut as few rows/columns as necessary.
+				int min_remove = available - max_allowed;
+				simple_packing_set[roc][c].set_lower_bound(min_remove);
+				pbv += simple_packing_set[roc][c]
+					.get_minimum_packing_set_size();
+			}
+		}
+
+		lb_incr = std::max(lb_incr, pbv);
+		if (lb_base + lb_incr >= ub) return lb_base + lb_incr;
+	}
+
+	// Flow bound.
+	if (param.fb) {
+		if (s == status::cut) {
+			vcg.set_activity(rc, vertex_state::inactive);
+		}
+		if (s == status::red) {
+			for (const entry &e : m[rc]) {
+				if (stat[e.rc] == status::implicitly_cut) {
+					vcg.set_activity(e.rc, vertex_state::inactive);
+				}
+			}
+			vcg.set_activity(rc, vertex_state::source);
+		}
+		if (s == status::blue) {
+			for (const entry &e : m[rc]) {
+				if (stat[e.rc] == status::implicitly_cut) {
+					vcg.set_activity(e.rc, vertex_state::inactive);
+				}
+			}
+			vcg.set_activity(rc, vertex_state::sink);
+		}
+
+		lb_incr = std::max(lb_incr, vcg.get_minimum_vertex_cut());
+		if (lb_base + lb_incr >= ub) return lb_base + lb_incr;
+	}
+
+	return lb_base + lb_incr;
 }
 
 status partial_partition::get_status(int rc) const {

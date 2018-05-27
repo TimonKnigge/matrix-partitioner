@@ -129,7 +129,7 @@ vertex_state vertex_cut_graph::get_activity(int u) const {
 	return state[u];
 }
 
-int vertex_cut_graph::get_maximum_vertex_cut() const {
+int vertex_cut_graph::get_minimum_vertex_cut() const {
 	return flow;
 }
 

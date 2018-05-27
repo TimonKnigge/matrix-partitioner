@@ -73,8 +73,23 @@ int bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
 	if (step.rt == recursion_type::descend) {
 		lb = pp.assign(step.rc, step.s, upper_bound);
 
+		// Branch again.
 		++current_rcs;
 		if (current_rcs < rcs.size() && lb < upper_bound) {
+			// We consider what vertex to branch on. The candidates are
+			// rcs[current_rcs, ..). 
+			// Strategy:
+			//	- Prioritize implicitly cut
+			//	- We pick the one that has the most free nonzeros.
+			for (size_t i = current_rcs + 1; i < rcs.size(); ++i) {
+				if (pp.get_free_nonzeros(rcs[current_rcs])
+						< pp.get_free_nonzeros(rcs[i])
+						|| pp.get_status(rcs[i]) == status::implicitly_cut)
+					std::swap(rcs[current_rcs], rcs[i]);
+			}
+
+			// Recurse on the cut last (note that branches are executed on a
+			// stack and thus in reverse order).
 			recurse(rcs[current_rcs], status::cut, call_stack, pp);
 
 			// First branch on the smaller component.

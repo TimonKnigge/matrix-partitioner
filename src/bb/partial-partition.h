@@ -76,6 +76,9 @@ class partial_partition {
 	// Retrieve the size of one side of the partition.
 	int get_partition_size(int side) const;
 
+	// How many free nonzeros there are in this row/column.
+	int get_free_nonzeros(int rc) const;
+
 	// Friend for debugging.
 	friend void print_ppmatrix(std::ostream &stream,
 		const partial_partition &pp);

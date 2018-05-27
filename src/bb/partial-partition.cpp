@@ -294,4 +294,10 @@ int partial_partition::get_partition_size(int side) const {
 	return partition_size[side];
 }
 
+int partial_partition::get_free_nonzeros(int rc) const {
+	return (int)m[rc].size()
+		- color_count[0][rc]
+		- color_count[1][rc];
+}
+
 }

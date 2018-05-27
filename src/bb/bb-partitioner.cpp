@@ -41,7 +41,7 @@ bool bbpartitioner::partition(const matrix &m, std::vector<status> &row,
 	col.assign(m.C, status::unassigned);
 
 	// Solve and store optimal status.
-	int optimal_value = solve(recursion_order, pp, optimal_status);
+	int optimal_value = solve(recursion_order, pp, optimal_status, 0);
 	for (int r = 0; r < m.R; ++r) row[r] = optimal_status[r];
 	for (int c = 0; c < m.C; ++c) col[c] = optimal_status[m.R + c];
 	std::cerr << "Finished, found partition of size " << optimal_value
@@ -91,7 +91,7 @@ int bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
 }
 
 int bbpartitioner::solve(std::vector<int> &rcs, partial_partition &pp,
-		std::vector<status> &optimal_status, int suggestion) {
+		std::vector<status> &optimal_status, int slb, int sub) {
 	// `rcs` describes the order in which we pass through the rows/columns,
 	// rcs[current_rcs] is the next row/column to branch on.
 	size_t current_rcs = 0;
@@ -102,11 +102,13 @@ int bbpartitioner::solve(std::vector<int> &rcs, partial_partition &pp,
 	recurse(rcs[0], status::cut, call_stack, pp);
 	recurse(rcs[0], status::red, call_stack, pp);
 
+	// Pick a good starting bound.
+	int optimal_value = std::min(pp.m.R, pp.m.C) + 2;
+	if (sub > 0 && sub < optimal_value)
+		optimal_value = sub;
+
 	// Now we manually apply recursion steps until the call stack is empty,
 	// effectively traversing the B&B tree.
-	int optimal_value = std::min(pp.m.R, pp.m.C) + 2;
-	if (suggestion > 0 && suggestion < optimal_value)
-		optimal_value = suggestion;
 	while (!call_stack.empty()) {
 		int lb = make_step(call_stack, current_rcs, rcs, pp, optimal_value);
 		if (current_rcs == rcs.size()) {
@@ -116,6 +118,9 @@ int bbpartitioner::solve(std::vector<int> &rcs, partial_partition &pp,
 					optimal_status[i] = pp.get_status(i);
 				std::cerr << "Improved solution found with cost " << lb
 					<< std::endl;
+				// If we are already hitting the suggested lower bound we
+				// can stop.
+				if (slb >= optimal_value) return optimal_value;
 			}
 		}
 	}

@@ -24,9 +24,9 @@ class bbpartitioner : public partitioner {
   private:
 	bbparameters param;
 
-	// The suggestion is a suggested strict upperbound, if applicable.
+	// slb and sub are suggested lower and upperbounds. The solution will be sought in [slb, sub).
 	int solve(std::vector<int> &rcs, partial_partition &pp,
-		std::vector<status> &optimal_status, int suggestion = -1);
+		std::vector<status> &optimal_status, int slb = 0, int sub = -1);
 
 	// Returns the lower bound after a descend, -1 for an ascend.
 	int make_step(std::stack<recursion_step> &call_stack, size_t &current_rcs,

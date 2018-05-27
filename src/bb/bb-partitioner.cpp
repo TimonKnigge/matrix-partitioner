@@ -91,7 +91,7 @@ int bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
 }
 
 int bbpartitioner::solve(std::vector<int> &rcs, partial_partition &pp,
-		std::vector<status> &optimal_status) {
+		std::vector<status> &optimal_status, int suggestion) {
 	// `rcs` describes the order in which we pass through the rows/columns,
 	// rcs[current_rcs] is the next row/column to branch on.
 	size_t current_rcs = 0;
@@ -105,6 +105,8 @@ int bbpartitioner::solve(std::vector<int> &rcs, partial_partition &pp,
 	// Now we manually apply recursion steps until the call stack is empty,
 	// effectively traversing the B&B tree.
 	int optimal_value = std::min(pp.m.R, pp.m.C) + 2;
+	if (suggestion > 0 && suggestion < optimal_value)
+		optimal_value = suggestion;
 	while (!call_stack.empty()) {
 		int lb = make_step(call_stack, current_rcs, rcs, pp, optimal_value);
 		if (current_rcs == rcs.size()) {

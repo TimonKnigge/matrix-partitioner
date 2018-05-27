@@ -30,6 +30,9 @@ public:
 	// Construct a matrix from a given set of nonzeros.
 	matrix(int _R, int _C, std::vector<std::pair<int, int>> &nonzeros);
 
+	// Empty matrix constructor (for convenience).
+	matrix(int _R, int _C);
+
 	// Overload IO operator.
 	friend std::ostream &operator<<(std::ostream &stream, const matrix &m);
 

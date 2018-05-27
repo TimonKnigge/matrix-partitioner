@@ -29,6 +29,13 @@ matrix::matrix(int _R, int _C, std::vector<std::pair<int, int>> &nonzeros) {
 	}
 }
 
+matrix::matrix(int _R, int _C) {
+	R = _R;
+	C = _C;
+	NZ = 0;
+	Cmax = 0;
+}
+
 std::ostream &operator<<(std::ostream &stream, const matrix &m) {
 	print_matrix(stream, m);
 	return stream;

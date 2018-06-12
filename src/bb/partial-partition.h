@@ -45,11 +45,12 @@ class partial_partition {
 	// Note don't confuse with partition_size!!
 
 	// Also for the extended packing bound (for use during the DFS):
-	// For each vertex a stack and an index (explained in the DFS function).
+	// For each vertex a stack, a tree-size counter and an index
+	// (explained in the DFS function).
 	// The index vector is quickly resettable so it can be reused for each
 	// DFS.
 	std::vector<std::stack<int>> dfs_stack;
-	mp::rvector<size_t> dfs_index;
+	mp::rvector<size_t> dfs_index, dfs_tree_size;
 
 	// Compute a lower bound on the size of any extension of this partial
 	// partition. Called by assign.
@@ -83,6 +84,11 @@ class partial_partition {
 	//		pp.undo(rc, old_status)
 	//	}
 	void undo(int rc, status os);
+
+	// Grow a set of trees from the given side of the partition and return
+	// their sizes. Based on the current state of the partition and vertex
+	// cut graph.
+	std::vector<int> grow_trees(int c);
 
 	// Status of the given row/column.
 	status get_status(int rc) const;

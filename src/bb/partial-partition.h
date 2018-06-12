@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <stack>
+#include <unordered_set>
 #include <vector>
 
 #include "bb-parameters.h"
@@ -39,10 +40,9 @@ class partial_partition {
 	// A vertex cut graph for computing flows/minimal vertex cuts.
 	mp::vertex_cut_graph vcg;
 
-	// For the extended packing bound, a list of all rows and columns
-	// assigned a definitive side.
-	std::vector<int> partition_side[2];
-	// Note don't confuse with partition_size!!
+	// For the extended packing bound, we maintain a set of all partially
+	// colored rows and columns.
+	std::unordered_set<int> partition_front[2];
 
 	// Also for the extended packing bound (for use during the DFS):
 	// For each vertex a stack, a tree-size counter and an index
@@ -50,7 +50,7 @@ class partial_partition {
 	// The index vector is quickly resettable so it can be reused for each
 	// DFS.
 	std::vector<std::stack<int>> dfs_stack;
-	mp::rvector<size_t> dfs_index, dfs_tree_size;
+	mp::rvector<int> dfs_index, dfs_tree_size;
 
 	// Compute a lower bound on the size of any extension of this partial
 	// partition. Called by assign.

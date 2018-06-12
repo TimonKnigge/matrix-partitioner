@@ -30,7 +30,7 @@ int main() {
 
 	mp::bbpartitioner bb(mp::bbparameters{
 		true,		// packing bound
-		false,		// extended packing bound
+		true,		// extended packing bound
 		false,		// matching bound
 		true}		// flow bound
 	);

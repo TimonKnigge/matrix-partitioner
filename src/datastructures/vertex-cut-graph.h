@@ -51,7 +51,7 @@ private:
 
 	// Internally used rvectors (for finding augmenting paths).
 	// Give parent vertex and parent edge (index).
-	rvector<int> par, pari;
+	mp::rvector<int> par, pari;
 
 	// Flow manipulation. The coefficient c (1/-1) signals whether we are
 	// adding or removing flow. Pushes/pulls a single augmenting path.

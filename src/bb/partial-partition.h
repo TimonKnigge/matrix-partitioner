@@ -2,11 +2,13 @@
 #define PARTIAL_PARTITION_H
 
 #include <iostream>
+#include <stack>
 #include <vector>
 
 #include "bb-parameters.h"
 #include "../datastructures/matrix.h"
 #include "../datastructures/packing-set.h"
+#include "../datastructures/rvector.h"
 #include "../datastructures/vertex-cut-graph.h"
 #include "../partitioner/partition-util.h"
 
@@ -36,6 +38,18 @@ class partial_partition {
 
 	// A vertex cut graph for computing flows/minimal vertex cuts.
 	mp::vertex_cut_graph vcg;
+
+	// For the extended packing bound, a list of all rows and columns
+	// assigned a definitive side.
+	std::vector<int> partition_side[2];
+	// Note don't confuse with partition_size!!
+
+	// Also for the extended packing bound (for use during the DFS):
+	// For each vertex a stack and an index (explained in the DFS function).
+	// The index vector is quickly resettable so it can be reused for each
+	// DFS.
+	std::vector<std::stack<int>> dfs_stack;
+	mp::rvector<size_t> dfs_index;
 
 	// Compute a lower bound on the size of any extension of this partial
 	// partition. Called by assign.

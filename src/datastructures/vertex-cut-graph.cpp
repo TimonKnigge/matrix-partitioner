@@ -19,6 +19,13 @@ vertex_cut_graph::vertex_cut_graph(const matrix &m) : V(2 * (m.R + m.C)),
 	}
 }
 
+bool vertex_cut_graph::is_free(int u) const {
+	bool is_active = (get_activity(u) == vertex_state::active);
+	int ui = inv(u);
+	bool has_flow = (graph[ui][0].flow > 0);
+	return is_active && !has_flow;
+}
+
 void vertex_cut_graph::set_activity(int u, vertex_state s) {
 	if (get_activity(u) == s) return;
 

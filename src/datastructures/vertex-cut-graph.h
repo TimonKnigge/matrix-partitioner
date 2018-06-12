@@ -39,6 +39,10 @@ public:
 	// Retrieve maximal vertex cut.
 	int get_minimum_vertex_cut() const;
 
+	// Check if vertex u is 'free', that is, if it is active and
+	// not part of a flow path.
+	bool is_free(int u) const;
+
 private:
 	// Current state of each vertex, in external terms.
 	std::vector<vertex_state> state;

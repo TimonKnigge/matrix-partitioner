@@ -18,7 +18,7 @@ partial_partition::partial_partition(const matrix &_m, bbparameters _param,
 			dfs_stack(_m.R + _m.C),
 			dfs_index(_m.R + _m.C, -1),
 			dfs_tree_size(_m.R + _m.C, 0),
-			dfront(_m.R + _m.C, -1),
+			dfront(_m.R + _m.C + 1, -1),
 			dfs_container(_m.R + _m.C, -1),
 			m(_m) {
 	color_count[0].assign(m.R + m.C, 0);
@@ -496,6 +496,7 @@ const mp::rvector<int> &partial_partition::get_dfront() {
 		q.push(rc);
 	}
 
+	int furthest = 0
 	while (!q.empty()) {
 		int rc = q.front();
 		int dst = dfront.get((size_t)rc);
@@ -504,9 +505,12 @@ const mp::rvector<int> &partial_partition::get_dfront() {
 			if (dfront.get((size_t)e.rc) == -1) {
 				dfront.set((size_t)e.rc, dst + 2);
 				q.push(e.rc);
+				furthest = dst + 2;
 			}
 		}
 	}
+	// Sneak in the max distance as well.
+	dfront.set((size_t)(m.R + m.C), furthest);
 
 	return dfront;
 }

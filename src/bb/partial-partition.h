@@ -114,6 +114,8 @@ class partial_partition {
 	int get_guaranteed_lower_bound() const;
 
 	const mp::rvector<int> &get_dfront();
+	const mp::rvector<int> &get_dfs_container() const;
+	int get_average_subgraph_weight() const;
 
 	// Friend for debugging.
 	friend void print_ppmatrix(std::ostream &stream,

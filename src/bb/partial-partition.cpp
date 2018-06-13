@@ -511,8 +511,11 @@ const mp::rvector<int> &partial_partition::get_dfront() {
 	return dfront;
 }
 
-const mp::rvector<int> &partial_partition::get_dfs_container() const {
-	return dfs_container;
+int partial_partition::get_subgraph_weight(int rc) const {
+	int root = dfs_container.get((size_t)rc);
+	if (root < 0)
+		return get_average_subgraph_weight();
+	return dfs_tree_size.get((size_t)root);
 }
 
 int partial_partition::get_average_subgraph_weight() const {

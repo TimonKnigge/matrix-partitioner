@@ -35,6 +35,11 @@ class bbpartitioner : public partitioner {
 	void recurse(int rc, status stat, std::stack<recursion_step> &call_stack,
 		const partial_partition &pp);
 
+	// Pick the next vertex to branch on. Just moves it into position
+	// rcs[current_rcs] so the algorithm will pick it up.
+	bool pick_next(size_t &current_rcs, std::vector<int> &rcs,
+		partial_partition &pp, int lower_bound, int upper_bound);
+
   public:
 	bbpartitioner(bbparameters _param) : param(_param) { }
 

@@ -52,6 +52,9 @@ class partial_partition {
 	std::vector<std::stack<int>> dfs_stack;
 	mp::rvector<int> dfs_index, dfs_tree_size;
 
+	// Rvectors for computing the distance of free vertices from the front.
+	mp::rvector<int> dfront;
+
 	// Compute a lower bound on the size of any extension of this partial
 	// partition. Called by assign.
 	int incremental_lower_bound(int rc, status s, int ub);
@@ -104,6 +107,8 @@ class partial_partition {
 
 	// How many actual rows/columns have been cut (no lowerbounding).
 	int get_guaranteed_lower_bound() const;
+
+	const mp::rvector<int> &get_dfront();
 
 	// Friend for debugging.
 	friend void print_ppmatrix(std::ostream &stream,

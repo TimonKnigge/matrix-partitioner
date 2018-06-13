@@ -18,6 +18,7 @@ partial_partition::partial_partition(const matrix &_m, bbparameters _param,
 			dfs_stack(_m.R + _m.C),
 			dfs_index(_m.R + _m.C, -1),
 			dfs_tree_size(_m.R + _m.C, 0),
+			dfront(_m.R + _m.C, -1),
 			m(_m) {
 	color_count[0].assign(m.R + m.C, 0);
 	color_count[1].assign(m.R + m.C, 0);
@@ -471,6 +472,35 @@ int partial_partition::get_guaranteed_lower_bound() const {
 	return cut;
 }
 
+const mp::rvector<int> &partial_partition::get_dfront() {
+	dfront.reset_all();
+	int small = 0, large = 1;
+	if (partition_size[small] > partition_size[large])
+		std::swap(small, large);
 
+	std::queue<int> q;
+	for (int rc : partition_front[small]) {
+		dfront.set((size_t)rc, 0);
+		q.push(rc);
+	}
+	for (int rc : partition_front[large]) {
+		dfront.set((size_t)rc, 1);
+		q.push(rc);
+	}
+
+	while (!q.empty()) {
+		int rc = q.front();
+		int dst = dfront.get((size_t)rc);
+		q.pop();
+		for (const auto &e : m[rc]) {
+			if (dfront.get((size_t)e.rc) == -1) {
+				dfront.set((size_t)e.rc, dst + 2);
+				q.push(e.rc);
+			}
+		}
+	}
+
+	return dfront;
+}
 
 }

@@ -146,8 +146,11 @@ int partial_partition::assign(int rc, status s, int ub) {
 	stat[rc] = s;
 
 	// We start adjusting the lower bound to see if it exceeds ub.
-	int lb = incremental_lower_bound(rc, s, ub);
-	return lb;
+	// If we go from implicitly cut to cut, there is no need to recompute
+	// anything!
+	if (!(os == status::implicitly_cut && s == status::cut))
+		lower_bound_cache = incremental_lower_bound(rc, s, ub);
+	return lower_bound_cache;
 }
 
 void partial_partition::undo(int rc, status os) {

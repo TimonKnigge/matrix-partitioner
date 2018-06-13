@@ -56,6 +56,9 @@ class partial_partition {
 	// partition. Called by assign.
 	int incremental_lower_bound(int rc, status s, int ub);
 
+	// Cache the lower bound, sometimes we do not need to recompute anything.
+	int lower_bound_cache = -1;
+
   public:
 	// The matrix partitioned.
 	const matrix &m;

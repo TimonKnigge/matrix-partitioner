@@ -11,7 +11,6 @@
 #include "partitioner/partition-util.h"
 
 constexpr float eps = 0.03f;
-constexpr std::clock_t timelimit = 100000000;
 
 int main() {
 	std::ios::sync_with_stdio(false);
@@ -37,7 +36,7 @@ int main() {
 		1.25f		// scaling factor
 	});
 	std::vector<mp::status> rowstat, colstat;
-	if (!bb.partition(cmat, rowstat, colstat, eps, timelimit)) {
+	if (!bb.partition(cmat, rowstat, colstat, eps)) {
 		std::cerr << "Partitioning failed." << std::endl;
 		return 0;
 	}

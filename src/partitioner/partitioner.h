@@ -1,7 +1,6 @@
 #ifndef PARTITIONER_H
 #define PARTITIONER_H
 
-#include <chrono>
 #include <vector>
 
 #include "./partition-util.h"
@@ -15,7 +14,7 @@ class partitioner {
 	// Partition a given matrix, and store the assignment in row and col.
 	// Returns true upon succes, false upon failure.
 	virtual bool partition(const matrix &m, std::vector<status> &row,
-		std::vector<status> &col, float epsilon, std::clock_t clocks) = 0;
+		std::vector<status> &col, float epsilon) = 0;
 
 	virtual ~partitioner() {};
 };

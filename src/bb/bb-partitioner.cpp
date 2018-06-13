@@ -9,7 +9,7 @@
 namespace mp {
 
 bool bbpartitioner::partition(const matrix &m, std::vector<status> &row,
-		std::vector<status> &col, float epsilon, std::clock_t clocks) {
+		std::vector<status> &col, float epsilon) {
 	bool valid;
 	std::string error;
 	std::tie(valid, error) = param.valid();

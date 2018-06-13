@@ -17,8 +17,12 @@ struct bbparameters {
 		// Whether or not to use the flow bound.
 		fb;
 
-	bbparameters(bool _pb, bool _epb, bool _mb, bool _fb)
-		: pb(_pb), epb(_epb), mb(_mb), fb(_fb) { }
+	// The initial upperbound to try, and the incremental scaling factor.
+	const int U0;
+	const float Uf;
+
+	bbparameters(bool _pb, bool _epb, bool _mb, bool _fb, int _U0, float _Uf)
+		: pb(_pb), epb(_epb), mb(_mb), fb(_fb), U0(_U0), Uf(_Uf) { }
 
 	// Returns whether or not the configuration is valid, and if not, a string
 	// describing the problem.

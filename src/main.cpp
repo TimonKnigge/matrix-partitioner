@@ -32,8 +32,10 @@ int main() {
 		true,		// packing bound
 		true,		// extended packing bound
 		false,		// matching bound
-		true}		// flow bound
-	);
+		true,		// flow bound
+		1,			// initial upperbound
+		1.25f		// scaling factor
+	});
 	std::vector<mp::status> rowstat, colstat;
 	if (!bb.partition(cmat, rowstat, colstat, eps, timelimit)) {
 		std::cerr << "Partitioning failed." << std::endl;

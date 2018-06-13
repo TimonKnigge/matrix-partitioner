@@ -1,6 +1,7 @@
 #include "./bb-partitioner.h"
 
 #include <algorithm>
+#include <cmath>
 #include <numeric>
 
 #include "../datastructures/matrix-util.h"
@@ -41,7 +42,14 @@ bool bbpartitioner::partition(const matrix &m, std::vector<status> &row,
 	col.assign(m.C, status::unassigned);
 
 	// Solve and store optimal status.
-	int optimal_value = solve(recursion_order, pp, optimal_status, 0);
+	int optimal_value = 1;
+	for (int U = param.U0, PU = -1;;
+			PU = U, U = int(std::ceil(param.Uf * U))) {
+		std::cerr << "Running with bound " << U << std::endl;
+		optimal_value = solve(recursion_order, pp, optimal_status, PU, U);
+		if (optimal_value < U) break;
+	}
+
 	for (int r = 0; r < m.R; ++r) row[r] = optimal_status[r];
 	for (int c = 0; c < m.C; ++c) col[c] = optimal_status[m.R + c];
 	std::cerr << "Finished, found partition of size " << optimal_value
@@ -84,7 +92,8 @@ int bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
 			for (size_t i = current_rcs + 1; i < rcs.size(); ++i) {
 				if (pp.get_free_nonzeros(rcs[current_rcs])
 						< pp.get_free_nonzeros(rcs[i])
-						|| pp.get_status(rcs[i]) == status::implicitly_cut)
+						|| (pp.get_status(rcs[i]) == status::implicitly_cut
+							&& pp.get_status(rcs[current_rcs]) != status::implicitly_cut))
 					std::swap(rcs[current_rcs], rcs[i]);
 			}
 
@@ -142,7 +151,9 @@ int bbpartitioner::solve(std::vector<int> &rcs, partial_partition &pp,
 					<< std::endl;
 				// If we are already hitting the suggested lower bound we
 				// can stop.
-				if (slb >= optimal_value) return optimal_value;
+				if (slb >= optimal_value) {
+					return optimal_value;
+				}
 			}
 		}
 	}

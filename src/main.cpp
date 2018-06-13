@@ -43,11 +43,11 @@ int main() {
 
 	// Print if small enough.
 	if (cmat.R <= 60 && cmat.C <= 60) {
-		print_partitioned_compressed_matrix(std::cerr, mat, idm, rowstat,
+		mp::print_partitioned_compressed_matrix(std::cerr, mat, idm, rowstat,
 			colstat);
 	}
 
-	print_partitioned_compressed_mm(std::cout, mat, idm, rowstat, colstat);
+	mp::print_partitioned_compressed_mm(std::cout, mat, idm, rowstat, colstat);
 
 	return 0;
 }

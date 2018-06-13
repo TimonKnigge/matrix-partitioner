@@ -19,6 +19,7 @@ partial_partition::partial_partition(const matrix &_m, bbparameters _param,
 			dfs_index(_m.R + _m.C, -1),
 			dfs_tree_size(_m.R + _m.C, 0),
 			dfront(_m.R + _m.C, -1),
+			dfs_container(_m.R + _m.C, -1),
 			m(_m) {
 	color_count[0].assign(m.R + m.C, 0);
 	color_count[1].assign(m.R + m.C, 0);
@@ -372,12 +373,15 @@ std::vector<int> partial_partition::grow_trees(int c) {
 	// Reset/initialize all required datastructures.
 	dfs_index.reset_all();
 	dfs_tree_size.reset_all();
+	dfs_container.reset_all();
+	subgraph_size_sums = subgraph_count = 0;
 	mp::min_heap<int> dfs_heap;
 	for (int rc : partition_front[c]) {
 		if (vcg.is_free(rc)) {
 			dfs_heap.push(key_value<int>{0, rc});
 			dfs_stack[rc].push(rc);
 			dfs_index.set((size_t)rc, 0);
+			dfs_container.set((size_t)rc, rc);
 		}
 	}
 
@@ -429,6 +433,7 @@ std::vector<int> partial_partition::grow_trees(int c) {
 				if (vsi < 0) {
 					// We can claim the vertex as well! Do it.
 					dfs_index.set((size_t)v, 0);
+					dfs_container.set((size_t)v, rc);
 					st.push(v);
 				}
 			}
@@ -448,8 +453,11 @@ std::vector<int> partial_partition::grow_trees(int c) {
 	std::vector<int> subgraph_sizes;
 	for (int rc : partition_front[c]) {
 		int sz = dfs_tree_size.get(rc);
-		if (sz > 0)
+		if (sz > 0) {
 			subgraph_sizes.push_back(sz);
+			subgraph_size_sums += sz;
+			subgraph_count += 1;
+		}
 	}
 	return subgraph_sizes;
 }

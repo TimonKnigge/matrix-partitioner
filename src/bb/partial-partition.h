@@ -52,8 +52,13 @@ class partial_partition {
 	std::vector<std::stack<int>> dfs_stack;
 	mp::rvector<int> dfs_index, dfs_tree_size;
 
-	// Rvectors for computing the distance of free vertices from the front.
+	// For branching order we maintain/compute some per-vertex statistics.
+	// - the distance of free vertices from the front.
+	// - the subgraph (EPB) containing this vertex
+	// - average subgraph size, jic
 	mp::rvector<int> dfront;
+	mp::rvector<int> dfs_container;
+	int subgraph_size_sums = 0, subgraph_count = 0;
 
 	// Compute a lower bound on the size of any extension of this partial
 	// partition. Called by assign.

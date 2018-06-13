@@ -467,4 +467,10 @@ int partial_partition::get_free_nonzeros(int rc) const {
 		- color_count[1][rc];
 }
 
+int partial_partition::get_guaranteed_lower_bound() const {
+	return cut;
+}
+
+
+
 }

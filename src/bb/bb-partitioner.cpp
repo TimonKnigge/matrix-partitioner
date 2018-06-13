@@ -110,7 +110,7 @@ int bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
 			// vertex is NOT implicitly cut, there is no need to branch on
 			// the cut.
 			if (pp.get_status(rcs[current_rcs]) == mp::status::implicitly_cut
-					|| lb + 1 < upper_bound)
+					|| pp.get_guaranteed_lower_bound() + 1 < upper_bound)
 				recurse(rcs[current_rcs], status::cut, call_stack, pp);
 
 			// First branch on the smaller component.

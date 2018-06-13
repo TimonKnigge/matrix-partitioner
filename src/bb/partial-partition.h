@@ -102,6 +102,9 @@ class partial_partition {
 	// How many free nonzeros there are in this row/column.
 	int get_free_nonzeros(int rc) const;
 
+	// How many actual rows/columns have been cut (no lowerbounding).
+	int get_guaranteed_lower_bound() const;
+
 	// Friend for debugging.
 	friend void print_ppmatrix(std::ostream &stream,
 		const partial_partition &pp);

@@ -496,7 +496,7 @@ const mp::rvector<int> &partial_partition::get_dfront() {
 		q.push(rc);
 	}
 
-	int furthest = 0
+	int furthest = 0;
 	while (!q.empty()) {
 		int rc = q.front();
 		int dst = dfront.get((size_t)rc);

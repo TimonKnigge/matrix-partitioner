@@ -76,15 +76,32 @@ bool bbpartitioner::pick_next(size_t &current_rcs, std::vector<int> &rcs,
 	if (current_rcs == rcs.size() || lower_bound >= upper_bound)
 		return false;
 
-	// First we branch on implicitly cut vertices, if they exist. Otherwise
-	// we pick the vertex with the largest degree.
+	// First we branch on implicitly cut vertices, if they exist.
 	for (size_t i = current_rcs; i < rcs.size(); ++i) {
 		if (pp.get_status(rcs[i]) == status::implicitly_cut) {
 			std::swap(rcs[current_rcs], rcs[i]);
-			break;
+			return true;
 		}
-		if (pp.get_free_nonzeros(rcs[i])
-				> pp.get_free_nonzeros(rcs[current_rcs])) {
+	}
+
+	// If not, we aggregate some statistics for each vertex and pick the
+	// (subjectively) best option.
+	long long curscore = -1LL;
+	const mp::rvector<int> &dfront = pp.get_dfront();
+	int mxdist = dfront.get((size_t)(pp.m.R + pp.m.C));
+	for (size_t i = current_rcs; i < rcs.size(); ++i) {
+		int free = pp.get_free_nonzeros(rcs[i]);
+		int sbgw = pp.get_subgraph_weight(rcs[i]);
+		int dfrt = dfront.get(rcs[i]); // Can be -1 !
+
+		long long score = 1;
+		score *= (long long)(1 + free);
+		score *= (long long)(1 + free);
+		score *= (long long)(1 + sbgw);
+		score *= (long long)(1 + (dfrt < 0 ? mxdist + 1 : dfrt / 2));
+		score *= (long long)(dfrt < 0 || dfrt % 2 == 1 ? 1LL : 10LL);
+		if (score > curscore) {
+			curscore = score;
 			std::swap(rcs[current_rcs], rcs[i]);
 		}
 	}

@@ -4,8 +4,10 @@
 #include <numeric>
 #include <queue>
 
+#include "../datastructures/matrix-util.h"
 #include "../datastructures/min-heap.h"
 #include "../io/output.h"
+#include "../partitioner/partition-util.h"
 
 namespace mp {
 
@@ -19,8 +21,8 @@ partial_partition::partial_partition(const matrix &_m, bbparameters _param,
 			dfs_index(_m.R + _m.C, -1),
 			dfs_tree_size(_m.R + _m.C, 0),
 			m(_m) {
-	color_count[0].assign(m.R + m.C, 0);
-	color_count[1].assign(m.R + m.C, 0);
+	color_count[RED].assign(m.R + m.C, 0);
+	color_count[BLUE].assign(m.R + m.C, 0);
 }
 
 bool partial_partition::can_assign(int rc, status s) const {
@@ -62,7 +64,8 @@ int partial_partition::assign(int rc, status s, int ub) {
 
 			if (param.pb) {
 				int free = m[rc].size() - color_count[color][rc];
-				simple_packing_set[rc < m.R ? 0 : 1][color].remove(free);
+				simple_packing_set[rc < m.R ? ROWS : COLS][color]
+					.remove(free);
 			}
 			if (param.epb) {
 				std::unordered_set<int> &front = partition_front[color];
@@ -91,13 +94,11 @@ int partial_partition::assign(int rc, status s, int ub) {
 				if (is == s) continue;
 
 				// Check how many nonzeros are still free.
-				int free = m[e.rc].size()
-					- color_count[0][e.rc]
-					- color_count[1][e.rc];
+				int free = get_free_nonzeros(e.rc);
 				// If using the simple packing bound, remove from packing set.
 				if (param.pb && is_partial(is)) {
 					int ocolor = get_color(is);
-					simple_packing_set[e.rc < m.R ? 0 : 1][ocolor]
+					simple_packing_set[e.rc < m.R ? ROWS : COLS][ocolor]
 						.remove(free);
 				}
 				// Certainly this nonzero is no longer free.
@@ -132,7 +133,8 @@ int partial_partition::assign(int rc, status s, int ub) {
 
 				// If the simple packing bound is enabled, add again.
 				if (param.pb && is_partial(stat[e.rc])) {
-					simple_packing_set[e.rc < m.R ? 0 : 1][color].add(free);
+					simple_packing_set[e.rc < m.R ? ROWS : COLS][color]
+						.add(free);
 				}
 			}
 			break;
@@ -176,12 +178,10 @@ void partial_partition::undo(int rc, status os) {
 				if (is == s) continue;
 
 				// Check how many nonzeros are still free.
-				int free = m[e.rc].size()
-					- color_count[0][e.rc]
-					- color_count[1][e.rc];
+				int free = get_free_nonzeros(e.rc);
 				// If using the simple packing bound, remove from packing set.
 				if (param.pb && is_partial(is)) {
-					simple_packing_set[e.rc < m.R ? 0 : 1][color]
+					simple_packing_set[e.rc < m.R ? ROWS : COLS][color]
 						.remove(free);
 				}
 				// Certainly this nonzero is free again.
@@ -222,7 +222,8 @@ void partial_partition::undo(int rc, status os) {
 				// If the simple packing bound is enabled, add again.
 				if (param.pb && is_partial(stat[e.rc])) {
 					int ocolor = get_color(stat[e.rc]);
-					simple_packing_set[e.rc < m.R ? 0 : 1][ocolor].add(free);
+					simple_packing_set[e.rc < m.R ? ROWS : COLS][ocolor]
+						.add(free);
 				}
 			}
 			break;
@@ -244,7 +245,8 @@ void partial_partition::undo(int rc, status os) {
 
 			if (param.pb) {
 				int free = m[rc].size() - color_count[color][rc];
-				simple_packing_set[rc < m.R ? 0 : 1][color].add(free);
+				simple_packing_set[rc < m.R ? ROWS : COLS][color]
+					.add(free);
 			}
 			if (param.epb) {
 				partition_front[color].insert(rc);
@@ -279,8 +281,8 @@ int partial_partition::incremental_lower_bound(int rc, status s, int ub) {
 	// Simple packing bound.
 	if (param.pb) {
 		int pbv = 0;
-		for (int roc = 0; roc < 2; ++roc) {
-			for (int c = 0; c < 2; ++c) {
+		for (int roc : {ROWS, COLS}) {
+			for (int c : {RED, BLUE}) {
 				int max_allowed = max_partition_size - partition_size[c];
 				int available = simple_packing_set[roc][c].total_sum();
 				if (max_allowed >= available) continue;
@@ -333,7 +335,7 @@ int partial_partition::incremental_lower_bound(int rc, status s, int ub) {
 		// recomputing everything here -> only one side needs to be
 		// recomputed?
 		int epbv = 0;
-		for (int c = 0; c < 2; ++c) {
+		for (int c : {RED, BLUE}) {
 			// We consider side c. We compute (the sizes of) a set of
 			// trees springing from this side.
 			std::vector<int> sizes = grow_trees(c);
@@ -464,8 +466,8 @@ int partial_partition::get_partition_size(int side) const {
 
 int partial_partition::get_free_nonzeros(int rc) const {
 	return (int)m[rc].size()
-		- color_count[0][rc]
-		- color_count[1][rc];
+		- color_count[RED][rc]
+		- color_count[BLUE][rc];
 }
 
 int partial_partition::get_guaranteed_lower_bound() const {

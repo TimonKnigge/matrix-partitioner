@@ -2,14 +2,17 @@
 
 #include <algorithm>
 #include <cmath>
+#include <ctime>
 #include <numeric>
 
 #include "../datastructures/matrix-util.h"
 
 namespace mp {
 
+constexpr long long PERIOD_SMALL = 10000LL;
+
 bool bbpartitioner::partition(const matrix &m, std::vector<status> &row,
-		std::vector<status> &col, float epsilon) {
+		std::vector<status> &col, float epsilon, long long tl) {
 	bool valid;
 	std::string error;
 	std::tie(valid, error) = param.valid();
@@ -43,19 +46,29 @@ bool bbpartitioner::partition(const matrix &m, std::vector<status> &row,
 
 	// Solve and store optimal status.
 	int optimal_value = 1;
+	double start = (double)clock();
 	for (int U = param.U0, PU = -1;;
 			PU = U, U = int(std::ceil(param.Uf * U))) {
 		std::cerr << "Running with bound " << U << std::endl;
-		optimal_value = solve(recursion_order, pp, optimal_status, PU, U);
+		optimal_value = solve(recursion_order, pp, optimal_status,
+					tl > 0 ? start + tl * CLOCKS_PER_SEC : 0.0,
+					PU, U);
 		if (optimal_value < U) break;
 	}
 
 	for (int r = 0; r < m.R; ++r) row[r] = optimal_status[r];
 	for (int c = 0; c < m.C; ++c) col[c] = optimal_status[m.R + c];
-	std::cerr << "Finished, found partition of size " << optimal_value
-		<< std::endl;
-
-	return true;
+	if (optimal_value >= 0) {
+		std::cerr << "Finished, found partition of size " << optimal_value
+			<< std::endl;
+		std::cerr << "Used ~" << int(std::ceil(clock()-start)/CLOCKS_PER_SEC)
+			<< " seconds." << std::endl;
+		return true;
+	} else {
+		std::cerr << "Out of time, last upperbound was " << -optimal_value
+			<< std::endl;
+		return false;
+	}
 }
 
 void bbpartitioner::recurse(int rc, status stat,
@@ -143,7 +156,8 @@ int bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
 }
 
 int bbpartitioner::solve(std::vector<int> &rcs, partial_partition &pp,
-		std::vector<status> &optimal_status, int slb, int sub) {
+		std::vector<status> &optimal_status, double limit,
+		int slb, int sub) {
 	// `rcs` describes the order in which we pass through the rows/columns,
 	// rcs[current_rcs] is the next row/column to branch on.
 	size_t current_rcs = 0;
@@ -161,6 +175,7 @@ int bbpartitioner::solve(std::vector<int> &rcs, partial_partition &pp,
 
 	// Now we manually apply recursion steps until the call stack is empty,
 	// effectively traversing the B&B tree.
+	long long progress_counter = 0;
 	while (!call_stack.empty()) {
 		int lb = make_step(call_stack, current_rcs, rcs, pp, optimal_value);
 		if (current_rcs == rcs.size()) {
@@ -175,6 +190,14 @@ int bbpartitioner::solve(std::vector<int> &rcs, partial_partition &pp,
 				if (slb >= optimal_value) {
 					return optimal_value;
 				}
+			}
+		}
+
+		progress_counter++;
+		if (progress_counter % PERIOD_SMALL == 0LL) {
+			if (limit > 1 && clock() > limit) {
+				// Out of time.
+				return -optimal_value;
 			}
 		}
 	}

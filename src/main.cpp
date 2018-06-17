@@ -11,7 +11,7 @@
 #include "partitioner/partition-util.h"
 
 constexpr float eps_default = 0.03f;
-constexpr long long timelimit_default = 60LL;
+constexpr long long timelimit_default = 0LL;
 
 void parse_arguments(int argc, char** argv, float &eps, long long &timelimit) {
 	if (argc > 1) {
@@ -43,7 +43,8 @@ int main(int argc, char** argv) {
 
 	std::cerr << "Read " << cmat.R << 'x' << cmat.C << " matrix with "
 		<< cmat.NZ << " nonzeros (after compression)" << std::endl;
-	std::cerr << "Attempting partitioning with eps=" << eps << std::endl;
+	std::cerr << "Attempting partitioning with eps=" << eps << " in ";
+	std::cerr << timelimit << " seconds." << std::endl;
 
 	mp::bbpartitioner bb(mp::bbparameters{
 		true,		// packing bound
@@ -54,7 +55,7 @@ int main(int argc, char** argv) {
 		1.25f		// scaling factor
 	});
 	std::vector<mp::status> rowstat, colstat;
-	if (!bb.partition(cmat, rowstat, colstat, eps)) {
+	if (!bb.partition(cmat, rowstat, colstat, eps, timelimit)) {
 		std::cerr << "Partitioning failed." << std::endl;
 		return 0;
 	}

@@ -24,9 +24,12 @@ class bbpartitioner : public partitioner {
   private:
 	bbparameters param;
 
-	// slb and sub are suggested lower and upperbounds. The solution will be sought in [slb, sub).
+	// slb and sub are suggested lower and upperbounds. The solution will be
+	// sought in [slb, sub). Returns -best-so-far when out of time. Limit
+	// should be compared to clock() (i.e. set to clock()+t*CLOCKS_PER_SEC).
 	int solve(std::vector<int> &rcs, partial_partition &pp,
-		std::vector<status> &optimal_status, int slb = 0, int sub = -1);
+		std::vector<status> &optimal_status, double limit,
+		int slb = 0, int sub = -1);
 
 	// Returns the lower bound after a descend, -1 for an ascend.
 	int make_step(std::stack<recursion_step> &call_stack, size_t &current_rcs,
@@ -44,7 +47,7 @@ class bbpartitioner : public partitioner {
 	bbpartitioner(bbparameters _param) : param(_param) { }
 
 	virtual bool partition(const matrix &m, std::vector<status> &row,
-		std::vector<status> &col, float epsilon);
+		std::vector<status> &col, float epsilon, long long tl);
 };
 
 }

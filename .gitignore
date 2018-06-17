@@ -8,3 +8,6 @@
 *.o
 *.d
 *.out
+
+# Output
+mp

@@ -9,6 +9,5 @@ debug info is written to standard error. Reading from and writing to files can
 easily be achieved by piping:
 
 ```Bash
-./mp < mtx/mymatrix.mtx > mtx/mymatrix_partitioned.mtx 2>
-mymatrix_debug.txt
+./mp < mtx/mymatrix.mtx > mtx/mymatrix_partitioned.mtx 2> mymatrix_debug.txt
 ```

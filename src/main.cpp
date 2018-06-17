@@ -55,18 +55,16 @@ int main(int argc, char** argv) {
 		1.25f		// scaling factor
 	});
 	std::vector<mp::status> rowstat, colstat;
-	if (!bb.partition(cmat, rowstat, colstat, eps, timelimit)) {
-		std::cerr << "Partitioning failed." << std::endl;
-		return 0;
+	if (bb.partition(cmat, rowstat, colstat, eps, timelimit)) {
+		std::cerr << "Partitioning succesful, printing to stdout now." << std::endl;
+		mp::print_partitioned_compressed_mm(std::cout, mat, idm, rowstat, colstat);
+	} else {
+		std::cerr << "Partitioning unsuccesful within timelimit." << std::endl;
+		if (!rowstat.empty() && rowstat[0] != mp::status::unassigned) {
+			std::cerr << "Got partitioning anyway, printing." << std::endl;
+			mp::print_partitioned_compressed_mm(std::cout, mat, idm, rowstat, colstat);
+		}
 	}
-
-	// Print if small enough.
-	if (cmat.R <= 60 && cmat.C <= 60) {
-		mp::print_partitioned_compressed_matrix(std::cerr, mat, idm, rowstat,
-			colstat);
-	}
-
-	mp::print_partitioned_compressed_mm(std::cout, mat, idm, rowstat, colstat);
 
 	return 0;
 }

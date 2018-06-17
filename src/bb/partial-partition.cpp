@@ -395,11 +395,15 @@ std::vector<int> partial_partition::grow_trees(int c) {
 		int u = st.top();
 
 		// Consider expanding the next edge from u, if possible. If not, pop.
-		int index = dfs_index.get((size_t)u);
-		dfs_index.set((size_t)u, index+1);
-		if (index == (int)m[u].size())
-			st.pop();
-		else {
+		bool claimed_edge = false;
+		while (!claimed_edge) {
+			int index = dfs_index.get((size_t)u);
+			if (index == (int)m[u].size()) {
+				st.pop();
+				break;
+			}
+			dfs_index.set((size_t)u, index+1);
+
 			// End point of the edge, and reverse index.
 			int v = m[u][index].rc;
 			int vi = m[u][index].index;
@@ -411,8 +415,7 @@ std::vector<int> partial_partition::grow_trees(int c) {
 			// the edge FIRST. If it is unassigned and unclaimed we may
 			// claim AND expand.
 			mp::status vs = get_status(v);
-			bool claimed_edge = false;
-			if (vs == color_to_status(c)) {
+			if (vs == color_to_status(c) || vs == color_to_status(1-c)) {
 				// Nothing, it is already red/blue and we can do nothing.
 			} else if (vs == status::cut || vs == status::implicitly_cut
 					|| !vcg.is_free(v)) {
@@ -433,14 +436,14 @@ std::vector<int> partial_partition::grow_trees(int c) {
 					st.push(v);
 				}
 			}
+		}
 
-			// If we claimed an edge, reinsert the stack.
-			if (claimed_edge) {
-				int sz = dfs_tree_size.get((size_t)rc);
-				dfs_tree_size.set((size_t)rc, sz + 1);
-				dfs_heap.pop();
-				dfs_heap.push(key_value<int>{sz + 1, rc});
-			}
+		// If we claimed an edge, reinsert the stack.
+		if (claimed_edge) {
+			int sz = dfs_tree_size.get((size_t)rc);
+			dfs_tree_size.set((size_t)rc, sz + 1);
+			dfs_heap.pop();
+			dfs_heap.push(key_value<int>{sz + 1, rc});
 		}
 	}
 

@@ -14,25 +14,25 @@ constexpr float eps_default = 0.03f;
 constexpr long long timelimit_default = 60LL;
 
 void parse_arguments(int argc, char** argv, float &eps, long long &timelimit) {
-  if (argc > 1) {
-    eps = atof(argv[1]);
-    std::cerr << "Read eps = " << eps << " from argv" << std::endl;
-  }
-  if (argc > 2) {
-    timelimit = atoll(argv[2]);
-    std::cerr << "Read timelimit of " << timelimit << " seconds from argv"
-              << std::endl;
-  }
+	if (argc > 1) {
+		eps = atof(argv[1]);
+		std::cerr << "Read eps = " << eps << " from argv" << std::endl;
+	}
+	if (argc > 2) {
+		timelimit = atoll(argv[2]);
+		std::cerr << "Read timelimit of " << timelimit << " seconds from argv"
+			<< std::endl;
+	}
 }
 
 int main(int argc, char** argv) {
 	std::ios::sync_with_stdio(false);
 	std::cin.tie(nullptr);
 
-        // Parse the input arguments.
-        float eps = eps_default;
-        long long timelimit = timelimit_default;
-        parse_arguments(argc, argv, eps, timelimit);
+	// Parse the input arguments.
+	float eps = eps_default;
+	long long timelimit = timelimit_default;
+	parse_arguments(argc, argv, eps, timelimit);
 
 	// Read matrix.
 	mp::matrix mat = mp::read_matrix(std::cin);

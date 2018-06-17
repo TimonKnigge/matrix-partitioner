@@ -52,14 +52,6 @@ class partial_partition {
 	std::vector<std::stack<int>> dfs_stack;
 	mp::rvector<int> dfs_index, dfs_tree_size;
 
-	// For branching order we maintain/compute some per-vertex statistics.
-	// - the distance of free vertices from the front.
-	// - the subgraph (EPB) containing this vertex
-	// - average subgraph size, jic
-	mp::rvector<int> dfront;
-	mp::rvector<int> dfs_container;
-	int subgraph_size_sums = 0, subgraph_count = 0;
-
 	// Compute a lower bound on the size of any extension of this partial
 	// partition. Called by assign.
 	int incremental_lower_bound(int rc, status s, int ub);
@@ -112,10 +104,6 @@ class partial_partition {
 
 	// How many actual rows/columns have been cut (no lowerbounding).
 	int get_guaranteed_lower_bound() const;
-
-	const mp::rvector<int> &get_dfront();
-	int get_subgraph_weight(int rc) const;
-	int get_average_subgraph_weight() const;
 
 	// Friend for debugging.
 	friend void print_ppmatrix(std::ostream &stream,

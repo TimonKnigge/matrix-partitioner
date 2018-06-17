@@ -18,8 +18,6 @@ partial_partition::partial_partition(const matrix &_m, bbparameters _param,
 			dfs_stack(_m.R + _m.C),
 			dfs_index(_m.R + _m.C, -1),
 			dfs_tree_size(_m.R + _m.C, 0),
-			dfront(_m.R + _m.C + 1, -1),
-			dfs_container(_m.R + _m.C, -1),
 			m(_m) {
 	color_count[0].assign(m.R + m.C, 0);
 	color_count[1].assign(m.R + m.C, 0);
@@ -373,15 +371,12 @@ std::vector<int> partial_partition::grow_trees(int c) {
 	// Reset/initialize all required datastructures.
 	dfs_index.reset_all();
 	dfs_tree_size.reset_all();
-	dfs_container.reset_all();
-	subgraph_size_sums = subgraph_count = 0;
 	mp::min_heap<int> dfs_heap;
 	for (int rc : partition_front[c]) {
 		if (vcg.is_free(rc)) {
 			dfs_heap.push(key_value<int>{0, rc});
 			dfs_stack[rc].push(rc);
 			dfs_index.set((size_t)rc, 0);
-			dfs_container.set((size_t)rc, rc);
 		}
 	}
 
@@ -433,7 +428,6 @@ std::vector<int> partial_partition::grow_trees(int c) {
 				if (vsi < 0) {
 					// We can claim the vertex as well! Do it.
 					dfs_index.set((size_t)v, 0);
-					dfs_container.set((size_t)v, rc);
 					st.push(v);
 				}
 			}
@@ -455,8 +449,6 @@ std::vector<int> partial_partition::grow_trees(int c) {
 		int sz = dfs_tree_size.get(rc);
 		if (sz > 0) {
 			subgraph_sizes.push_back(sz);
-			subgraph_size_sums += sz;
-			subgraph_count += 1;
 		}
 	}
 	return subgraph_sizes;
@@ -478,54 +470,6 @@ int partial_partition::get_free_nonzeros(int rc) const {
 
 int partial_partition::get_guaranteed_lower_bound() const {
 	return cut;
-}
-
-const mp::rvector<int> &partial_partition::get_dfront() {
-	dfront.reset_all();
-	int small = 0, large = 1;
-	if (partition_size[small] > partition_size[large])
-		std::swap(small, large);
-
-	std::queue<int> q;
-	for (int rc : partition_front[small]) {
-		dfront.set((size_t)rc, 0);
-		q.push(rc);
-	}
-	for (int rc : partition_front[large]) {
-		dfront.set((size_t)rc, 1);
-		q.push(rc);
-	}
-
-	int furthest = 0;
-	while (!q.empty()) {
-		int rc = q.front();
-		int dst = dfront.get((size_t)rc);
-		q.pop();
-		for (const auto &e : m[rc]) {
-			if (dfront.get((size_t)e.rc) == -1) {
-				dfront.set((size_t)e.rc, dst + 2);
-				q.push(e.rc);
-				furthest = dst + 2;
-			}
-		}
-	}
-	// Sneak in the max distance as well.
-	dfront.set((size_t)(m.R + m.C), furthest);
-
-	return dfront;
-}
-
-int partial_partition::get_subgraph_weight(int rc) const {
-	int root = dfs_container.get((size_t)rc);
-	if (root < 0)
-		return get_average_subgraph_weight();
-	return dfs_tree_size.get((size_t)root);
-}
-
-int partial_partition::get_average_subgraph_weight() const {
-	if (subgraph_count == 0)
-		return 0;
-	return subgraph_size_sums / subgraph_count;
 }
 
 }

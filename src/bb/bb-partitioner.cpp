@@ -9,7 +9,7 @@
 
 namespace mp {
 
-constexpr long long PERIOD_SMALL = 10000LL;
+constexpr long long PERIOD_SMALL = 1000LL;
 
 bool bbpartitioner::partition(const matrix &m, std::vector<status> &row,
 		std::vector<status> &col, float epsilon, long long tl) {

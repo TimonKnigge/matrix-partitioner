@@ -47,7 +47,7 @@ bool bbpartitioner::partition(const matrix &m, std::vector<status> &row,
 	// Solve and store optimal status.
 	int optimal_value = 1;
 	double start = (double)clock();
-	for (int U = param.U0, PU = -1;;
+	for (int U = param.U0, PU = 0;;
 			PU = U, U = int(std::ceil(param.Uf * U))) {
 		std::cerr << "Running with bound " << U << std::endl;
 		optimal_value = solve(recursion_order, pp, optimal_status,

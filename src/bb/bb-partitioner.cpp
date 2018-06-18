@@ -59,9 +59,9 @@ bool bbpartitioner::partition(const matrix &m, std::vector<status> &row,
 	for (int r = 0; r < m.R; ++r) row[r] = optimal_status[r];
 	for (int c = 0; c < m.C; ++c) col[c] = optimal_status[m.R + c];
 	if (optimal_value >= 0) {
-		std::cerr << "Finished, found partition of size " << optimal_value
+		std::cerr << "Finished, found partition of volume " << optimal_value
 			<< std::endl;
-		std::cerr << "Used ~" << int(std::ceil(clock()-start)/CLOCKS_PER_SEC)
+		std::cerr << "Used ~" << (std::ceil(clock()-start)/CLOCKS_PER_SEC)
 			<< " seconds." << std::endl;
 		return true;
 	} else {

@@ -19,16 +19,20 @@ def verify(O, P, eps=0.03, debug=True):
 		for c, v in row:
 			OI.add((r, c))
 	side = [0, 0, 0]
+	vol = [0]*(PR+PC)
 	for r, row in enumerate(PM):
 		for c, v in row:
 			PI.add((r, c))
 			if len(v) != 1 or int(v[0]) < 1 or int(v[0]) > 3:
 				raise ValueError("Partitioned matrix has non-{1,2,3} value.")
 			side[int(v[0])-1] += 1
+			vol[r] |= int(v[0])
+			vol[PR+c] |= int(v[0])
 	if len(PI) != PNZ:
 		raise ValueError("Number of nonzeros in partitioned matrix does not line up.")
 	elif len(OI) != ONZ:
 		raise ValueError("Number of nonzeros in original matrix does not line up.")
+
 	for r, c in PI:
 		if (r, c) not in OI:
 			raise ValueError("Nonzeros in partitioned matrix not the same as in original.")
@@ -46,6 +50,9 @@ def verify(O, P, eps=0.03, debug=True):
 		print(str.format("This ammounts to an imbalance of eps={}", imb))
 	if imb > eps:
 		raise ValueError("Partition imbalance is too large.")
+	if debug:
+		volume = sum(s == 3 for s in vol)
+		print(str.format("Volume is {}.", volume))
 
 def main():
 	if len(sys.argv) < 3:

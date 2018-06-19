@@ -8,15 +8,19 @@
 
 ## Name the run (will be used as a directory name, so only
 ## alphanumerics!!).
-NAME=upto5kfor5m
+NAME=run_identifier
 
 ## List of binaries to test (with various configurations).
 ## Note: the binaries will be id'd by their name, so make
-## sure this is a valid part of a filename.
+## sure this can be a valid part of a filename.
 declare -a SOLVER=("./mp1", "./mp2")
 
 ## Consider all matrices (zipped as .tar.gz) in this directory
-## (recursively).
+## (recursively). We assume the matrices are downloaded from
+## the Suite Sparse Matrix Collection (sparse.tamu.edu) and
+## therefore consiste of a file NAME.tar.gz containing only
+## NAME/NAME.mtx. For other formats, the code below should
+## be trivial to rewrite.
 DIR=tars/
 
 ## Timelimit for every matrix (in seconds) and epsilon.
@@ -30,7 +34,7 @@ SOL=false
 ## DEFINE EVERYTHING ABOVE ##
 #############################
 
-echo "Running '${NAME}' with TL=${TL}, EPS=${EPS}."
+echo "Run '${NAME}', with TL=${TL}, EPS=${EPS}."
 
 # Make a directory to store results, and one for unzips.
 OUTDIR=runs/${NAME}

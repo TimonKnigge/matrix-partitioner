@@ -28,8 +28,8 @@ def main():
 	svg = open(sys.argv[2], 'w')
 	svg.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n')
 	svg.write(str.format('<svg xmlns:svg="http://www.w3.org/2000/svg" '
-			'xmlns="http://www.w3.org/2000.svg" version="1.0" '
-			'width="{}" height="{}" nid="svg2">\n', C*F, R*F))
+			'xmlns="http://www.w3.org/2000/svg" version="1.0" '
+			'width="{}" height="{}" id="svg2">\n', C*F, R*F))
 
 	svg.write('\t<g>\n')
 	svg.write(str.format('\t\t<rect width="{}" height="{}" x="0" y="0" id="bkg" '

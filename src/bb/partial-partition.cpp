@@ -477,4 +477,8 @@ int partial_partition::get_guaranteed_lower_bound() const {
 	return cut;
 }
 
+const mp::vertex_cut_graph &partial_partition::get_vertex_cut_graph() const {
+	return vcg;
+}
+
 }

@@ -105,6 +105,9 @@ class partial_partition {
 	// How many actual rows/columns have been cut (no lowerbounding).
 	int get_guaranteed_lower_bound() const;
 
+	// Retrieve the VCG. Used by bb-partitioner for branching decisions.
+	const mp::vertex_cut_graph &get_vertex_cut_graph() const;
+
 	// Friend for debugging.
 	friend void print_ppmatrix(std::ostream &stream,
 		const partial_partition &pp);

@@ -549,8 +549,9 @@ bool partial_partition::find_completion(const std::vector<int> &rcs,
 
 	// Try find a partition.
 	std::vector<bool> part(comps.size(), false);
-	if (mp::partition(comps, max_partition_size - partition_size[RED],
-			max_partition_size - partition_size[BLUE], part)) {
+	if (mp::partition(comps,
+			max_partition_size - completed_partition_size[RED],
+			max_partition_size - completed_partition_size[BLUE], part)) {
 		// Copy the partition into the 
 		for (size_t i = 0; i < part.size(); ++i)
 			for (int rc : comp_contents[i])

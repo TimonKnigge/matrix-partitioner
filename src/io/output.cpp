@@ -151,7 +151,36 @@ void print_ppmatrix(std::ostream &stream, const partial_partition &pp) {
 	}
 	std::cerr << "cut: " << pp.cut;
 	std::cerr << ", impcut: " << pp.implicitly_cut;
-	std::cerr << ", vcg: " << pp.vcg.get_minimum_vertex_cut() << std::endl;
+	std::cerr << ", vcg: " << pp.vcg.get_minimum_vertex_cut();
+	std::cerr << ", lbc: " << pp.lower_bound_cache;
+	std::cerr << std::endl;
+
+	using vvi = std::vector<std::vector<int>>;
+	vvi rtoc(pp.m.R, std::vector<int>(pp.m.C, 0));
+	vvi ctor(pp.m.R, std::vector<int>(pp.m.C, 0));
+	for (int i = 0; i < pp.vcg.graph.size(); ++i) {
+		auto &es = pp.vcg.graph[i];
+		for (int j = 0; j < es.size(); ++j) {
+			if (i / 2 == es[j].v / 2) continue;
+			if (es[j].cap < 1) continue;
+			int fr = i/2, to = es[j].v/2;
+			int flo = es[j].flow;
+			if (fr < pp.m.R) { rtoc[fr][to-pp.m.R] = flo; }
+			else ctor[to][fr-pp.m.R] = flo;
+		}
+	}
+
+	for (int r = 0; r < pp.m.R; ++r) {
+		std::cerr << std::endl;
+		for (int c = 0; c < pp.m.C; ++c) {
+			std::cerr << ' ' << rtoc[r][c] << '#';
+		}
+		std::cerr << std::endl;
+		for (int c = 0; c < pp.m.C; ++c) {
+			std::cerr << ' ' << '#' << ctor[r][c];
+		}
+		std::cerr << std::endl;
+	}
 }
 
 }

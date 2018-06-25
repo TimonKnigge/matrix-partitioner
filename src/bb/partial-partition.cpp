@@ -376,7 +376,10 @@ std::vector<int> partial_partition::grow_trees(int c) {
 	dfs_tree_size.reset_all();
 	mp::min_heap<int> dfs_heap;
 	for (int rc : partition_front[c]) {
+		std::cerr << "Partial -> " << rc << std::endl;
+		std::cerr << " state : " << (int)vcg.get_activity(rc) << std::endl;
 		if (vcg.is_free(rc)) {
+			std::cerr << " => pushing " << rc << std::endl;
 			dfs_heap.push(key_value<int>{0, rc});
 			dfs_stack[rc].push(rc);
 			dfs_index.set((size_t)rc, 0);
@@ -451,41 +454,50 @@ std::vector<int> partial_partition::grow_trees(int c) {
 	// Aggregate the input: check all partially c vertices on the
 	// front and add their values if >0.
 	std::vector<int> subgraph_sizes;
+	std::cerr << "Subg sizes: ";
 	for (int rc : partition_front[c]) {
 		int sz = dfs_tree_size.get(rc);
 		if (sz > 0) {
 			subgraph_sizes.push_back(sz);
+			std::cerr << ' ' << sz;
 		}
 	}
+	std::cerr << std::endl;
 	return subgraph_sizes;
 }
 
-bool partial_partition::find_completion(const std::vector<int> &rcs,
-		std::vector<status> &assignment) {
+partial_partition::completion partial_partition::find_completion(
+		const std::vector<int> &rcs, std::vector<status> &assignment) {
 	// If there exists a non-trivial vertex cut, we cannot extend this
 	// partial partition without cutting extra rows or columns.
 	if (vcg.get_minimum_vertex_cut() > 0)
-		return false;
+		return partial_partition::completion::unknown;
 
 	// To avoid redundant computations we ignore partial partitions with
 	// implicitly cut rows and columns.
 	if (implicitly_cut > 0)
-		return false;
+		return partial_partition::completion::unknown;
 
 	// If, through the packing bound, we already found that it is necessary
 	// to cut more rows or columns to achieve a balanced partition, then we
 	// also pass.
 	if (lower_bound_cache > cut)
-		return false;
+		return partial_partition::completion::unknown;
+
+	std::cerr << "Passed preliminary checks." << std::endl;
 
 	// Collect red, blue and free components.
 	dfs_index.reset_all();
 	std::stack<int> st;
 	int completed_partition_size[2] = {partition_size[0], partition_size[1]};
-	std::vector<int> comps;
+	std::vector<int> comps, guaranteed[2];
 	std::vector<std::vector<int>> comp_contents;
+	std::cerr << "Init: {" << completed_partition_size[0] << ',';
+	std::cerr << completed_partition_size[1] << "}" << std::endl;
 	for (auto it = rcs.rbegin(); it != rcs.rend(); ++it) {
 		int rc = *it;
+
+		std::cerr << "Reached " << rc << std::endl;
 
 		// Reached the assigned vertices, so we can break.
 		mp::status stat = get_status(rc);
@@ -493,9 +505,13 @@ bool partial_partition::find_completion(const std::vector<int> &rcs,
 				|| stat == mp::status::cut)
 			break;
 
+	std::cerr << dfs_index.get((size_t)rc) << std::endl;
+
 		// If we already visited this vertex we can continue.
 		if (dfs_index.get((size_t)rc) >= 0)
 			continue;
+
+		std::cerr << "Starting search from " << rc << std::endl;
 
 		// Explore the component through DFS.
 		int side = -1, size = 0;
@@ -509,7 +525,7 @@ bool partial_partition::find_completion(const std::vector<int> &rcs,
 			if (i == (int)m[u].size()) {
 				st.pop();
 				comp_contents.back().push_back(u);
-				break;
+				continue;
 			}
 			dfs_index.set((size_t)u, i+1);
 
@@ -525,14 +541,14 @@ bool partial_partition::find_completion(const std::vector<int> &rcs,
 			} else if (vs == status::cut) {
 				// We can claim this edge but we can't extend, since this
 				// vertex is cut.
-				side += 1;
+				size += 1;
 			} else {
 				// Let's begin by checking the index of the target. If it
 				// is -1 then we can expand. If it is not more than the
 				// reverse index then we can at least claim the edge.
 				int vsi = dfs_index.get((size_t)v);
 				if (vsi <= vi)
-					side += 1;
+					size += 1;
 				if (vsi < 0) {
 					dfs_index.set((size_t)v, 0);
 					st.push(v);
@@ -540,12 +556,34 @@ bool partial_partition::find_completion(const std::vector<int> &rcs,
 			}
 		}
 
+		std::cerr << "size=" << size << ", side="<<side << std::endl;
+
 		// Record this component.
-		if (side >= 0)
+		if (side >= 0) {
 			completed_partition_size[side] += size;
-		else
+			guaranteed[side].insert(guaranteed[side].end(),
+				comp_contents.back().begin(), comp_contents.back().end());
+			comp_contents.pop_back();
+		} else
 			comps.push_back(size);
 	}
+
+	std::cerr << "Found " << comps.size() << " components." << std::endl;
+	for (size_t i = 0; i < comps.size(); ++i) {
+		std::cerr << comps[i] << " with";
+		for (int j : comp_contents[i]) std::cerr << ' ' << j;
+		std::cerr << std::endl;
+	}
+	std::cerr << "Post: {" << completed_partition_size[0] << ',';
+	std::cerr << completed_partition_size[1] << "}" << std::endl;
+
+	// Check if none of the partitions are too large already.
+	if (completed_partition_size[RED] > max_partition_size
+			|| completed_partition_size[BLUE] > max_partition_size)
+		return partial_partition::completion::impossible;
+
+TODO: if comps is 0 then just assign
+TODO: if succesfull also do guaranteed
 
 	// Try find a partition.
 	std::vector<bool> part(comps.size(), false);
@@ -556,9 +594,9 @@ bool partial_partition::find_completion(const std::vector<int> &rcs,
 		for (size_t i = 0; i < part.size(); ++i)
 			for (int rc : comp_contents[i])
 				assignment[rc] = (part[i] ? status::red : status::blue);
-		return true;
+		return partial_partition::completion::possible;
 	} else
-		return false;
+		return partial_partition::completion::impossible;
 }
 
 status partial_partition::get_status(int rc) const {

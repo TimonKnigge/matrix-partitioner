@@ -114,25 +114,69 @@ bool bbpartitioner::pick_next(size_t &current_rcs, std::vector<int> &rcs,
 	return true;
 }
 
-int bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
+void bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
 		size_t &current_rcs, std::vector<int> &rcs, partial_partition &pp,
-		int upper_bound) {
+		int &optimal_value, std::vector<status> &optimal_status) {
 	recursion_step step = call_stack.top();
 	call_stack.pop();
 	
 	int lb = -1;
 	if (step.rt == recursion_type::descend) {
-		lb = pp.assign(step.rc, step.s, upper_bound);
+		// Make the assignment by taking a step in the bb tree.
+		lb = pp.assign(step.rc, step.s, optimal_value);
+		++current_rcs;
+
+		std::cerr << "Did assignment of rc=" << step.rc <<", lb=" << lb << std::endl;
+		print_ppmatrix(std::cerr, pp);
+
+		// If we are in a leaf vertex, record and return.
+		if (current_rcs == rcs.size() && lb < optimal_value) {
+			optimal_value = lb;
+			for (size_t i = 0; i < optimal_status.size(); ++i)
+				optimal_status[i] = pp.get_status(i);
+			std::cerr << "Improved solution found with cost " << lb
+				<< std::endl;
+			return;
+		}
+
+		// If we are not in a leaf vertex, we could try finding a
+		// completion. To avoid redundant computations we only do
+		// this in the root or after a vertex was cut.
+		if ((current_rcs <= 1 || step.s == mp::status::cut) 
+				&& lb < optimal_value) {
+			partial_partition::completion stat
+					= pp.find_completion(rcs, optimal_status);
+			// If we find a completion we record it. Otherwise
+			// if there doesn't exist one, we can safely increase
+			// the lowerbound by 1.
+			if (stat == partial_partition::completion::possible) {
+				// Success, so fill in the remaining values and
+				// record and return. Note: by returning before
+				// we try branching again we make sure the rest
+				// of this subtree is discarded.
+				optimal_value = lb;
+				for (size_t i = 0; i < current_rcs; ++i)
+					optimal_status[rcs[i]] = pp.get_status(rcs[i]);
+				std::cerr << "Improved solution found with cost " << lb
+					<< " (by completion)." << std::endl;
+				return;
+			}
+			if (stat == partial_partition::completion::impossible)
+				lb += 1;
+		}
+
+		std::cerr << std::endl << "Will now find next" << std::endl;
+		std::cerr << lb << ' ' << optimal_value << std::endl;
 
 		// Try branching again.
-		++current_rcs;
-		if (pick_next(current_rcs, rcs, pp, lb, upper_bound)) {
+		if (pick_next(current_rcs, rcs, pp, lb, optimal_value)) {
+			std::cerr << "Next is " << rcs[current_rcs] << std::endl;
 			// Recurse on the cut last (note that branches are executed on a
 			// stack and thus in reverse order). Also, if lb + 1 == ub and this
 			// vertex is NOT implicitly cut, there is no need to branch on
 			// the cut.
 			if (pp.get_status(rcs[current_rcs]) == mp::status::implicitly_cut
-					|| pp.get_guaranteed_lower_bound() + 1 < upper_bound)
+					|| pp.get_guaranteed_lower_bound() + 1 < optimal_value)
 				recurse(rcs[current_rcs], status::cut, call_stack, pp);
 
 			// First branch on the smaller component.
@@ -151,8 +195,6 @@ int bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
 		pp.undo(step.rc, step.s);
 		--current_rcs;
 	}
-
-	return lb;
 }
 
 int bbpartitioner::solve(std::vector<int> &rcs, partial_partition &pp,
@@ -177,21 +219,10 @@ int bbpartitioner::solve(std::vector<int> &rcs, partial_partition &pp,
 	// effectively traversing the B&B tree.
 	long long progress_counter = 0;
 	while (!call_stack.empty()) {
-		int lb = make_step(call_stack, current_rcs, rcs, pp, optimal_value);
-		if (current_rcs == rcs.size()) {
-			if (optimal_value > lb) {
-				optimal_value = lb;
-				for (size_t i = 0; i < optimal_status.size(); ++i)
-					optimal_status[i] = pp.get_status(i);
-				std::cerr << "Improved solution found with cost " << lb
-					<< std::endl;
-				// If we are already hitting the suggested lower bound we
-				// can stop.
-				if (slb >= optimal_value) {
-					return optimal_value;
-				}
-			}
-		}
+		make_step(call_stack, current_rcs, rcs, pp, optimal_value,
+				optimal_status);
+		if (slb >= optimal_value)
+			return optimal_value;
 
 		progress_counter++;
 		if (progress_counter % PERIOD_SMALL == 0LL) {

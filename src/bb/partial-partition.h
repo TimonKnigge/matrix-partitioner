@@ -95,8 +95,11 @@ class partial_partition {
 
 	// Attempt to find an extension of the current partial partition that does
 	// not cut any additional rows or columns. Returns if succesful.
-	// We implicitly assume that the free rows and columns are at the end of rcs.
-	bool find_completion(const std::vector<int> &rcs, std::vector<status> &assignment);
+	// We implicitly assume that the free rows and columns are at the end of
+	// rcs.
+	enum completion { unknown = 0, impossible = 1, possible = 2 };
+	partial_partition::completion find_completion(const std::vector<int> &rcs,
+			std::vector<status> &assignment);
 
 	// Status of the given row/column.
 	status get_status(int rc) const;

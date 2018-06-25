@@ -14,8 +14,10 @@ vertex_cut_graph::vertex_cut_graph(const matrix &m) : V(2 * (m.R + m.C)),
 	}
 	for (int u = 0; u < m.R; ++u) {
 		for (const entry &e : m[u]) {
-			add_edge(outv(u), inv(e.rc), 1);
-			add_edge(outv(e.rc), inv(u), 1);
+			int uos = (int)graph[outv(u)].size();
+			int ercos = (int)graph[outv(e.rc)].size();
+			add_edge(outv(u), inv(e.rc), 1, ercos);
+			add_edge(outv(e.rc), inv(u), 1, uos);
 		}
 	}
 }
@@ -40,8 +42,9 @@ void vertex_cut_graph::set_activity(int u, vertex_state s) {
 			&& s == vertex_state::inactive) {
 		// Mark as inactive and remove passthrough edge.
 		bool has_flow = graph[ui][0].flow > 0;
-		graph[ui][0].flow = graph[ui][0].cap = 0;
-		graph[uo][0].flow = graph[uo][0].cap = 0;
+		if (has_flow)
+			adjust_flow(ui, 0, -1);
+		graph[ui][0].cap = graph[uo][0].cap = 0;
 
 		// If there was flow we have to reroute or cancel it.
 		if (has_flow) {
@@ -70,8 +73,7 @@ void vertex_cut_graph::set_activity(int u, vertex_state s) {
 			// Try pushing from uo.
 			if (push(uo, sinks, 1)) {
 				// Success, now adjust flow.
-				graph[ui][0].flow += 1;
-				graph[uo][0].flow -= 1;
+				adjust_flow(ui, 0, 1);
 				flow += 1;
 			} else {
 				// Failure, reroute ui flow.
@@ -130,6 +132,18 @@ void vertex_cut_graph::set_activity(int u, vertex_state s) {
 		while (debit > 0 && push(ui, sources, -1) < 0) --debit, --flow;
 	}
 	// else nothing interesting changes in the flow graph.
+
+	// It is possible for cycles to appear in the flow graph due to the
+	// irregularity of the udpates. So we periodically clear the graph.
+	// This is easiest to detect when the flow is 0 but there are edges
+	// that have flow going through them. In this case we can simply zero
+	// all flow edges.
+	if (flow == 0 && magnitude > 0) {
+		for (int u = 0; u < V; ++u)
+			for (internal_edge &e : graph[u])
+				e.flow = 0;
+		magnitude = 0;
+	}
 }
 
 //bool vertex_cut_graph::set_activity(int u, vertex_state s) { }
@@ -166,7 +180,7 @@ int vertex_cut_graph::push(int s, std::unordered_map<int, int> &T, int c) {
 		for (int i = 0; i < (int)graph[u].size(); ++i) {
 			const internal_edge &e = graph[u][i];
 			if (e.flow >= e.cap) continue;
-			if (state[e.v / 2] == vertex_state::inactive) continue;
+			if (state[lift(e.v)] == vertex_state::inactive) continue;
 			if (par.get(e.v) != -1) continue;
 			if (e.flow == 0 && c < 0) continue;
 
@@ -181,8 +195,23 @@ int vertex_cut_graph::push(int s, std::unordered_map<int, int> &T, int c) {
 	T[t] += c;
 	while (t != s) {
 		int p = par.get(t), pi = pari.get(t);
-		graph[p][pi].flow++;
-		graph[t][graph[p][pi].rev].flow--;
+		adjust_flow(p, pi, 1);
+		// Avoid positive-flow cycles of the form:
+		// outv(u) -> inv(v) -> outv(v) -> inv(u) -> ...
+		if (graph[p][pi].crossid >= 0) {
+			// This implies p is the outvertex and t an invertex. If the
+			// cross edge has flow and the internal edges of p/2 and t/2
+			// also do, we can cancel out this cycle.
+			int pin = inv(lift(p)), tout = outv(lift(t));
+			int cid = graph[p][pi].crossid;
+			if (graph[t][0].flow > 0 && graph[tout][cid].flow > 0
+					&& graph[pin][0].flow > 0) {
+				adjust_flow(p, pi, -1);
+				adjust_flow(t, 0, -1);
+				adjust_flow(tout, cid, -1);
+				adjust_flow(pin, 0, -1);
+			}
+		}
 		t = p;
 	}
 
@@ -216,7 +245,7 @@ int vertex_cut_graph::pull(int t, std::unordered_map<int, int> &S, int c) {
 			const internal_edge &e = graph[u][i];
 			const internal_edge &re = graph[e.v][e.rev];
 			if (re.flow >= re.cap) continue;
-			if (state[e.v / 2] == vertex_state::inactive) continue;
+			if (state[lift(e.v)] == vertex_state::inactive) continue;
 			if (par.get(e.v) != -1) continue;
 			if (re.flow == 0 && c < 0) continue;
 
@@ -231,17 +260,42 @@ int vertex_cut_graph::pull(int t, std::unordered_map<int, int> &S, int c) {
 	S[s] += c;
 	while (s != t) {
 		int p = par.get(s), pi = pari.get(s);
-		graph[p][pi].flow--;
-		graph[s][graph[p][pi].rev].flow++;
+		adjust_flow(p, pi, -1);
+		// Avoid positive-flow cycles of the form:
+		// outv(u) -> inv(v) -> outv(v) -> inv(u) -> ...
+		// Since we are now pulling from p_pi we are pushing on
+		// the reverse edge. So we consider an edge-cycle containing
+		// the reverse edge: this reverse edge is (s, graph[p][pi].rev)
+		int si = graph[p][pi].rev;
+		if (graph[s][si].crossid >= 0) {
+			// This implies s is the outvertex and p an invertex. If the
+			// cross edge has flow and the internal edges of s/2 and p/2
+			// also do, we can cancel out this cycle.
+			int pout = outv(lift(p)), sin = inv(lift(s));
+			int cid = graph[s][si].crossid;
+			if (graph[p][0].flow > 0 && graph[pout][cid].flow > 0
+					&& graph[sin][0].flow > 0) {
+				adjust_flow(s, si, -1);
+				adjust_flow(p, 0, -1);
+				adjust_flow(pout, cid, -1);
+				adjust_flow(sin, 0, -1);
+			}
+		}
 		s = p;
 	}
 
 	return c;
 }
 
-void vertex_cut_graph::add_edge(int u, int v, int cap) {
-	graph[u].emplace_back(v, (int)graph[v].size(), cap);
+void vertex_cut_graph::add_edge(int u, int v, int cap, int cid) {
+	graph[u].emplace_back(v, (int)graph[v].size(), cap, cid);
 	graph[v].emplace_back(u, (int)graph[u].size()-1, 0);
+}
+
+void vertex_cut_graph::adjust_flow(int u, int ei, int c) {
+	magnitude += -abs(graph[u][ei].flow) + abs(graph[u][ei].flow + c);
+	graph[u][ei].flow += c;
+	graph[graph[u][ei].v][graph[u][ei].rev].flow -= c;
 }
 
 }

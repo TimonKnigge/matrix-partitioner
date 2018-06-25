@@ -12,9 +12,10 @@ vertex_cut_graph::vertex_cut_graph(const matrix &m) : V(2 * (m.R + m.C)),
 	for (int u = 0; u < m.R + m.C; ++u) {
 		add_edge(inv(u), outv(u), 1);
 	}
-	for (int u = 0; u < m.R + m.C; ++u) {
+	for (int u = 0; u < m.R; ++u) {
 		for (const entry &e : m[u]) {
 			add_edge(outv(u), inv(e.rc), 1);
+			add_edge(outv(e.rc), inv(u), 1);
 		}
 	}
 }
@@ -167,6 +168,7 @@ int vertex_cut_graph::push(int s, std::unordered_map<int, int> &T, int c) {
 			if (e.flow >= e.cap) continue;
 			if (state[e.v / 2] == vertex_state::inactive) continue;
 			if (par.get(e.v) != -1) continue;
+			if (e.flow == 0 && c < 0) continue;
 
 			par.set(e.v, u);
 			pari.set(e.v, i);
@@ -216,6 +218,7 @@ int vertex_cut_graph::pull(int t, std::unordered_map<int, int> &S, int c) {
 			if (re.flow >= re.cap) continue;
 			if (state[e.v / 2] == vertex_state::inactive) continue;
 			if (par.get(e.v) != -1) continue;
+			if (re.flow == 0 && c < 0) continue;
 
 			par.set(e.v, u);
 			pari.set(e.v, i);

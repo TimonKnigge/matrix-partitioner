@@ -11,6 +11,9 @@
 \newcommand{\bgeb}{
 	\textsc{Bipartite \allowbreak Graph \allowbreak Edge-\allowbreak Bisection}
  }
+
+\newcommand{\sgeb}{\textsc{GEB} }
+\newcommand{\sgb}{\textsc{GB} }
 % /commands
 
 \begin{document}
@@ -75,7 +78,9 @@
 			by $E_1$.}}
 	\end{problem}
 
-	We note:
+	We call a vertex with adjacent edges from both partitions `cut'. The
+	goal is to minimize the amount of cut vertices.
+	Next, we note:
 	\begin{theorem}\label{bgeb-to-mbpt}
 		\begin{equation}
 			\begin{split}
@@ -99,7 +104,7 @@
 	\end{problem}
 
 	\subsection{\geb is \NP-Complete}
-	We will do a reduction from \gb, proven \NP-Complete in
+	We will do a reduction from \gb which was proven \NP-Complete in
 	\cite{gb-np-complete} under the name \textsc{Minimum \allowbreak
 	cut \allowbreak into \allowbreak equal-\allowbreak sized \allowbreak
 	subsets}.
@@ -112,12 +117,101 @@
 			$|\{\, \{u, v\} \,\mid\, u \in V_1, v\in V_2 \,\}| \leq M$?}
 	\end{problem}
 
+	Analogously to \geb, an edge with endpoints in both sides of the
+	partition is called `cut', the goal is to minimize the amount of
+	cut edges.
+
 	Let us give a sketch of our proof strategy:
 	given an instance $(G, M)$ of the \gb problem, we
 	will build a new graph $G'$, whose optimal solution under the 
 	\geb problem will give us an optimal solution under \gb on $G$.
 
-	Specifically, 
+	Specifically, for each vertex $v \in V$ we create a clique $K_u$ of size
+	$S$ (specified later). For every edge $\{u, v\} \in E$, we merge
+	two vertices in the cliques $K_u$ and $K_v$ together into a single
+	vertex. We then solve the \geb on the resulting graph $(V', E')$, and
+	translate the resulting coloring of its edges into a coloring of the
+	vertices of $(V, E)$. (Here, the colors correspond to sites in the
+	partition.) We note that if we color each clique in $(V', E')$
+	monochromatically with the color of its vertex in $(V, E)$, then
+	an edge between two differently colored vertices in $(V, E)$ will
+	correspond precisely with a vertex shared by two cliques in $(V', E')$.
+	An example is given in \ref{figure-graph-clique-conversion}. We note that
+	the \geb problem gives us no guarantee that each clique is colored
+	monochromatically, but we will work around this later.
+	\todo{Add image of coloring conversion}
+
+	Formally, let us define the \textit{clique expansion} of a graph as follows:
+
+	\begin{definition}
+		\label{clique-expansion}
+		Given a graph $G = (V, E)$,
+		let $S = 4 + 2|V|\binom{|E|}{2}$.
+		We define its clique expansion expansion
+		$\mathcal{K}(G) = (V', E')$ as first taking a disjoint union of $|V|$
+		copies of the complete graph on $S$ vertices $K_S$. Then, labelling the
+		edges in $E$ as $e_1, e_2, \dots, e_{|E|}$, for each edge $e_i = \{u, v\}$
+		we merge the $i^{th}$ vertex of the $K_S$ representing $u$ with the $i^{th}$
+		vertex of the $K_S$ representing $v$.
+	\end{definition}
+
+	Here, the clique size $S$ will allow us to prove several
+	useful propositions later. Notice that by construction, each pair of cliques is
+	merged at most once, each time in a previously unmerged vertex. As a consequence,
+	while cliques share vertices, they do not share edges.
+
+	\begin{proposition}
+		\label{poly-size}
+		The size of $\mathcal{K}(G) = (V', E')$ is polynomial in the size of
+		$G = (V, E)$.
+	\end{proposition}
+	\begin{proof}
+		By construction, each vertex in $V$ induces a subgraph with $O(|V||E|^2)$
+		vertices and $O(|V|^2|E|^4)$ edges. After merging, the graph will only
+		become smaller. So $|V'|$ is $O(|V|^2 |E|^2)$ and $|E'|$ is $O(|V|^3|E|^4)$.
+	\end{proof}
+
+	So $\mathcal{K}(G)$ is of polynomial size and we can solve the \geb problem
+	on it. We now want to show that both problems have equal optimal solutions (in
+	the sense of an optimization problem, not a decision problem). For
+	a graph $G=(V, E)$, let $\sgb(G)$ denote the optimal solution of the \gb
+	problem on $G$, and let $\sgeb(\mathcal{K}(G))$ denote the optimal solution of
+	the \geb problem on its \textit{clique expansion} $\mathcal{K}(G)$.
+
+	\begin{proposition}
+		\label{geb-leq-gb}
+		For any graph $G$ we have $\sgeb(\mathcal{K}(G)) \leq \sgb(G)$.
+	\end{proposition}
+	\begin{proof}
+		Consider any valid equipartitioning of $G = (V, E)$ of cost $C$ (that
+		is, there are
+		exactly $C$ edges with endpoints in both colors). For any vertex $c$,
+		color all edges in the corresponding clique $K_u$ in $\mathcal{K}(G)
+			= (V', E')$ with the same color.
+
+		Since each clique $K_u$ in $\mathcal{K}(G)$ has the same number of
+		edges ($\binom{S}{2}$), and by
+		assumption the partitioning of $V$ is into two equal sized subsets, the
+		strategy described above partitions $E'$ into two equal sized subsets.
+
+		Now let $s$ be a vertex in $\mathcal{K}(G)$. If $s$ is contained in only
+		one clique, it is not cut
+		since we color each $K_u$ monochromatically. If $s$ is shared by two
+		cliques $K_u$ and $K_v$, then $s$ corresponds to the edge
+		$e = \{u, v\} \in E$, and
+		we can see that this vertex if and only if $e$ is cut (since $K_u$ and
+		$K_v$ are colored like $u$ and $v$ respectively).
+
+		So the number of cut vertices in the induced partitioning of
+		$\mathcal{K}(G)$ is exactly the number of cut edges in the original
+		partitioningo of $G$. We can then minimize over all valid partitionings
+		of $G$ to achieve the desired inequality.
+	\end{proof}
+
+	Unfortunately the converse is harder to prove since we cannot guarantee
+	that each clique in $\mathcal{K}(G)$ is colored monochromatically. It turns
+	out however, that we can still deterministically associate a color with each
+	clique, provided we have an \textbf{optimal coloring}.
 
 	\subsection{\bgeb is \NP-Complete}
 

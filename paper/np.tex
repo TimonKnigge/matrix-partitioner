@@ -1,0 +1,59 @@
+\documentclass{article}
+
+\input{preamble.tex}
+
+% Add commands here
+
+% Decision problems
+\newcommand{\mbpt}{\textsc{Matrix Bipartition}}
+\newcommand{\gb}{\textsc{Graph Bisection}}
+\newcommand{\geb}{\textsc{Graph Edge-Bisection}}
+\newcommand{\bgeb}{\textsc{Bipartite Graph Edge-Bisection}}
+% /commands
+
+\begin{document}
+
+	\section{Hardness results}
+	In this section we will formally analyze the matrix partitioning
+	problem and prove that it is \NP-Complete, even if we fix the
+	the number of processors to $k = 2$. We will assume we are looking
+	for a perfect partitioning, i.e. with imbalance parameter $\epsilon = 0$.
+
+	\subsection{Preliminaries}
+	To begin, let us define a formal decision-variant of the matrix
+	partitioning problem for $k = 2$, based on the optimization
+	variant described in \ref{introductory-section} where the goal
+	is to minimize the total communication volume.
+
+	\begin{problem}
+		\problemtitle{\mbpt}
+		\probleminput{A $n\times m$ matrix $M$, whose nonzeros are precisely
+			indexed by the set
+			$Z \subseteq \{\, 1, \dots, n \,\} \times
+				\{\, 1, \dots, m \,\}$, and an integer $V$, the required
+			maximum volume.}
+		\problemquestion{Does there exist a disjoint partitioning of $Z$
+			into $Z_1 \cup Z_2$ such that $|Z_1| = |Z_2|$ and volume
+			$VOL(Z_1, Z_2) \leq V$?}
+	\end{problem}
+
+	Here $VOL(Z_1, Z_2)$ counts the number of rows and columns that
+	have nonzeros in $Z_1$ and $Z_2$, as before.
+
+	When thinking about the matrix bipartitioning problem, it is helpful
+	to reformulate it in terms of graphs. Given an $n \times m$ matrix $M$
+	we can define a bipartite adjacency graph $G(M) = (V(M), E(M))$ with
+	$n$ vertices representing the rows of $M$, and $m$ vertices representing
+	the columns, where a row vertex $r$ and a column vertex $c$ are connected
+	if and only if $M_{rc}$ is nonzero.
+
+	This equivalence extends to the partitioning problem. A bipartitioning of
+	the nonzeros of $M$ corresponds to a bipartitioning of the edges of $G(M)$,
+	and the rows and columns contributing to the final volume are correspond
+	precisely to the vertices with edges in both sides of the partition. See
+	also figure \ref{figure-for-graph-equiv}
+
+	To this end 
+
+		
+\end{document}

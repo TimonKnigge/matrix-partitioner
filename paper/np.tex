@@ -195,25 +195,99 @@
 		strategy described above partitions $E'$ into two equal sized subsets.
 
 		Now let $s$ be a vertex in $\mathcal{K}(G)$. If $s$ is contained in only
-		one clique, it is not cut
+		one clique, it is not cut,
 		since we color each $K_u$ monochromatically. If $s$ is shared by two
 		cliques $K_u$ and $K_v$, then $s$ corresponds to the edge
 		$e = \{u, v\} \in E$, and
 		we can see that this vertex if and only if $e$ is cut (since $K_u$ and
-		$K_v$ are colored like $u$ and $v$ respectively).
+		$K_v$ are colored like $u$ and $v$ respectively). Since by construction,
+		each vertex is in at most two cliques, there is no ambiguity.
 
 		So the number of cut vertices in the induced partitioning of
 		$\mathcal{K}(G)$ is exactly the number of cut edges in the original
-		partitioningo of $G$. We can then minimize over all valid partitionings
+		partitioning of $G$. We can then minimize over all valid partitionings
 		of $G$ to achieve the desired inequality.
 	\end{proof}
 
 	Unfortunately the converse is harder to prove since we cannot guarantee
-	that each clique in $\mathcal{K}(G)$ is colored monochromatically. It turns
+	that an optimal partitioning of $\mathcal{K}(G)$ colors each edge
+	monochromatically. It turns
 	out however, that we can still deterministically associate a color with each
 	clique, provided we have an \textbf{optimal coloring}.
 
+	\begin{definition}
+		Let $K$ be a clique and suppose we have a coloring of its edges. The
+		dominating color of $K$ is a color $c$ such that there exists a vertex
+		in $K$ with all of its adjacent edges colored $c$.
+	\end{definition}
+
+	While this property is clearly not well-defined in general, it is for our
+	restricted case:
+
+	\begin{lemma}
+		\label{dom-col}
+		Given a graph $G = (V, E)$ and an optimal partitioning of the edges
+		of its clique
+		expansion $\mathcal{K}(G)$. Then each clique $K_u$ in $\mathcal{K}(G)$
+		has a well-defined dominating color.
+	\end{lemma}
+	\begin{proof}
+		Fix a clique $K_u$ in $\mathcal{K}(G)$. We need to prove existence and
+		uniqueness of its dominating color.
+
+		First, uniqueness is trivial. To the contrary, assume there are to
+		vertices $r, b$ in $K_u$ such that $r$ has only red edges adjacent,
+		and $b$ only blue edges. Since $K_u$ is a clique, the edge $\{r, b\}$
+		exists, which must be both red and blue, a contradiction.
+
+		As for existence, assume to the contrary that every vertex in $K_u$
+		has both blue and red edges adjacent. But this means each vertex in
+		$K_u$ is cut by the partitioning, and the cost of this partitioning
+		of $\mathcal{K}(G)$ is at least the clique size
+		$S = 4+2|V|\binom{|E|}{2}$. One may verify that for any graph,
+		$S > |E|$. However, $|E|$ is a trivial upperbound on the \gb problem
+		on $(V, E)$, which, by \ref{geb-leq-gb} is an upperbound on the optimal
+		partitioning of the edges of $\mathcal{K}(G)$. Together with the
+		observation that the cut size is at least $S$, this contradicts the
+		optimality of the partitioning of $\mathcal{K}(G)$. Hence there exists
+		a vertex (at least $S-|E|$ in fact) that only has adjacent edges of
+		a single color.
+	\end{proof}
+
+	Our strategy should now be obvious. We will color vertices in $G$ by
+	the dominating color of their cliques in $\mathcal{K}(G)$.
+
+	\begin{proposition}
+		\label{gb-leq-geb}
+		For any graph $G$ we have $\sgb(G) \leq \sgeb(\mathcal{K}(G))$.
+	\end{proposition}
+	\begin{proof}
+		Fix any optimal partitioning of $\mathcal{K}(G) = (V', E')$, and
+		color each vertex $u$ in $G = (V, E)$ with the dominating color of
+		its associated clique $K_u$ in $\mathcal{K}(G)$. We would like to
+		prove two things about this partitioning: that it equipartitions $V$,
+		and that the number of cut edges in $G$ is no more than the number of
+		cut vertices in $\mathcal{K}(G)$.
+
+		\todo{Finish proof}.
+	\end{proof}
+
+	We can now conclude:
+
+	\begin{theorem}
+		$\gb \leq_{\mathcal{P}} \geb$
+	\end{theorem}
+	\begin{proof}
+		For a given instance of \gb $(G, M)$, by \ref{geb-leq-gb} and
+		\ref{gb-leq-geb} we know
+		$\sgb(G) \leq M$ if and only if $\sgeb(\mathcal{K}(G)) \leq M$. So
+		if we can solve \geb on $\mathcal{K}(GB)$ (which has size polynomial
+		in the size of $G$, by \ref{poly-size}) in polynomial time, we can
+		also solve \gb on $G$ in polynomial time.
+	\end{proof}
+
 	\subsection{\bgeb is \NP-Complete}
+	\todo{Prove title}
 
 	As a corollary of the above theorem, \ref{bgeb-to-mbpt} and the
 	\NP-Completeness of \geb, we now get the main theorem of the section

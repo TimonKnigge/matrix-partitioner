@@ -15,3 +15,8 @@
 # Output
 mp
 *.svg
+
+# Latex
+*.aux
+*.log
+*.pdf

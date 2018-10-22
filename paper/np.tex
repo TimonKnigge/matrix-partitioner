@@ -5,10 +5,12 @@
 % Add commands here
 
 % Decision problems
-\newcommand{\mbpt}{\textsc{Matrix Bipartition}}
-\newcommand{\gb}{\textsc{Graph Bisection}}
-\newcommand{\geb}{\textsc{Graph Edge-Bisection}}
-\newcommand{\bgeb}{\textsc{Bipartite Graph Edge-Bisection}}
+\newcommand{\mbpt}{\textsc{Matrix \allowbreak Bipartition} }
+\newcommand{\gb}{\textsc{Graph \allowbreak Bisection} }
+\newcommand{\geb}{\textsc{Graph \allowbreak Edge-\allowbreak Bisection} }
+\newcommand{\bgeb}{
+	\textsc{Bipartite \allowbreak Graph \allowbreak Edge-\allowbreak Bisection}
+ }
 % /commands
 
 \begin{document}
@@ -23,7 +25,8 @@
 	To begin, let us define a formal decision-variant of the matrix
 	partitioning problem for $k = 2$, based on the optimization
 	variant described in \ref{introductory-section} where the goal
-	is to minimize the total communication volume.
+	is to minimize the total communication volume. We formulate our
+	decision problems in the style of \cite{npbook}.
 
 	\begin{problem}
 		\problemtitle{\mbpt}
@@ -51,9 +54,79 @@
 	the nonzeros of $M$ corresponds to a bipartitioning of the edges of $G(M)$,
 	and the rows and columns contributing to the final volume are correspond
 	precisely to the vertices with edges in both sides of the partition. See
-	also figure \ref{figure-for-graph-equiv}
+	also figure \ref{figure-for-graph-equiv}. \todo{Add image of graph equiv.}
 
-	To this end 
+	It should be clear this procedure is also reversible, i.e. for any
+	bipartite graph we can construct a corresponding matrix.
+	To this end we define an equivalent bipartitioning problem on graphs that
+	we will base our reduction on:
 
-		
+	\begin{problem}
+		\problemtitle{\bgeb}
+		\probleminput{Given a bipartite graph
+			$G = (L \cup R, E)$ and an integer
+			$V$.}
+		\problemquestion{Does there exist a disjoint partitioning of $E$
+			into $E_1 \cup E_2$ such that $|E_1| = |E_2|$ and
+			$\big|\big(\bigcup E_1 \big) \cap
+				\big(\bigcup E_2 \big)\big| \leq V$?\footnote{
+			Writing an edge as the set $\{ u, v\} \subset V$, then
+			$\bigcup E_1$ gives precisely the set of vertices touched
+			by $E_1$.}}
+	\end{problem}
+
+	We note:
+	\begin{theorem}\label{bgeb-to-mbpt}
+		\begin{equation}
+			\begin{split}
+			\mbpt &\leq_{\mathcal{P}} \bgeb \\ &\leq_{\mathcal{P}} \mbpt
+			\end{split}
+		\end{equation}
+	\end{theorem}
+	\begin{proof} This trivially follows from the construction described
+		above.
+	\end{proof}
+
+	Hence, from now on we will focus on proving the hardness of \bgeb.
+	To achieve this, we will use as a stepping stone the version of this
+	problem where we remove the restriction that the graph is bipartite:
+
+	\begin{problem}
+		\problemtitle{\geb}
+		\probleminput{As with $\bgeb$, but without the restriction that $G$
+			is bipartite.}
+		\problemquestion{As with $\bgeb$.}
+	\end{problem}
+
+	\subsection{\geb is \NP-Complete}
+	We will do a reduction from \gb, proven \NP-Complete in
+	\cite{gb-np-complete} under the name \textsc{Minimum \allowbreak
+	cut \allowbreak into \allowbreak equal-\allowbreak sized \allowbreak
+	subsets}.
+
+	\begin{problem}
+		\problemtitle{\gb}
+		\probleminput{A graph $G = (V, E)$, an integer $M$.}
+		\problemquestion{Does there exist a disjoint partition of $V$
+			into $V_1 \cup V_2$ with $|V_1| = |V_2|2$ and such that
+			$|\{\, \{u, v\} \,\mid\, u \in V_1, v\in V_2 \,\}| \leq M$?}
+	\end{problem}
+
+	Let us give a sketch of our proof strategy:
+	given an instance $(G, M)$ of the \gb problem, we
+	will build a new graph $G'$, whose optimal solution under the 
+	\geb problem will give us an optimal solution under \gb on $G$.
+
+	Specifically, 
+
+	\subsection{\bgeb is \NP-Complete}
+
+	As a corollary of the above theorem, \ref{bgeb-to-mbpt} and the
+	\NP-Completeness of \geb, we now get the main theorem of the section
+	for free:
+
+	\begin{theorem}
+		\mbpt is \NP-Complete.
+	\end{theorem}
+	
 \end{document}

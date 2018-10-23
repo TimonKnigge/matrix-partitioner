@@ -14,21 +14,6 @@
 \newcommand{\sgeb}{\textsc{GEB} }
 \newcommand{\sgb}{\textsc{GB} }
 
-% Fast clique drawing
-\newcommand\single[3]{ % #1=labels, $2= n=number of nodes
-	\foreach \x in {1,...,#2}{
-		\pgfmathsetmacro{\ang}{360/#2}
-		\pgfmathparse{(\x-1)*\ang}
-		\node[shape=circle,fill=black,draw=black] (#1-\x)
-			at (\pgfmathresult:1cm) {};
-	}
-	\foreach \x [count=\xi from 1] in {1,...,#2}{
-		\foreach \y in {\x,...,#2}{
-			\path (#1-\xi) edge[color=#3,line width=1.75pt] (#1-\y);
-		}
-	}
-}
-
 % /commands
 
 \begin{document}
@@ -73,71 +58,6 @@
 	and the rows and columns contributing to the final volume are correspond
 	precisely to the vertices with edges in both sides of the partition. See
 	also \autoref{figure-for-graph-equiv}.
-
-\begin{figure}[h]
-\begin{tikzpicture}
-
-\begin{scope}
-\node at (5, 0){\huge$\rightarrow$};
-\end{scope}
-
-\begin{scope}
-\node at (9, -3.5){\huge$\downarrow$};
-\end{scope}
-
-\begin{scope}
-\node at (5, -7){\huge$\leftarrow$};
-\end{scope}
-
-\begin{scope}
-\node[shape=circle,fill=black,draw=black,minimum size=13pt] (1) at      ($(-0.5,{sqrt(3)*-0.5})$) {};
-\node[shape=circle,fill=black,draw=black,minimum size=13pt] (2) at      ($(-0.5,{sqrt(3)*0.5})$) {};
-\node[shape=circle,fill=black,draw=black,minimum size=13pt] (3) at      (1, 0){};
-\node[shape=circle,fill=black,draw=black,minimum size=13pt] (4) at      ($({1+sqrt(2)}, 0)$) {};
-
-\draw[line width=1.5pt] (1) -- (2) -- (3) -- (1);
-\draw[line width=1.5pt] (3) -- (4);
-\end{scope}
-
-\begin{scope}[local bounding box=scope1,shift={(9, 0)}]
-\foreach \s[count=\si from 0] in {0,120,240}{
-\begin{scope}[shift={($(\s:1.1414)$)}, rotate=\s]
-\single{\si}{5}{black};
-\end{scope}
-}
-\begin{scope}[shift={(3.1415, 0)}, rotate=180]
-\single{4}{5}{black};
-\end{scope}
-\end{scope}
-
-\begin{scope}[local bounding box=scope1,shift={(9, -7)}]
-\foreach \s[count=\si from 0] in {0,120,240}{
-\begin{scope}[shift={($(\s:1.1414)$)}, rotate=\s]
-\ifthenelse{\equal{\si}{0}}
-{\single{\si}{5}{red};}
-{\single{\si}{5}{blue};}
-\end{scope}
-}
-\begin{scope}[shift={(3.1415, 0)}, rotate=180]
-\single{4}{5}{red};
-\end{scope}
-\end{scope}
-
-\begin{scope}[shift={(0, -7)}]
-\node[shape=circle,fill=blue,draw=blue,minimum size=13pt] (1) at (     $(-0.5,{sqrt(3)*-0.5})$) {};
-\node[shape=circle,fill=blue,draw=blue,minimum size=13pt] (2) at (     $(-0.5,{sqrt(3)*0.5})$) {};
-\node[shape=circle,fill=red,draw=red,minimum size=13pt] (3) at (1,      0){};
-\node[shape=circle,fill=red,draw=red,minimum size=13pt] (4) at ($(     {1+sqrt(2)}, 0)$) {};
-
-\draw[line width=1.5pt] (1) -- (2) -- (3) -- (1);
-\draw[line width=1.5pt] (3) -- (4);
-\end{scope}
-\end{tikzpicture}
-\centering
-\caption{Solving \textsc{Graph Bisection} using \gebisection.}
-\label{conversionimage}
-\end{figure}
-
 
 	\todo{Add image of graph equiv.}
 	\todo{Continue by describing equivalence of coloring and partitioning}
@@ -233,10 +153,17 @@
 	correspond precisely with a vertex shared by two differently colored
 	cliques in $(V', E')$.
 	An example is given in \autoref{figure-graph-clique-conversion}.
+
+	\begin{figure}[h]
+		\input{figure-1-conversion.tikz}
+		\centering
+		\caption{Solving \gb using \geb.}
+		\label{figure-graph-clique-conversion}
+	\end{figure}
+
 	We note that
 	the \geb problem gives us no guarantee that each clique is colored
 	monochromatically, but we will work around this later.
-	\todo{Add image of coloring conversion}
 
 	Formally, let us define the \textit{clique expansion} of a graph as
 	follows:

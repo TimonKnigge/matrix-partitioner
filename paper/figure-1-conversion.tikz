@@ -1,0 +1,85 @@
+% Fast clique drawing
+\newcommand\single[3]{ % #1=labels, $2= n=number of nodes
+	\foreach \x in {1,...,#2}{
+		\pgfmathsetmacro{\ang}{360/#2}
+		\pgfmathparse{(\x-1)*\ang}
+		\node[shape=circle,fill=black,draw=black] (#1-\x)
+			at (\pgfmathresult:1cm) {};
+	}
+	\foreach \x [count=\xi from 1] in {1,...,#2}{
+		\foreach \y in {\x,...,#2}{
+			\path (#1-\xi) edge[color=#3,line width=1.75pt] (#1-\y);
+		}
+	}
+}
+\begin{tikzpicture}%[thick,scale=0.8, every node/.style={transform shape}]
+
+	% Arrows giving direction of conversion
+	\begin{scope}
+		\node at (4, 0){\huge$\rightarrow$};
+	\end{scope}
+
+	\begin{scope}
+		\node at (8, -2.5){\huge$\downarrow$};
+	\end{scope}
+
+	\begin{scope}
+		\node at (4, -5){\huge$\leftarrow$};
+	\end{scope}
+
+	% Initial graph
+	\begin{scope}
+		\node[shape=circle,fill=black,draw=black,minimum size=13pt] (1)
+				at ($(-0.5,{sqrt(3)*-0.5})$) {};
+		\node[shape=circle,fill=black,draw=black,minimum size=13pt] (2)
+				at ($(-0.5,{sqrt(3)*0.5})$) {};
+		\node[shape=circle,fill=black,draw=black,minimum size=13pt] (3)
+				at (1, 0){};
+		\node[shape=circle,fill=black,draw=black,minimum size=13pt] (4)
+				at ($({1+sqrt(2)}, 0)$) {};
+
+		\draw[line width=1.5pt] (1) -- (2) -- (3) -- (1);
+		\draw[line width=1.5pt] (3) -- (4);
+	\end{scope}
+
+	% Uncolored cliques
+	\begin{scope}[local bounding box=scope1,shift={(7, 0)}]
+		\foreach \s[count=\si from 0] in {0,120,240}{
+			\begin{scope}[shift={($(\s:1.1414)$)}, rotate=\s]
+				\single{\si}{7}{black};
+			\end{scope}
+		}
+		\begin{scope}[shift={(3.1415, 0)}, rotate=180]
+			\single{4}{7}{black};
+		\end{scope}
+	\end{scope}
+
+	% Colored cliques
+	\begin{scope}[local bounding box=scope1,shift={(7, -5)}]
+		\foreach \s[count=\si from 0] in {0,120,240}{
+			\begin{scope}[shift={($(\s:1.1414)$)}, rotate=\s]
+				\ifthenelse{\equal{\si}{0}}
+					{\single{\si}{7}{red};}
+					{\single{\si}{7}{blue};}
+			\end{scope}
+		}
+		\begin{scope}[shift={(3.1415, 0)}, rotate=180]
+			\single{4}{7}{red};
+		\end{scope}
+	\end{scope}
+
+	% Final graph
+	\begin{scope}[shift={(0, -5)}]
+		\node[shape=circle,fill=blue,draw=blue,minimum size=13pt] (1)
+				at ($(-0.5,{sqrt(3)*-0.5})$) {};
+		\node[shape=circle,fill=blue,draw=blue,minimum size=13pt] (2)
+				at ($(-0.5,{sqrt(3)*0.5})$) {};
+		\node[shape=circle,fill=red,draw=red,minimum size=13pt] (3)
+				at (1, 0){};
+		\node[shape=circle,fill=red,draw=red,minimum size=13pt] (4)
+				at ($({1+sqrt(2)}, 0)$) {};
+
+		\draw[line width=1.5pt] (1) -- (2) -- (3) -- (1);
+		\draw[line width=1.5pt] (3) -- (4);
+	\end{scope}
+\end{tikzpicture}

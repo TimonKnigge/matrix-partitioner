@@ -11,9 +11,24 @@
 \newcommand{\bgeb}{
 	\textsc{Bipartite \allowbreak Graph \allowbreak Edge-\allowbreak Bisection}
  }
-
 \newcommand{\sgeb}{\textsc{GEB} }
 \newcommand{\sgb}{\textsc{GB} }
+
+% Fast clique drawing
+\newcommand\single[3]{ % #1=labels, $2= n=number of nodes
+	\foreach \x in {1,...,#2}{
+		\pgfmathsetmacro{\ang}{360/#2}
+		\pgfmathparse{(\x-1)*\ang}
+		\node[shape=circle,fill=black,draw=black] (#1-\x)
+			at (\pgfmathresult:1cm) {};
+	}
+	\foreach \x [count=\xi from 1] in {1,...,#2}{
+		\foreach \y in {\x,...,#2}{
+			\path (#1-\xi) edge[color=#3,line width=1.75pt] (#1-\y);
+		}
+	}
+}
+
 % /commands
 
 \begin{document}
@@ -27,7 +42,7 @@
 	\subsection{Preliminaries}
 	To begin, let us define a formal decision-variant of the matrix
 	partitioning problem for $k = 2$, based on the optimization
-	variant described in \ref{introductory-section} where the goal
+	variant described in \autoref{introductory-section} where the goal
 	is to minimize the total communication volume. We formulate our
 	decision problems in the style of \cite{npbook}.
 
@@ -57,10 +72,83 @@
 	the nonzeros of $M$ corresponds to a bipartitioning of the edges of $G(M)$,
 	and the rows and columns contributing to the final volume are correspond
 	precisely to the vertices with edges in both sides of the partition. See
-	also figure \ref{figure-for-graph-equiv}. \todo{Add image of graph equiv.}
+	also \autoref{figure-for-graph-equiv}.
+
+\begin{figure}[h]
+\begin{tikzpicture}
+
+\begin{scope}
+\node at (5, 0){\huge$\rightarrow$};
+\end{scope}
+
+\begin{scope}
+\node at (9, -3.5){\huge$\downarrow$};
+\end{scope}
+
+\begin{scope}
+\node at (5, -7){\huge$\leftarrow$};
+\end{scope}
+
+\begin{scope}
+\node[shape=circle,fill=black,draw=black,minimum size=13pt] (1) at      ($(-0.5,{sqrt(3)*-0.5})$) {};
+\node[shape=circle,fill=black,draw=black,minimum size=13pt] (2) at      ($(-0.5,{sqrt(3)*0.5})$) {};
+\node[shape=circle,fill=black,draw=black,minimum size=13pt] (3) at      (1, 0){};
+\node[shape=circle,fill=black,draw=black,minimum size=13pt] (4) at      ($({1+sqrt(2)}, 0)$) {};
+
+\draw[line width=1.5pt] (1) -- (2) -- (3) -- (1);
+\draw[line width=1.5pt] (3) -- (4);
+\end{scope}
+
+\begin{scope}[local bounding box=scope1,shift={(9, 0)}]
+\foreach \s[count=\si from 0] in {0,120,240}{
+\begin{scope}[shift={($(\s:1.1414)$)}, rotate=\s]
+\single{\si}{5}{black};
+\end{scope}
+}
+\begin{scope}[shift={(3.1415, 0)}, rotate=180]
+\single{4}{5}{black};
+\end{scope}
+\end{scope}
+
+\begin{scope}[local bounding box=scope1,shift={(9, -7)}]
+\foreach \s[count=\si from 0] in {0,120,240}{
+\begin{scope}[shift={($(\s:1.1414)$)}, rotate=\s]
+\ifthenelse{\equal{\si}{0}}
+{\single{\si}{5}{red};}
+{\single{\si}{5}{blue};}
+\end{scope}
+}
+\begin{scope}[shift={(3.1415, 0)}, rotate=180]
+\single{4}{5}{red};
+\end{scope}
+\end{scope}
+
+\begin{scope}[shift={(0, -7)}]
+\node[shape=circle,fill=blue,draw=blue,minimum size=13pt] (1) at (     $(-0.5,{sqrt(3)*-0.5})$) {};
+\node[shape=circle,fill=blue,draw=blue,minimum size=13pt] (2) at (     $(-0.5,{sqrt(3)*0.5})$) {};
+\node[shape=circle,fill=red,draw=red,minimum size=13pt] (3) at (1,      0){};
+\node[shape=circle,fill=red,draw=red,minimum size=13pt] (4) at ($(     {1+sqrt(2)}, 0)$) {};
+
+\draw[line width=1.5pt] (1) -- (2) -- (3) -- (1);
+\draw[line width=1.5pt] (3) -- (4);
+\end{scope}
+\end{tikzpicture}
+\centering
+\caption{Solving \textsc{Graph Bisection} using \gebisection.}
+\label{conversionimage}
+\end{figure}
+
+
+	\todo{Add image of graph equiv.}
+	\todo{Continue by describing equivalence of coloring and partitioning}
 
 	It should be clear this procedure is also reversible, i.e. for any
-	bipartite graph we can construct a corresponding matrix.
+	bipartite graph $G$ on $n$ and $m$ vertices,
+	we can construct a corresponding matrix $M$ of size $n \times m$ which has
+	nonzeros precisely for the vertices that are connected in $G$. While the
+	nonzero entries of this matrix can be any value, the associated nonzero
+	pattern is uniquely determined by the edges of $G$.
+
 	To this end we define an equivalent bipartitioning problem on graphs that
 	we will base our reduction on:
 
@@ -79,7 +167,9 @@
 	\end{problem}
 
 	We call a vertex with adjacent edges from both partitions `cut'. The
-	goal is to minimize the amount of cut vertices.
+	goal is to minimize the amount of cut vertices. Additionally, when we
+	explicitly need the partitioning/coloring of $E$, we will write it 
+	as a map $\pi : E \to \{0,1\}$.
 	Next, we note:
 	\begin{theorem}\label{bgeb-to-mbpt}
 		\begin{equation}
@@ -88,8 +178,8 @@
 			\end{split}
 		\end{equation}
 	\end{theorem}
-	\begin{proof} This trivially follows from the construction described
-		above.
+	\begin{proof} This follows directly from the construction described
+		previously.
 	\end{proof}
 
 	Hence, from now on we will focus on proving the hardness of \bgeb.
@@ -98,9 +188,13 @@
 
 	\begin{problem}
 		\problemtitle{\geb}
-		\probleminput{As with $\bgeb$, but without the restriction that $G$
-			is bipartite.}
-		\problemquestion{As with $\bgeb$.}
+		\probleminput{Given a graph
+			$G = (L \cup R, E)$ and an integer
+			$V$.}
+		\problemquestion{Does there exist a disjoint partitioning of $E$
+			into $E_1 \cup E_2$ such that $|E_1| = |E_2|$ and
+			$\big|\big(\bigcup E_1 \big) \cap
+				\big(\bigcup E_2 \big)\big| \leq V$?}
 	\end{problem}
 
 	\subsection{\geb is \NP-Complete}
@@ -119,29 +213,33 @@
 
 	Analogously to \geb, an edge with endpoints in both sides of the
 	partition is called `cut', the goal is to minimize the amount of
-	cut edges.
+	cut edges. We similarly write a partitioning/coloring of $V$ as
+	a map $\tau : V \to \{0, 1\}$.
 
 	Let us give a sketch of our proof strategy:
 	given an instance $(G, M)$ of the \gb problem, we
 	will build a new graph $G'$, whose optimal solution under the 
 	\geb problem will give us an optimal solution under \gb on $G$.
 
-	Specifically, for each vertex $v \in V$ we create a clique $K_u$ of size
+	Specifically, for each vertex $u \in V$ we create a clique $K_u$ of size
 	$S$ (specified later). For every edge $\{u, v\} \in E$, we merge
 	two vertices in the cliques $K_u$ and $K_v$ together into a single
 	vertex. We then solve the \geb on the resulting graph $(V', E')$, and
 	translate the resulting coloring of its edges into a coloring of the
-	vertices of $(V, E)$. (Here, the colors correspond to sites in the
+	vertices of $(V, E)$. (Here, the colors correspond to sides in the
 	partition.) We note that if we color each clique in $(V', E')$
 	monochromatically with the color of its vertex in $(V, E)$, then
 	an edge between two differently colored vertices in $(V, E)$ will
-	correspond precisely with a vertex shared by two cliques in $(V', E')$.
-	An example is given in \ref{figure-graph-clique-conversion}. We note that
+	correspond precisely with a vertex shared by two differently colored
+	cliques in $(V', E')$.
+	An example is given in \autoref{figure-graph-clique-conversion}.
+	We note that
 	the \geb problem gives us no guarantee that each clique is colored
 	monochromatically, but we will work around this later.
 	\todo{Add image of coloring conversion}
 
-	Formally, let us define the \textit{clique expansion} of a graph as follows:
+	Formally, let us define the \textit{clique expansion} of a graph as
+	follows:
 
 	\begin{definition}
 		\label{clique-expansion}
@@ -150,15 +248,23 @@
 		We define its clique expansion expansion
 		$\mathcal{K}(G) = (V', E')$ as first taking a disjoint union of $|V|$
 		copies of the complete graph on $S$ vertices $K_S$. Then, labelling the
-		edges in $E$ as $e_1, e_2, \dots, e_{|E|}$, for each edge $e_i = \{u, v\}$
-		we merge the $i^{th}$ vertex of the $K_S$ representing $u$ with the $i^{th}$
-		vertex of the $K_S$ representing $v$.
+		edges in $E$ as $e_1, e_2, \dots, e_{|E|}$, for each edge
+		$e_i = \{u, v\}$
+		we merge the $i^{th}$ vertex of the $K_S$ representing $u$ with the
+		$i^{th}$ vertex of the $K_S$ representing $v$.
 	\end{definition}
 
 	Here, the clique size $S$ will allow us to prove several
-	useful propositions later. Notice that by construction, each pair of cliques is
-	merged at most once, each time in a previously unmerged vertex. As a consequence,
-	while cliques share vertices, they do not share edges.
+	useful propositions later. Notice that by construction, each pair of
+	cliques is merged at most once, each time in a previously unmerged vertex.
+	As a consequence, while cliques share vertices, they do not share edges.
+
+	Additionally, throughout this section we will make a slight abuse of
+	terminology. A clique usually (and up until now) refers to any collection
+	of pairwise connected vertices. However, from now on, when we talk about
+	`cliques' in $\mathcal{K}(G)$ we will be referring specifically to the
+	maximal cliques corresponding to vertices, i.e. the cliques
+	$\{\, K_u \,\mid\, u \in V \,\}$ in $\mathcal{K}(G)$.
 
 	\begin{proposition}
 		\label{poly-size}
@@ -166,54 +272,62 @@
 		$G = (V, E)$.
 	\end{proposition}
 	\begin{proof}
-		By construction, each vertex in $V$ induces a subgraph with $O(|V||E|^2)$
+		By construction, each vertex in $V$ induces a subgraph with
+		$O(|V||E|^2)$
 		vertices and $O(|V|^2|E|^4)$ edges. After merging, the graph will only
-		become smaller. So $|V'|$ is $O(|V|^2 |E|^2)$ and $|E'|$ is $O(|V|^3|E|^4)$.
+		become smaller. So $|V'|$ is $O(|V|^2 |E|^2)$ and $|E'|$ is
+		$O(|V|^3|E|^4)$.
 	\end{proof}
 
 	So $\mathcal{K}(G)$ is of polynomial size and we can solve the \geb problem
-	on it. We now want to show that both problems have equal optimal solutions (in
-	the sense of an optimization problem, not a decision problem). For
+	on it. We now want to show that both problems have equal optimal solutions
+	(in the sense of an optimization problem, not a decision problem). For
 	a graph $G=(V, E)$, let $\sgb(G)$ denote the optimal solution of the \gb
-	problem on $G$, and let $\sgeb(\mathcal{K}(G))$ denote the optimal solution of
-	the \geb problem on its \textit{clique expansion} $\mathcal{K}(G)$.
+	problem on $G$, and let $\sgeb(\mathcal{K}(G))$ denote the optimal solution
+	of the \geb problem on its \textit{clique expansion} $\mathcal{K}(G)$.
 
 	\begin{proposition}
 		\label{geb-leq-gb}
 		For any graph $G$ we have $\sgeb(\mathcal{K}(G)) \leq \sgb(G)$.
 	\end{proposition}
 	\begin{proof}
-		Consider any valid equipartitioning of $G = (V, E)$ of cost $C$ (that
-		is, there are
-		exactly $C$ edges with endpoints in both colors). For any vertex $c$,
+		Consider any valid equipartitioning $\tau$ of $G = (V, E)$ of cost
+		$C$ (that is, there are
+		exactly $C$ edges $\{u, v\}$ with $\tau(u) \neq \tau(v)$).
+		For any vertex $u$,
 		color all edges in the corresponding clique $K_u$ in $\mathcal{K}(G)
-			= (V', E')$ with the same color.
+			= (V', E')$ with the same color, i.e. for any edge $e$ in $K_u$
+		let $\pi(e) := \tau(u)$.
 
 		Since each clique $K_u$ in $\mathcal{K}(G)$ has the same number of
 		edges ($\binom{S}{2}$), and by
 		assumption the partitioning of $V$ is into two equal sized subsets, the
 		strategy described above partitions $E'$ into two equal sized subsets.
 
-		Now let $s$ be a vertex in $\mathcal{K}(G)$. If $s$ is contained in only
-		one clique, it is not cut,
-		since we color each $K_u$ monochromatically. If $s$ is shared by two
+		Now let $s$ be a vertex in $\mathcal{K}(G)$. If $s$ is contained in
+		only one clique, it is not cut,
+		since we color the edges of
+		each $K_u$ monochromatically. If $s$ is shared by two
 		cliques $K_u$ and $K_v$, then $s$ corresponds to the edge
 		$e = \{u, v\} \in E$, and
-		we can see that this vertex if and only if $e$ is cut (since $K_u$ and
-		$K_v$ are colored like $u$ and $v$ respectively). Since by construction,
+		we can see that this vertex is cut by $\pi$
+		if and only if $e$ is cut by $\tau$ (since $K_u$ and
+		$K_v$ are colored like $u$ and $v$ respectively).
+		Since by construction,
 		each vertex is in at most two cliques, there is no ambiguity.
 
-		So the number of cut vertices in the induced partitioning of
+		So the number of cut vertices in the induced partitioning $\pi$ of the
+		edges of
 		$\mathcal{K}(G)$ is exactly the number of cut edges in the original
-		partitioning of $G$. We can then minimize over all valid partitionings
-		of $G$ to achieve the desired inequality.
+		partitioning $\pi$ of the vertices of $G$. We can then minimize
+		over all valid partitionings of $G$ to achieve the desired inequality.
 	\end{proof}
 
 	Unfortunately the converse is harder to prove since we cannot guarantee
-	that an optimal partitioning of $\mathcal{K}(G)$ colors each edge
+	that an optimal partitioning of $\mathcal{K}(G)$ colors each clique
 	monochromatically. It turns
-	out however, that we can still deterministically associate a color with each
-	clique, provided we have an \textbf{optimal coloring}.
+	out however, that we can still deterministically associate a color with
+	each clique, provided we have an \textbf{optimal coloring}.
 
 	\begin{definition}
 		Let $K$ be a clique and suppose we have a coloring of its edges. The
@@ -226,8 +340,8 @@
 
 	\begin{lemma}
 		\label{dom-col}
-		Given a graph $G = (V, E)$ and an optimal partitioning of the edges
-		of its clique
+		Given a graph $G = (V, E)$ and an optimal partitioning $\pi$
+		of the edges of its clique
 		expansion $\mathcal{K}(G)$. Then each clique $K_u$ in $\mathcal{K}(G)$
 		has a well-defined dominating color.
 	\end{lemma}
@@ -235,54 +349,159 @@
 		Fix a clique $K_u$ in $\mathcal{K}(G)$. We need to prove existence and
 		uniqueness of its dominating color.
 
-		First, uniqueness is trivial. To the contrary, assume there are to
+		First, uniqueness is trivial. To the contrary, assume there are two
 		vertices $r, b$ in $K_u$ such that $r$ has only red edges adjacent,
 		and $b$ only blue edges. Since $K_u$ is a clique, the edge $\{r, b\}$
 		exists, which must be both red and blue, a contradiction.
 
 		As for existence, assume to the contrary that every vertex in $K_u$
 		has both blue and red edges adjacent. But this means each vertex in
-		$K_u$ is cut by the partitioning, and the cost of this partitioning
-		of $\mathcal{K}(G)$ is at least the clique size
+		$K_u$ is cut by $\pi$ the partitioning, and so the cost of
+		this partitioning of $\mathcal{K}(G)$ is at least the clique size
 		$S = 4+2|V|\binom{|E|}{2}$. One may verify that for any graph,
 		$S > |E|$. However, $|E|$ is a trivial upperbound on the \gb problem
-		on $(V, E)$, which, by \ref{geb-leq-gb} is an upperbound on the optimal
-		partitioning of the edges of $\mathcal{K}(G)$. Together with the
-		observation that the cut size is at least $S$, this contradicts the
-		optimality of the partitioning of $\mathcal{K}(G)$. Hence there exists
-		a vertex (at least $S-|E|$ in fact) that only has adjacent edges of
-		a single color.
+		on $(V, E)$ (in which we cut \textit{every} edge in $E$),
+		which, by \autoref{geb-leq-gb} is an upperbound on the optimal
+		partitioning of the edges of $\mathcal{K}(G)$. Since we assumed our
+		partitioning $\pi$ is optimal, i.e. has cut size
+		exactly equal to $\sgeb(\mathcal{K}(G))$, this implies that
+
+		$$|E| \geq \sgb(G) \geq \sgeb(\mathcal{K}(G)) \geq S > |E|$$
+
+		which is a contradiction, so there must exist a vertex that only has
+		adjacent edges of a single color (in fact, we have shown $K_u$ must
+		contain at least $S - |E| > 0$ such vertices).
 	\end{proof}
 
+	In addition to the above, we would like to note in particular that by
+	definition, if $K_u$ has dominating color $c$, then any vertex in $K_u$
+	has at least one adjacent edge with color $c$.
+
 	Our strategy should now be obvious. We will color vertices in $G$ by
-	the dominating color of their cliques in $\mathcal{K}(G)$.
+	the dominating color of their cliques in an optimal partitioning of
+	$\mathcal{K}(G)$.
 
 	\begin{proposition}
 		\label{gb-leq-geb}
 		For any graph $G$ we have $\sgb(G) \leq \sgeb(\mathcal{K}(G))$.
 	\end{proposition}
 	\begin{proof}
-		Fix any optimal partitioning of $\mathcal{K}(G) = (V', E')$, and
-		color each vertex $u$ in $G = (V, E)$ with the dominating color of
-		its associated clique $K_u$ in $\mathcal{K}(G)$. We would like to
-		prove two things about this partitioning: that it equipartitions $V$,
-		and that the number of cut edges in $G$ is no more than the number of
-		cut vertices in $\mathcal{K}(G)$.
+		Fix any optimal partitioning $\pi$ of $\mathcal{K}(G) = (V', E')$, and
+		let $\tau$ color each vertex $u$ in $G = (V, E)$ with the dominating
+		color of its associated clique $K_u$ in $\mathcal{K}(G)$. We would
+		like to
+		prove two things about this partitioning $\tau$:
+		that the number of cut edges in $G$ is no more than the number of
+		cut vertices in $\mathcal{K}(G)$, and that it equipartitions $V$.
 
-		\todo{Finish proof}.
+
+		\begin{lemma}
+			\label{gb-leq-geb-lemma-1}
+			The number of edges cut by $\tau$ in $G$ is no more than the number
+			of vertices cut by $\pi$ in $\mathcal{K}(G)$.
+		\end{lemma}
+		\begin{proof}
+			Suppose $\tau$ cuts edge $e_i = \{u, v\} \in E$, that is,
+			$\tau(u) \neq \tau(v)$. This means the dominating colors of
+			of $K_u$ and $K_v$ are different, say without loss of generality
+			that $K_u$ is red and $K_v$ is blue. Hence, the vertex $s$ in
+			$\mathcal{K}(G)$ that
+			corresponds to $e_i$, which we obtained during construction
+			by merging the $i^{th}$
+			vertex of $K_u$ with the $i^{th}$ vertex of $K_v$, must have
+			red edges adjacent, because it is contained in $K_u$, and blue
+			edges, because it is contained in $K_v$.
+
+			So $\pi$ cuts $s$.
+			Since for every edge $e_j \in E$ we merged different
+			vertices (specifically, for $e_j$ we used the $j^{th}$ vertex of
+			the two cliques), each edge in $E$ cut by $\tau$ has a unique
+			corresponding vertex $s$ in $\mathcal{K}(G)$ cut by $\pi$,
+			proving the lemma.
+			\todo{In mijn scriptie deed ik dit in twee stappen door eerst te
+				bewijzen dat je gratis elke clique kan herkleuren naar zijn
+				dominante kleur, en dan de correspondentie $K_u \to u$ kan
+				gebruiken. Dit is iets korter, ik hoop dat het nog duidelijk
+				is.}
+		\end{proof}
+		\begin{lemma}
+			\label{gb-leq-geb-lemma-2}
+			$\tau$ equipartitions $V$.
+		\end{lemma}
+		\begin{proof}
+			Equivalently, we would like to prove that our optimal partitioning
+			$\pi$ of $\mathcal{K}(G)$ contains as many cliques with red as
+			their dominating color as it contains cliques with blue as their
+			dominating color.
+
+			Let $r,b \geq 0$, $r+b=|V|$ count these quantities, assuming
+			without loss of generality that $r \geq b$. Now consider a lower
+			bound on the number of red edges in a clique in $\mathcal{K}(G)$.
+			In each red clique we have at most
+			$|E|$ cut vertices (since we assumed our partitioning was optimal,
+			as in the proof of \autoref{dom-col}) (in fact,
+			across all cliques there are at most $|E|$ cut vertices, but for a
+			lower bound this will suffice), and the edges between two such
+			vertices may be blue, but none of the other $S - |E|$ vertices are
+			cut so, so all other edges should be red, and a lower
+			bound on the number of red edges in $\pi$ is:
+
+			$$r\Big( \binom{S}{2} - \binom{|E|}{2}\Big)$$
+
+			Similarly, we can find an upper bound for the number of blue edges
+			by the following reasoning: we color each blue-dominated clique
+			entirely blue, and as many edges as possible in each red-dominated
+			clique (at most $\binom{|E|}{2}$, as before). This gives as
+			upperbound:
+
+			$$b\binom{S}{2} + r\binom{|E|}{2}$$
+
+			But since $\pi$ was an optimal \textit{equi}partitioning of the
+			edges of $\mathcal{K}(G)$, certainly the lower bound on the amount
+			of red edges must be smaller than or equal to the upper bound on
+			the amount of blue edges:
+
+			$$r\Big( \binom{S}{2} - \binom{|E|}{2}\Big)
+				\leq b\binom{S}{2} + r\binom{|E|}{2}$$
+
+			Reordering terms:
+
+			\begin{equation}
+				\label{ineq-pf}
+				(r-b)\binom{S}{2} \leq 2r\binom{|E|}{2}
+			\end{equation}
+
+			Recall that we set $S = 4 + 2|V|\binom{|E|}{2}$. Since $S \geq 4$
+			we have $S \leq \binom{S}{2}$. Also, clearly $r \leq |V|$. So if
+			\autoref{ineq-pf} holds, then certainly the following holds:
+
+			$$(r-b)S \leq 2|V|\binom{|E|}{2}$$
+
+			Substituting $S$ and rewriting we get:
+
+			$$4(r-b) + 2(r-b-1)|V|\binom{|E|}{2} \leq 0$$
+ 
+			Since $r \geq b$, clearly this can only hold if $r=b$.
+		\end{proof}
+
+		Together \autoref{gb-leq-geb-lemma-1} and \autoref{gb-leq-geb-lemma-2}
+		imply that we can turn any optimal solution to the \geb problem on
+		$\mathcal{K}(G)$ into a solution of equal value to the \gb problem on
+		$G$, proving \autoref{gb-leq-geb}.
 	\end{proof}
 
 	We can now conclude:
 
 	\begin{theorem}
-		$\gb \leq_{\mathcal{P}} \geb$
+		\geb is \NP-Complete.
 	\end{theorem}
 	\begin{proof}
-		For a given instance of \gb $(G, M)$, by \ref{geb-leq-gb} and
-		\ref{gb-leq-geb} we know
+		We claim that $\gb \leq_{\mathcal{P}} \geb$.
+		For a given instance of \gb $(G, M)$, by \autoref{geb-leq-gb} and
+		\autoref{gb-leq-geb} we know
 		$\sgb(G) \leq M$ if and only if $\sgeb(\mathcal{K}(G)) \leq M$. So
-		if we can solve \geb on $\mathcal{K}(GB)$ (which has size polynomial
-		in the size of $G$, by \ref{poly-size}) in polynomial time, we can
+		if we can solve \geb on $\mathcal{K}(G)$ (which has size polynomial
+		in the size of $G$, by \autoref{poly-size}) in polynomial time, we can
 		also solve \gb on $G$ in polynomial time.
 	\end{proof}
 

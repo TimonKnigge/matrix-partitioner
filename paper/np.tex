@@ -25,6 +25,7 @@
 	for a perfect partitioning, i.e. with imbalance parameter $\epsilon = 0$.
 
 	\subsection{Preliminaries}
+	\label{1-preliminaries}
 	To begin, let us define a formal decision-variant of the matrix
 	partitioning problem for $k = 2$, based on the optimization
 	variant described in \autoref{introductory-section} where the goal
@@ -73,14 +74,14 @@
 	we will base our reduction on:
 
 	\begin{problem}
-		\problemtitle{\bgeb}
-		\probleminput{Given a bipartite graph
-			$G = (L \cup R, E)$ and an integer
-			$V$.}
+		\problemtitle{\geb}
+		\probleminput{Given a graph
+			$G = (V, E)$ and an integer
+			$M$.}
 		\problemquestion{Does there exist a disjoint partitioning of $E$
 			into $E_1 \cup E_2$ such that $|E_1| = |E_2|$ and
 			$\big|\big(\bigcup E_1 \big) \cap
-				\big(\bigcup E_2 \big)\big| \leq V$?\footnote{
+				\big(\bigcup E_2 \big)\big| \leq M$?\footnote{
 			Writing an edge as the set $\{ u, v\} \subset V$, then
 			$\bigcup E_1$ gives precisely the set of vertices touched
 			by $E_1$.}}
@@ -90,32 +91,6 @@
 	goal is to minimize the amount of cut vertices. Additionally, when we
 	explicitly need the partitioning/coloring of $E$, we will write it 
 	as a map $\pi : E \to \{0,1\}$.
-	Next, we note:
-	\begin{theorem}\label{bgeb-to-mbpt}
-		\begin{equation}
-			\begin{split}
-			\mbpt &\leq_{\mathcal{P}} \bgeb \\ &\leq_{\mathcal{P}} \mbpt
-			\end{split}
-		\end{equation}
-	\end{theorem}
-	\begin{proof} This follows directly from the construction described
-		previously.
-	\end{proof}
-
-	Hence, from now on we will focus on proving the hardness of \bgeb.
-	To achieve this, we will use as a stepping stone the version of this
-	problem where we remove the restriction that the graph is bipartite:
-
-	\begin{problem}
-		\problemtitle{\geb}
-		\probleminput{Given a graph
-			$G = (L \cup R, E)$ and an integer
-			$V$.}
-		\problemquestion{Does there exist a disjoint partitioning of $E$
-			into $E_1 \cup E_2$ such that $|E_1| = |E_2|$ and
-			$\big|\big(\bigcup E_1 \big) \cap
-				\big(\bigcup E_2 \big)\big| \leq V$?}
-	\end{problem}
 
 	\subsection{\geb is \NP-Complete}
 	We will do a reduction from \gb which was proven \NP-Complete in
@@ -432,15 +407,53 @@
 		also solve \gb on $G$ in polynomial time.
 	\end{proof}
 
-	\subsection{\bgeb is \NP-Complete}
-	\todo{Prove title}
+	\subsection{\mbpt is \NP-Complete}
 
-	As a corollary of the above theorem, \ref{bgeb-to-mbpt} and the
-	\NP-Completeness of \geb, we now get the main theorem of the section
-	for free:
+	We now consider the original \mbpt problem. As mentioned in
+	\autoref{1-preliminaries} this is equivalent to partitioning the edges of
+	a graph. We would like to immediately draw an equivalence between \mbpt
+	and \geb, but note that for a matrix $M$ the associated graph $G(M)$ is
+	always bipartite. However, we can resolve this:
 
-	\begin{theorem}
-		\mbpt is \NP-Complete.
-	\end{theorem}
-	
+	\begin{definition}
+		Given a graph $G = (V, E)$, it's \textit{edge split graph}
+		$\mathcal{S}(G) = (V', E')$ is given as:
+
+		$$V' = V \cup \{\, v_e \,\mid\, e \in E \,\}$$
+		$$E' = \bigcup_{e = \{u, w\} \in E} \{\,\{u, v_e\}\, \{v_e, w\}\,\}$$
+	\end{definition}
+
+	In other words, we replace each edge by a path of length two. The resulting
+	graph is clearly bipartite (with sides $V$ and $V' \setminus V$). Using
+	this bipartite extension of a graph, we can build a matrix and use \mbpt
+	to solve \geb. This process is displayed in figure \ref{}.
+
+	\todo{Insert picture}
+
+	First, we prove that we can safely take the \textit{edge split graph}
+	without affecting the \geb problem.
+
+	\begin{proposition}
+		\label{split-graph}
+		For any graph $G$ we have $\sgeb(G) = \sgeb(\mathcal{S}(G))$.
+	\end{proposition}
+
+	\begin{proof}
+		Let $G = (V, E)$ and $\mathcal{S}(G) = (V', E')$.
+		\begin{enumerate}
+			\item[$(\geq)$] Let $\pi$ be an optimal coloring of $E$. We define
+					a coloring $\pi'$ of $E'$ as follows. Let
+					$e' = \{u, v_e\} \in E'$ with $u \in V \subseteq V'$ and
+					$v_e \in V' \setminus V$. So $e'$ is half of the length two
+					path associated with $e$ in $G$. We set
+					$\pi'(e') = \pi(e)$, that is, we give each edge in $E'$ the
+					color of the edge in $E$ that induced it.
+
+					Then no vertices in $V'\setminus V$ were colored, since
+					both edges in a path have the same color, and the vertices
+					cut by $\pi'$ in $V \subseteq V'$ are precisely those
+					cut by $\pi$ in 
+			\item[$(\leq)$] abcd
+		\end{enumerate}
+	\end{proof}
 \end{document}

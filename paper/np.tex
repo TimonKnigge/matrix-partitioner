@@ -449,11 +449,72 @@
 					$\pi'(e') = \pi(e)$, that is, we give each edge in $E'$ the
 					color of the edge in $E$ that induced it.
 
-					Then no vertices in $V'\setminus V$ were colored, since
+					Then no vertices in $V'\setminus V$ were cut, since
 					both edges in a path have the same color, and the vertices
 					cut by $\pi'$ in $V \subseteq V'$ are precisely those
-					cut by $\pi$ in 
-			\item[$(\leq)$] abcd
+					cut by $\pi$ in $V$.
+			\item[$(\leq)$] Let $\pi'$ be any optimal coloring of $E'$. Now for
+					each edge $e \in E$ there are three possibilities:
+					\begin{itemize}
+						\item Both corresponding edges in $E'$ are colored red
+							by $\pi'$.
+						\item Both corresponding edges in $E'$ are colored blue
+							by $\pi'$.
+						\item The corresponding edges in $E'$ are colored with
+							two colors.
+					\end{itemize}
+					Let these quantities be counted by $n_r, n_b$ and $n_{rb}$
+					respectively. Then $|E| = n_r + n_b + n_{rb}$. But since
+					$\pi'$ colors as many edges in $E'$ red as blue, we also
+					have that $2n_r + n_{rb} = 2n_b + n_{rb}$, hence
+					$n_r = n_b$. So $n_{rb} = |E| - (n_r + n_b)$. Since $|E|$
+					is even (otherwise no valid equipartitioning exists),
+					$n_{rb}$ is the difference between two even numbers, and
+					hence even.
+
+					Now we will repeatedly apply the following procedure: pick
+					two edges $e = \{u, w\}$ and $f = \{s, t\}$ in $E$
+					from the third category, and assume
+					without loss of generality that
+					$\pi'(\{u, v_e\}) = \pi'(\{s, v_f\}) = 0$ and that
+					$\pi'(\{v_e, w\}) = \pi'(\{v_f, t\}) = 1$.
+
+					Now make a new coloring $\pi''$ which is identical to
+					$\pi'$ except that $\pi''(\{v_e, w\}) = 0$ and
+					$\pi''(\{s, v_f\}) = 1$. That is, we color the edges
+					corresponding $e$ as $0$ and $f$ as $1$.
+
+					\todo{Image}
+
+					So $\pi'$ and $\pi''$ are identical on the neighbourhoods
+					of $V' \setminus \{ v_e, w, s, v_f\}$, and hence cut the
+					same vertices there. Notice that $v_e$ and $v_f$ were cut,
+					but
+					aren't anymore. And $w$ and $s$ may have gone from
+					`not cut' to `cut',
+					but this does not matter since `uncutting' $v_e$ and $v_f$
+					compensates for this. So $\pi''$ does not cut more
+					vertices than $\pi'$.
+
+					Each time we apply this procedure we reduce $n_{rb}$ by
+					two, and since it is finite and even, we eventually arrive
+					at a coloring where each pair of edges $\{u, v_e\},
+					\{v_e, w\}$ has the same color, without increasing the
+					number of cut vertices. We can then map this to
+					a coloring $\pi$ of $E$, like in $(\geq)$.
 		\end{enumerate}
 	\end{proof}
+
+	Now we can turn any graph into a bipartite graph without changing its
+	smallest edge bisection. Using this we can prove the main theorem of this
+	section:
+
+	\begin{theorem}
+		\label{main-thm}
+		\mbpt is \NP-Complete.
+	\end{theorem}
+	\begin{proof}
+
+	\end{proof}
+
 \end{document}

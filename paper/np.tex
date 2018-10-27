@@ -45,7 +45,12 @@
 	\end{problem}
 
 	Here $VOL(Z_1, Z_2)$ counts the number of rows and columns that
-	have nonzeros in $Z_1$ and $Z_2$, as before.
+	have nonzeros in $Z_1$ and $Z_2$, as before. Note that unlike before,
+	we require $|Z_1|$ and $|Z_2|$ to be exactly equal, which implicitly
+	requires that the number of nonzeros is odd. This is not a very big
+	problem however: if $|Z|$ is odd, we can add one more dummy row and column
+	with a single nonzero. Then we can proceed under the assumption that $|Z|$
+	is even and at least one equipartitioning exists.
 
 	When thinking about the matrix bipartitioning problem, it is helpful
 	to reformulate it in terms of graphs. Given an $n \times m$ matrix $M$
@@ -58,18 +63,15 @@
 	the nonzeros of $M$ corresponds to a bipartitioning of the edges of $G(M)$,
 	and the rows and columns contributing to the final volume are correspond
 	precisely to the vertices with edges in both sides of the partition. See
-	also \autoref{figure-for-graph-equiv}.
+	also the figure.
 
 	\begin{figure}[h]
 		\input{figure-0-mat-equiv.tikz}
 		\centering
-		\label{mat-equiv}
+		\label{mat-equiv-fig}
 		\caption{Graph and matrix equivalence.}
 	\end{figure}
 	
-	\todo{Add image of graph equiv.}
-	\todo{Continue by describing equivalence of coloring and partitioning}
-
 	It should be clear this procedure is also reversible, i.e. for any
 	bipartite graph $G$ on $n$ and $m$ vertices,
 	we can construct a corresponding matrix $M$ of size $n \times m$ which has
@@ -327,11 +329,6 @@
 			the two cliques), each edge in $E$ cut by $\tau$ has a unique
 			corresponding vertex $s$ in $\mathcal{K}(G)$ cut by $\pi$,
 			proving the lemma.
-			\todo{In mijn scriptie deed ik dit in twee stappen door eerst te
-				bewijzen dat je gratis elke clique kan herkleuren naar zijn
-				dominante kleur, en dan de correspondentie $K_u \to u$ kan
-				gebruiken. Dit is iets korter, ik hoop dat het nog duidelijk
-				is.}
 		\end{proof}
 		\begin{lemma}
 			\label{gb-leq-geb-lemma-2}
@@ -433,9 +430,7 @@
 	In other words, we replace each edge by a path of length two. The resulting
 	graph is clearly bipartite (with sides $V$ and $V' \setminus V$). Using
 	this bipartite extension of a graph, we can build a matrix and use \mbpt
-	to solve \geb. This process is displayed in figure \ref{}.
-
-	\todo{Insert picture}
+	to solve \geb.
 
 	First, we prove that we can safely take the \textit{edge split graph}
 	without affecting the \geb problem.
@@ -524,14 +519,22 @@
 		$M$ with $M_{ij} = 1$ if $i \in L$ and $j \in R$ are connected, and $0$
 		otherwise.
 
-		We can now solve the \mbpt problem on $M$, and 
+		We can now solve the \mbpt problem on $M$, and using the correspondence
+		between matrices and bipartite graphs described in
+		\autoref{1-preliminaries}, we can turn this into an equipartitioning of
+		$E'$, since we have a correspondence between the partitioning of edges
+		and the partitioning of nonzeros, and a correspondence between cutting
+		vertices and cutting rows and columns. This is displayed in the figure.
 
 		\begin{figure}[h]
 			\input{figure-2-split.tikz}
 			\centering
-			\label{mat-equiv}
+			\label{figmgeb}
 			\caption{Solving \geb using \mbpt.}
 		\end{figure}
+
+		Now \autoref{split-graph} gives us a constructive algorithm to
+		transition between $G'$ and $G$, solving \geb on $G$.
 	\end{proof}
 
 \end{document}

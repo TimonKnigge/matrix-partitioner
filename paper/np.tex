@@ -60,6 +60,13 @@
 	precisely to the vertices with edges in both sides of the partition. See
 	also \autoref{figure-for-graph-equiv}.
 
+	\begin{figure}[h]
+		\input{figure-0-mat-equiv.tikz}
+		\centering
+		\label{mat-equiv}
+		\caption{Graph and matrix equivalence.}
+	\end{figure}
+	
 	\todo{Add image of graph equiv.}
 	\todo{Continue by describing equivalence of coloring and partitioning}
 
@@ -484,8 +491,6 @@
 					$\pi''(\{s, v_f\}) = 1$. That is, we color the edges
 					corresponding $e$ as $0$ and $f$ as $1$.
 
-					\todo{Image}
-
 					So $\pi'$ and $\pi''$ are identical on the neighbourhoods
 					of $V' \setminus \{ v_e, w, s, v_f\}$, and hence cut the
 					same vertices there. Notice that $v_e$ and $v_f$ were cut,
@@ -514,7 +519,19 @@
 		\mbpt is \NP-Complete.
 	\end{theorem}
 	\begin{proof}
+		We will show that $\geb \leq_{\mathcal{P}} \mbpt$. Given a graph $G$,
+		let $G'=\mathcal{S}(G)=(L\cup R, E')$. Create a $|L| \times |R|$ matrix
+		$M$ with $M_{ij} = 1$ if $i \in L$ and $j \in R$ are connected, and $0$
+		otherwise.
 
+		We can now solve the \mbpt problem on $M$, and 
+
+		\begin{figure}[h]
+			\input{figure-2-split.tikz}
+			\centering
+			\label{mat-equiv}
+			\caption{Solving \geb using \mbpt.}
+		\end{figure}
 	\end{proof}
 
 \end{document}

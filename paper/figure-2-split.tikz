@@ -1,0 +1,116 @@
+\begin{tikzpicture}
+[
+	box/.style={rectangle,draw=black,thick, minimum size=0.5cm},
+]
+		
+	\begin{scope}
+		\node at (3.5, 0){\huge$\rightarrow$};
+	\end{scope}
+
+	\begin{scope}
+		\node at (8.5, 0){\huge$\rightarrow$};
+	\end{scope}
+
+	\begin{scope}
+		\node at (10.8, -2){\huge$\downarrow$};
+	\end{scope}
+			
+	\begin{scope}
+		\node at (3.5, -4.2){\huge$\leftarrow$};
+	\end{scope}
+
+	\begin{scope}
+		\node at (8.5, -4.2){\huge$\leftarrow$};
+	\end{scope}
+		
+	\begin{scope}
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (1) at ($(-0.5,{sqrt(3)*-0.5})$) {1};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (2) at ($(-0.5,{sqrt(3)*0.5})$) {2};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (3) at (1, 0){3};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (4) at ($({1+sqrt(2)}, 0)$) {4};
+		
+		\draw[line width=1.5pt] (1) -- (2) -- (3) -- (1);
+		\draw[line width=1.5pt] (3) -- (4);
+	\end{scope}
+
+	\begin{scope}[local bounding box=scope1,shift={(5, 0)}]
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (1) at ($(-0.5,{sqrt(3)*-0.5})$) {1};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (5) at ($(-0.5,0)$) {5};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (2) at ($(-0.5,{sqrt(3)*0.5})$) {2};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (6) at ($(0.25,{sqrt(3)*0.25})$){6};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (3) at (1, 0){3};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (7) at ($(0.25,{sqrt(3)*-0.25})$){7};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (4) at ($({1+sqrt(2)}, 0)$) {4};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (8) at ($({1+0.5*sqrt(2)}, 0)$){8};
+			
+		\draw[line width=1.5pt] (1) -- (5) -- (2) -- (6) -- (3) -- (7) -- (1);
+		\draw[line width=1.5pt] (3) -- (8) -- (4);
+	\end{scope}
+
+	\begin{scope}[local bounding box=scope1,shift={(5, -4.2)}]
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (1) at ($(-0.5,{sqrt(3)*-0.5})$) {1};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (5) at ($(-0.5,0)$) {5};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (2) at ($(-0.5,{sqrt(3)*0.5})$) {2};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (6) at ($(0.25,{sqrt(3)*0.25})$){6};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (3) at (1, 0){3};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (7) at ($(0.25,{sqrt(3)*-0.25})$){7};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (4) at ($({1+sqrt(2)}, 0)$) {4};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (8) at ($({1+0.5*sqrt(2)}, 0)$){8};
+			
+		\draw[line width=3pt,draw=red] (1) -- (5) -- (2) -- (6) -- (3);
+		\draw[line width=3pt,draw=blue] (1) -- (7) -- (3) -- (8) -- (4);
+	\end{scope}
+	\begin{scope}[shift={(0, -4.2)}]
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (1) at ($(-0.5,{sqrt(3)*-0.5})$) {1};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (2) at ($(-0.5,{sqrt(3)*0.5})$) {2};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (3) at (1, 0){3};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (4) at ($({1+sqrt(2)}, 0)$) {4};
+		
+		\draw[line width=3pt,draw=red] (1) -- (2) -- (3);
+		\draw[line width=3pt,draw=blue] (1) -- (3) -- (4);
+	\end{scope}
+	\begin{scope}[shift={(10,-0.7)}]
+		\foreach \x in {0,0.5,1,1.5}{
+			\foreach \y in {0,0.5,1,1.5}
+				\node[box] at (\x,\y){};
+		}
+		\node[box,fill=gray] at (0	,1.5){};
+		\node[box,fill=gray] at (1	,1.5){};
+		\node[box,fill=gray] at (0	,1){};
+		\node[box,fill=gray] at (0.5	,1){};
+		\node[box,fill=gray] at (0.5	,0.5){};
+		\node[box,fill=gray] at (1	,0.5){};
+		\node[box,fill=gray] at (1.5	,0.5){};
+		\node[box,fill=gray] at (1.5	,0){};
+		\node[] at (-0.5,	0) {4};
+		\node[] at (-0.5,	0.5) {3};
+		\node[] at (-0.5,	1) {2};
+		\node[] at (-0.5,	1.5) {1};
+		\node[] at (0,	2) {5};
+		\node[] at (0.5,	2) {6};
+		\node[] at (1,	2) {7};
+		\node[] at (1.5,	2) {8};
+	\end{scope}
+	\begin{scope}[shift={(10,-5)}]
+		\foreach \x in {0,0.5,1,1.5}{
+			\foreach \y in {0,0.5,1,1.5}
+				\node[box] at (\x,\y){};
+		}
+		\node[box,fill=red] at (0	,1.5){};
+		\node[box,fill=blue] at (1	,1.5){};
+		\node[box,fill=red] at (0	,1){};
+		\node[box,fill=red] at (0.5	,1){};
+		\node[box,fill=red] at (0.5	,0.5){};
+		\node[box,fill=blue] at (1	,0.5){};
+		\node[box,fill=blue] at (1.5	,0.5){};
+		\node[box,fill=blue] at (1.5	,0){};
+		\node[] at (-0.5,	0) {4};
+		\node[] at (-0.5,	0.5) {3};
+		\node[] at (-0.5,	1) {2};
+		\node[] at (-0.5,	1.5) {1};
+		\node[] at (0,	2) {5};
+		\node[] at (0.5,	2) {6};
+		\node[] at (1,	2) {7};
+		\node[] at (1.5,	2) {8};
+	\end{scope}
+\end{tikzpicture}

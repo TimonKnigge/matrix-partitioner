@@ -1,0 +1,37 @@
+\begin{tikzpicture}
+[
+	box/.style={rectangle,draw=black,thick, minimum size=0.5cm},
+]
+		
+	\begin{scope}
+		\node at (3.5, 0){\huge$\rightarrow$};
+	\end{scope}
+
+	\begin{scope}[shift={(0, 0)}]
+		\foreach \x in {0,0.5,1}{
+			\foreach \y in {0,0.5,1}
+				\node[box] at (\x,\y){};
+		}
+		\node[box,fill=gray] at (0, 1){};
+		\node[box,fill=gray] at (0.5, 1){};
+		\node[box,fill=gray] at (1, 0.5){};
+		\node[box,fill=gray] at (0.5, 0){};
+		\node[] at (-0.5,	0) {3};
+		\node[] at (-0.5,	0.5) {2};
+		\node[] at (-0.5,	1) {1};
+		\node[] at (0,	1.5) {5};
+		\node[] at (0.5,	1.5) {6};
+		\node[] at (1,	1.5) {7};
+	\end{scope}
+
+
+	\begin{scope}
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (1) at ($(-0.5,{sqrt(3)*-0.5})$) {1};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (2) at ($(-0.5,{sqrt(3)*0.5})$) {2};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (3) at (1, 0){3};
+		\node[shape=circle,fill=white,draw=black,minimum size=13pt] (4) at ($({1+sqrt(2)}, 0)$) {4};
+		
+		\draw[line width=1.5pt] (1) -- (2) -- (3) -- (1);
+		\draw[line width=1.5pt] (3) -- (4);
+	\end{scope}
+\end{tikzpicture}

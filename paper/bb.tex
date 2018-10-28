@@ -180,19 +180,70 @@
 	Finding a maximal set of vertex disjoint paths is a classical maximum flow
 	problem, that can be solved by duplicating each vertex and connecting them
 	with a capacity $1$ edge, to enforce that every vertex be used only once.
-	A good description on how to do this exactly may be found in \todo{Find
-		something}.
+	Specifically, given our graph $G = (V, E)$ we create
+	a new directed graph $G' = (V', A)$ with two vertices $v_{in}$, $v_{out}$
+	for every $v \in V$, arcs $(u_{out}, v_{in})$ for every $\{u, v\} \in E$,
+	and finally we add the arc $(u_{in}, u_{out})$ for every $u \in V$.
+	Giving all arcs integer capacities, then the maximum flow between
+	$u_{out}$ and $v_{in}$ in $G'$ gives us the minimum vertex cut between
+	$u$ and $v$ in $G$.
+	A more thorough exposition may be found in \cite{} CLRS
+	in chapter 26.
 
 	However, while the maximum flow problem may be solved in polynomial time,
-	it still requires computation over the entire graph
+	it still requires computation over the entire graph, which may slow down
+	our algorithm for large matrices. Instead, we can reuse the flow from the
+	previous branch and bound step and incrementally recompute the new flow.
 
-	\todo{For implementation notes, misschien toch uitleggen?}
+	We will state, for the sake of completeness,
+	without exposition, how to do this for each change. Suppose
+	our branch and bound algorithm selects $u$, and that we already have the
+	corresponding maximum flow for our current partial assignment.
+	\begin{enumerate}
+		\item[] \textbf{Coloring $u$ red} This means the relevant vertex
+			becomes a source for the maximum flow problem ($u_{out}$
+			specifically). Hence, any new paths will have this vertex as their
+			source, and we can just repeatedly do a breadth first search from
+			this vertex to find an augmenting path (as opposed to searching
+			from all sources, as when we would compute the flow from scratch).
+		\item[] \textbf{Uncoloring $u$ red} Now $u_{out}$ is the source of 
+			some flow paths. We would like to maintain as many of these as
+			possible (to keep our flow maximal). To this end, we temporarily
+			pretend that $u_{out}$ is a sink, and find reverse augmenting paths
+			to other sources. This we can also do in a single breadth first
+			search per unit change in flow. Once this is no longer possible,
+			we instead search for sinks to remove flow paths (decrementing the
+			flow for each path we find).
+		\item[] \textbf{Cutting $u$} This means completely taking $u$ out of
+			the flow graph, since the paths for our Flow Bound may not run
+			through $C$. However, at most a single path is running through
+			$u$, which we could check by looking at the current flow through
+			$(u_{in}, u_{out})$. If there is a flow, we can scan from $u_{in}$
+			to search for $u_{out}$ (not using the arc that connects them) to
+			reroute the flow path in question. If possible, we augment this
+			path. If not, we scan for an augmenting path to a source starting
+			from $u_{in}$ and a reverse augmenting path to a
+			sink starting from $u_{out}$ so we can remove one flow path. We
+			then set the capacity of $(u_{in}, u_{out})$ to $0$. This requires
+			at most three breadth first searches.
+		\item[] \textbf{Uncutting $u$} Any new augmenting path would have to
+			run through $u$, and clearly there can be at most one. So we scan
+			for a reverse augmenting path to a source from $u_{in}$ and an
+			augmenting path to a sink from $u_{out}$. If we find both, we can
+			concatenate them and augment this path, incrementing our flow by
+			one.
+	\end{enumerate}
+
+	The cases for coloring and uncoloring blue vertices are symmetric, so we
+	will omit them.
+	Note that the reason we can readjust flow paths by single breadth first
+	searches is that all arcs have unit capacities.
 
 	\subsection{Extended Packing Bound}
 
 	We now consider the problem of extending the packing bound over the whole
 	graph (rather than just neighbourhoods of $R$ and $B$). This idea is based
-	on 
+	on  \todo{Write.}
 	\begin{definition}
 		An internally connected
 	\end{definition}
@@ -223,14 +274,24 @@
 	bipartition, we traverse first the subtree that assigns $u$ to the smallest
 	side in the bipartition.
 
-	As a footnote we will refer to the paper by et. al. (\cite{}) who show
+	As a footnote we will refer to the paper by \todo{Mumcuyan} et. al. (\cite{}) who show
 	other branching strategies can be faster, and learn to predict the optimal
 	strategy based matrix statistics.
 	
-	\subsubsection{Upper and lower bounds}
+	\subsubsection{Initial upper bound}
 
-	\todo{Repeated runs with increasing bounds $0, 1, ...$.}
-	\todo{Incremental computation of lower bound}
+	To correctly prune, our branch and bound algorithm needs an upper bound to
+	compare its lower bound against. Before we have found our first feasible
+	solution we could use the trivial $\min(n, m) + 1$ lower bound. Although
+	this upper bound is in some sense tight (consider an odd square matrix
+	with only one nonzero), it is usually quite bad and forces our algorithm
+	to consider many very suboptimal solutions before arriving at better ones.
 
+	Instead, we would like to run the algorithm with an upper bound as tight
+	as possible. Hence, we run our algorithm with an initial (strict) upper
+	bound of $U_1 = 1$, and rerun with
+	$U_{i+1} = \lceil \frac{5}{4} U_i \rceil$ until we have found a solution.
+	\todo{Als blijkt dat looptijd echt meer van volume afhankelijk is zou dat
+		hier goed uitkomen.}
 
 \end{document}

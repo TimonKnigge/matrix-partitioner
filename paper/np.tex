@@ -47,10 +47,11 @@
 	Here $VOL(Z_1, Z_2)$ counts the number of rows and columns that
 	have nonzeros in $Z_1$ and $Z_2$, as before. Note that unlike before,
 	we require $|Z_1|$ and $|Z_2|$ to be exactly equal, which implicitly
-	requires that the number of nonzeros is odd. This is not a very big
+	requires that the number of nonzeros is even. This is not a very big
 	problem however: if $|Z|$ is odd, we can add one more dummy row and column
 	with a single nonzero. Then we can proceed under the assumption that $|Z|$
-	is even and at least one equipartitioning exists.
+	is even and at least one equipartitioning exists, and remove the dummy
+	nonzero at the end again.
 
 	When thinking about the matrix bipartitioning problem, it is helpful
 	to reformulate it in terms of graphs. Given an $n \times m$ matrix $M$

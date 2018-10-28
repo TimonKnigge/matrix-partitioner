@@ -136,25 +136,101 @@
 	a series of vertices $v_1, v_2, \dots, v_k$ with
 	$v_i \not\in R\cup B\cup C$ for $1 \leq i\leq k$,
 	and in particular $v_1 \in P_R$ and $v_k \in P_B$,
-	such that $\{v_i, v_{i+1}\} \in E$ for all $1 \leq i < k$.
+	such that $\{v_i, v_{i+1}\} \in E$ for all $1 \leq i < k$. This
+	corresponds to a series of intersecting rows and columns, the first of
+	which contains a red nonzero (corresponding to the edge between $v_1$ and
+	its neighbour in $R$) and the last a blue nonzero.
 
-	\subsubsection{Implementation notes for the Flow Bound}
-	\todo{incremental}
-	\todo{augmenting paths}
+	Clearly then any extension of the current partial assignment must cut one
+	of these vertices. If $v_1$ is not cut then it must be fully red, making
+	$v_2$ partially red, etc..
+
+	\todo{Image, from slides? Maar die heeft 2 paths, dus kan later miss.beter}
+
+	So if a single path between $P_R$ and $P_B$ implies that we have to cut at
+	least one vertex, how do we extend this to multiple paths? Here we run in
+	to the same issue as with the matching bound: if we have two paths that
+	share a vertex, we can just cut that vertex to separate red and blue edges,
+	for a cost of $1$.
+
+	\todo{Hier is een plaatje ook wel leuk, maar niet echt nodig}
+
+	Hence, to prove a lower bound of more than $1$ we have to require that the
+	paths are disjoint. In particular, the
+	strongest lower bound we can find will be the maximum number of vertex
+	disjoint paths between $P_R$ and $P_B$. Note that these paths must be
+	vertex disjoint in $P_R$ and $P_B$ as well, since those vertices may also
+	still be cut. Alternatively, when we imagine $R$ and $B$ as a single
+	vertex, we are looking for a maximum number of paths from $R$ to $B$ that
+	are vertex disjoint outside of $R$ and $B$. In fact, a theorem by Menger
+	shows that this is actually exactly the size of the smallest vertex cut.
+
+	\begin{theorem}{(Menger, \cite{})}
+		Let $G$ be a finite undirected graph, and let $u$ and $v$ be two
+		non-adjacent vertices in $G$, then the size of the smallest vertex cut
+		separating $u$ and $v$ equals the maximum number of vertex disjoint
+		paths between $u$ and $v$.
+	\end{theorem}
+
+	Unfortunately, the resulting cut may be very unbalanced, so we can only
+	use this as an upperbound.
+
+	\subsubsection{Implementation notes on the Flow Bound}
+
+	Finding a maximal set of vertex disjoint paths is a classical maximum flow
+	problem, that can be solved by duplicating each vertex and connecting them
+	with a capacity $1$ edge, to enforce that every vertex be used only once.
+	A good description on how to do this exactly may be found in \todo{Find
+		something}.
+
+	However, while the maximum flow problem may be solved in polynomial time,
+	it still requires computation over the entire graph
+
+	\todo{For implementation notes, misschien toch uitleggen?}
 
 	\subsection{Extended Packing Bound}
 
 	We now consider the problem of extending the packing bound over the whole
-	graph (rather than just neighbourhoods of $R$ and $B$). 
-
+	graph (rather than just neighbourhoods of $R$ and $B$). This idea is based
+	on 
 	\begin{definition}
 		An internally connected
 	\end{definition}
 
+	\subsubsection{Implementation notes on the Extended Packing Bound}
+
 	\subsection{Further implementation notes}
 
-	\todo{First branch on the smallest of red/blue, then cut}
-	\todo{Select next vertex by max free degree.}
+	In this section, in the interest of reproducibility, we make a few notes
+	on relevant decisions we made regarding implementation of the branch and
+	bound algorithm.
+
+	\subsubsection{Branching strategy}
+	While we already specified that we branch on marking a row or column as
+	\textit{red}, \textit{blue} or \textit{cut}, the order in which we
+	select the rows and columns for branching could significantly affect the
+	performance of the algorithm.
+
+	Intuitively, it makes sense to branch on rows and columns with more free
+	nonzeros, since their assignment affects the balance of the bipartitioning
+	the most, and their high connectivity suggests they may be useful as
+	sources of paths in the Flow Bound or subgraphs in the Extended Packing
+	Bound. Thus, at each step we select for branching a row or column $u$
+	with a maximal
+	number of unassigned nonzeros, breaking ties arbitrarily. Additionally,
+	since the goal is to cut as few rows and columns as possible, we traverse
+	the `\textit{cut}' subtree last, and since the goal is to balance the
+	bipartition, we traverse first the subtree that assigns $u$ to the smallest
+	side in the bipartition.
+
+	As a footnote we will refer to the paper by et. al. (\cite{}) who show
+	other branching strategies can be faster, and learn to predict the optimal
+	strategy based matrix statistics.
+	
+	\subsubsection{Upper and lower bounds}
+
 	\todo{Repeated runs with increasing bounds $0, 1, ...$.}
+	\todo{Incremental computation of lower bound}
+
 
 \end{document}

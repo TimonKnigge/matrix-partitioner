@@ -1,0 +1,131 @@
+\documentclass{article}
+
+\input{preamble.tex}
+
+
+\begin{document}
+
+	\section{Exact Algorithm}
+
+	In this section we give an exact algorithm for finding an exact
+	bipartitioning of a matrix, extending the branch and bound
+	algorithm by Pelt \&
+	Bisseling \cite{pelt-and-bisseling}. We first give a quick overview
+	of their approach, a better understanding can be gained by reading the
+	paper itself.
+
+	After that we give two new bounds that extend the reach of the previous
+	algorithm.
+
+	\subsection{Previous work}
+
+	All of this subsection concerns work done in \cite{pelt-and-bisseling}.
+
+	Recall that a branch and bound algorithm initially starts with
+	(a representation of) the whole solution space, and then repeatedly
+	branches on properties of the solutions until these are refined
+	enough that they specify a single solution (this is a leaf in the branch
+	and bound tree). When the properties are
+	chosen carefully, we may cut off (`bound') large parts of the search
+	tree.
+
+	In the case of matrix bipartitioning, a first obvious choice would 
+	be to branch on
+	which side of the partition we put each nonzero in. For an $n \times m$
+	matrix with $N$ nonzeros this results in $2^N$ leaf nodes. However,
+	\todo{waarom niet?, even goed praten waarom dit een slecht idee is}.
+	Instead, we can branch of the status of each of the
+	rows and columns of the matrix: each of them is either entirely red,
+	entirely blue, or `cut', i.e. it contains both colors. As a result, we
+	only have $3^{n+m}$ leafs, which is already smaller than $2^N$ when
+	$n + m < \log_3(2) N \approx 0.63N$. However, not all of the $3^{n+m}$
+	states are even reachable: if a row and column intersect in a nonzero,
+	we cannot mark one of them as \textit{red} and one of them as \textit{blue}
+	(i.e. we do require assignments be consistent).
+
+	When we traverse the branch and bound tree, at each stage we have a
+	`partial assignment', where some of the rows and columns are
+	\textit{red}, \textit{blue} or \textit{cut}, and some are still
+	unassigned. For a given matrix $M$ and its bipartite graph representation
+	$G(M) = (V, E)$ (recall \autoref{}),
+	we will write $R \subseteq V$ (resp. $B, C \subseteq V$)
+	for the vertices (corresponding to rows and columns) that were assigned
+	\textit{red} (resp. \textit{blue}, \textit{cut}). Additionally, while
+	all remaining vertices are unassigned, they may still be connected to
+	vertices in $R, B$ and $C$. For example, if an unassigned column
+	vertex $u$ is
+	adjacent to a row vertex in $r \in R$, this means that $M_{ru}$ is nonzero.
+	In particular, since row $r$ is red, we cannot make $u$ blue. So we will
+	call $u$ \textit{partially red}, written as $P_R$ (with $P_B$ defined
+	analogously). Finally, an unassigned vertex may have neighbours in both
+	$R$ and $B$. While unassigned, we are basically forced to cut this vertex.
+	Because of this, we assume that whenever such a vertex is created, we
+	immediately cut it. So we will ignore these vertices.
+
+	For pruning, the following two bounds are used:
+	\begin{enumerate}
+		\item[] \textbf{Packing bound} Let $E(R)$ denote all the edges that
+				are colored red by the current partial assignment (that is, all
+				edges adjacent to a vertex in $R$).
+				For each partially red vertex
+				$p \in P_R$ (i.e. $p$ has a vertex in $R$ adjacent), let
+				$$N^R(p) = \{\, e \in E \,\mid\, \text{$e$ is adjacent to $p$
+				but not to $R$ or $B$}\,\}$$
+				Then all edges in $N^R(p)$ are still free, but directly
+				adjacent to a red edge, since $p$ is adjacent to some $r\in R$,
+				so we are forced to color $\{p, r\}$ red.
+
+				If we don't want to cut any more vertices, we have to color all
+				edges in $N^R(p)$ red. But if
+				$|E(R)| + \sum_{p\in P_R} |N^R(p)| > \frac{1}{2}|E|$, this will
+				lead to an unbalanced partition, and we are forced to cut some
+				of the vertices $p \in P_R$. Since we are looking for a lower
+				bound, we can greedily take those vertices with largest
+				$|N^R(p)|$ until the sum is small enough again.
+
+				Note that we implicitly assumed all the $N^R(p)$ were disjoint,
+				so we can assign their edges independently. Since
+				$G(M) = (V,E)$ is bipartite, this is true if we consider each
+				side of the bipartition separately. We can then do the same
+				for $P_B$, and add everything together to get the
+				\textit{packing bound}.
+		\item[] \textbf{Matching bound} Let's consider some $p \in P_R$ and
+				$q \in P_B$ with $\{p, q\} \in E$. We note that $p$ has a red
+				edge adjacent (through its adjacent vertex in $R$), and $q$ has
+				a blue edge adjacent. Clearly no matter what color we give
+				$\{p, q\}$, we will have to cut one of them.
+
+				We can improve this by finding a maximal set of such edges that
+				are disjoint (this is necessary, since otherwise we could
+				resolve $\{p, q\}$ and $\{p, q'\}$ just by cutting $p$).
+				The relevant graph is just our bipartite graph
+				$G(M) = (V, E)$ restricted to
+				$P_R \cup P_B \subseteq V$, keeping only edges with one
+				endpoint in $P_R$ and one in $P_B$. Bipartite
+				matching is a classical problem we can solve in polynomial
+				time. Then the size of the maximum matching is a lower bound
+				on the number of vertices that still have to be cut by any
+				extension of the current partial assignment.
+	\end{enumerate}
+
+	These two bounds conflict with each other, so must take the maximum of the
+	two. We add to this the total number of already cut vertices $|C|$ to
+	obtain a lower bound on any extension of the current partial assignment.
+	If this matches the cost of the best solution already seen (an obvious
+	upper bound on the optimal solution), we can prune the current subtree.
+
+	One issue with these two bounds is that they are in some sense `local'
+	bounds. They both only consider the direct neighbourhoods of $R$ and $B$
+	(through $P_R$ and $P_B$). The two bounds we give next can be seen as
+	extending the above bounds to the whole graph, taking full advantages of
+	its connectivity.
+
+	\subsection{Flow Bound}
+
+	We will begin 
+
+	\subsection{Extended Packing Bound}
+
+	\subsection{Further implementation notes}
+
+\end{document}

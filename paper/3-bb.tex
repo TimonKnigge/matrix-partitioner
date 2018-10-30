@@ -1,15 +1,10 @@
-\documentclass{article}
-
-\input{preamble.tex}
-
-\begin{document}
-
 	\section{Exact Algorithm}
+	\label{sec:opt}
 
 	In this section we give an exact algorithm for finding an exact
 	bipartitioning of a matrix, extending the branch and bound
 	algorithm by Pelt \&
-	Bisseling \cite{pelt-and-bisseling}. We first give a quick overview
+	Bisseling \cite{pelt15}. We first give a quick overview
 	of their approach, though
 	a better understanding can be gained by reading the
 	paper itself.
@@ -19,7 +14,7 @@
 
 	\subsection{Previous work}
 
-	All of this subsection concerns work done in \cite{pelt-and-bisseling}.
+	All of this subsection concerns work done in \cite{pelt15}.
 
 	Recall that a branch and bound algorithm initially starts with
 	(a representation of) the whole solution space, and then repeatedly
@@ -47,7 +42,7 @@
 	`partial assignment', where some of the rows and columns are
 	\textit{red}, \textit{blue} or \textit{cut}, and some are still
 	unassigned. For a given matrix $M$ and its bipartite graph representation
-	$G(M) = (V, E)$ (recall \autoref{}),
+	$G(M) = (V, E)$ (recall the equivalence from \autoref{sec:np}),
 	we will write $R \subseteq V$ (resp. $B, C \subseteq V$)
 	for the vertices (corresponding to rows and columns) that were assigned
 	\textit{red} (resp. \textit{blue}, \textit{cut}). Additionally, while
@@ -312,5 +307,3 @@
 	$U_{i+1} = \lceil \frac{5}{4} U_i \rceil$ until we have found a solution.
 	\todo{Als blijkt dat looptijd echt meer van volume afhankelijk is zou dat
 		hier goed uitkomen.}
-
-\end{document}

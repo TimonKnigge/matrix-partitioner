@@ -1,24 +1,5 @@
-\documentclass{article}
-
-\input{preamble.tex}
-
-% Add commands here
-
-% Decision problems
-\newcommand{\mbpt}{\textsc{Matrix \allowbreak Bipartition} }
-\newcommand{\gb}{\textsc{Graph \allowbreak Bisection} }
-\newcommand{\geb}{\textsc{Graph \allowbreak Edge-\allowbreak Bisection} }
-\newcommand{\bgeb}{
-	\textsc{Bipartite \allowbreak Graph \allowbreak Edge-\allowbreak Bisection}
- }
-\newcommand{\sgeb}{\textsc{GEB} }
-\newcommand{\sgb}{\textsc{GB} }
-
-% /commands
-
-\begin{document}
-
 	\section{Hardness results}
+	\label{sec:np}
 	In this section we will formally analyze the matrix partitioning
 	problem and prove that it is \NP-Complete, even if we fix the
 	the number of processors to $k = 2$. We will assume we are looking
@@ -28,13 +9,13 @@
 	\label{1-preliminaries}
 	To begin, let us define a formal decision-variant of the matrix
 	partitioning problem for $k = 2$, based on the optimization
-	variant described in \autoref{introductory-section} where the goal
+	variant described in \autoref{sec:intro} where the goal
 	is to minimize the total communication volume. We formulate our
 	decision problems in the style of \cite{npbook}.
 
 	\begin{problem}
 		\problemtitle{\mbpt}
-		\probleminput{A $n\times m$ matrix $M$, whose nonzeros are precisely
+		\probleminput{An $n\times m$ matrix $A$, whose nonzeros are precisely
 			indexed by the set
 			$Z \subseteq \{\, 1, \dots, n \,\} \times
 				\{\, 1, \dots, m \,\}$, and an integer $V$, the required
@@ -54,15 +35,15 @@
 	nonzero at the end again.
 
 	When thinking about the matrix bipartitioning problem, it is helpful
-	to reformulate it in terms of graphs. Given an $n \times m$ matrix $M$
-	we can define a bipartite adjacency graph $G(M) = (V(M), E(M))$ with
-	$n$ vertices representing the rows of $M$, and $m$ vertices representing
+	to reformulate it in terms of graphs. Given an $n \times m$ matrix $A$
+	we can define a bipartite adjacency graph $G(A) = (V(A), E(A))$ with
+	$n$ vertices representing the rows of $A$, and $m$ vertices representing
 	the columns, where a row vertex $r$ and a column vertex $c$ are connected
-	if and only if $M_{rc}$ is nonzero.
+	if and only if $A_{rc}$ is nonzero.
 
 	This equivalence extends to the partitioning problem. A bipartitioning of
-	the nonzeros of $M$ corresponds to a bipartitioning of the edges of $G(M)$,
-	and the rows and columns contributing to the final volume are correspond
+	the nonzeros of $A$ corresponds to a bipartitioning of the edges of $G(A)$,
+	and the rows and columns contributing to the final volume correspond
 	precisely to the vertices with edges in both sides of the partition. See
 	also the figure.
 
@@ -75,7 +56,7 @@
 	
 	It should be clear this procedure is also reversible, i.e. for any
 	bipartite graph $G$ on $n$ and $m$ vertices,
-	we can construct a corresponding matrix $M$ of size $n \times m$ which has
+	we can construct a corresponding matrix $A$ of size $n \times m$ which has
 	nonzeros precisely for the vertices that are connected in $G$. While the
 	nonzero entries of this matrix can be any value, the associated nonzero
 	pattern is uniquely determined by the edges of $G$.
@@ -90,20 +71,20 @@
 			$M$.}
 		\problemquestion{Does there exist a disjoint partitioning of $E$
 			into $E_1 \cup E_2$ such that $|E_1| = |E_2|$ and
-			$\big|\big(\bigcup E_1 \big) \cap
-				\big(\bigcup E_2 \big)\big| \leq M$?\footnote{
+			$\big|\big(\bigcup_{e\in E_1} e \big) \cap
+				\big(\bigcup_{e\in E_2} e \big)\big| \leq M$?\footnote{
 			Writing an edge as the set $\{ u, v\} \subset V$, then
-			$\bigcup E_1$ gives precisely the set of vertices touched
+			$\bigcup_{e \in E_1} e$ gives precisely the set of vertices touched
 			by $E_1$.}}
 	\end{problem}
 
 	We call a vertex with adjacent edges from both partitions `cut'. The
-	goal is to minimize the amount of cut vertices. Additionally, when we
+	goal is to minimize the number of cut vertices. Additionally, when we
 	explicitly need the partitioning/coloring of $E$, we will write it 
 	as a map $\pi : E \to \{0,1\}$.
 
 	\subsection{\geb is \NP-Complete}
-	We will do a reduction from \gb which was proven \NP-Complete in
+	We will perform a reduction from \gb which was proven \NP-Complete in
 	\cite{gb-np-complete} under the name \textsc{Minimum \allowbreak
 	cut \allowbreak into \allowbreak equal-\allowbreak sized \allowbreak
 	subsets}.
@@ -112,14 +93,18 @@
 		\problemtitle{\gb}
 		\probleminput{A graph $G = (V, E)$, an integer $M$.}
 		\problemquestion{Does there exist a disjoint partition of $V$
-			into $V_1 \cup V_2$ with $|V_1| = |V_2|2$ and such that
+			into $V_1 \cup V_2$ with $|V_1| = |V_2|$ and such that
 			$|\{\, \{u, v\} \,\mid\, u \in V_1, v\in V_2 \,\}| \leq M$?}
 	\end{problem}
 
 	Analogously to \geb, an edge with endpoints in both sides of the
-	partition is called `cut', the goal is to minimize the amount of
-	cut edges. We similarly write a partitioning/coloring of $V$ as
-	a map $\tau : V \to \{0, 1\}$.
+	partition is called `cut', the goal is to minimize the number of
+	cut edges. We similarly write a partitioning of $V$ as
+	a map $\tau : V \to \{0, 1\}$. We can also think of $\tau$ as coloring
+	the vertices in $V$, where one side of the partition has color red, and one
+	side has color blue. However this should not be confused with the classical
+	graph coloring problem, since we allow neighbouring vertices to have the
+	same color.
 
 	Let us give a sketch of our proof strategy:
 	given an instance $(G, M)$ of the \gb problem, we
@@ -157,9 +142,9 @@
 		\label{clique-expansion}
 		Given a graph $G = (V, E)$,
 		let $S = 4 + 2|V|\binom{|E|}{2}$.
-		We define its clique expansion expansion
+		We define its clique expansion
 		$\mathcal{K}(G) = (V', E')$ as first taking a disjoint union of $|V|$
-		copies of the complete graph on $S$ vertices $K_S$. Then, labelling the
+		copies of the complete graph $K_S$ on $S$ vertices. Then, labelling the
 		edges in $E$ as $e_1, e_2, \dots, e_{|E|}$, for each edge
 		$e_i = \{u, v\}$
 		we merge the $i^{th}$ vertex of the $K_S$ representing $u$ with the
@@ -197,6 +182,7 @@
 	a graph $G=(V, E)$, let $\sgb(G)$ denote the optimal solution of the \gb
 	problem on $G$, and let $\sgeb(\mathcal{K}(G))$ denote the optimal solution
 	of the \geb problem on its \textit{clique expansion} $\mathcal{K}(G)$.
+	Here, the solution refers to the communication volume.
 
 	\begin{proposition}
 		\label{geb-leq-gb}
@@ -239,7 +225,7 @@
 	that an optimal partitioning of $\mathcal{K}(G)$ colors each clique
 	monochromatically. It turns
 	out however, that we can still deterministically associate a color with
-	each clique, provided we have an \textbf{optimal coloring}.
+	each clique, provided we have an \textbf{optimal partitioning}.
 
 	\begin{definition}
 		Let $K$ be a clique and suppose we have a coloring of its edges. The
@@ -268,12 +254,12 @@
 
 		As for existence, assume to the contrary that every vertex in $K_u$
 		has both blue and red edges adjacent. But this means each vertex in
-		$K_u$ is cut by $\pi$ the partitioning, and so the cost of
+		$K_u$ is cut by the partitioning $\pi$, and so the cost of
 		this partitioning of $\mathcal{K}(G)$ is at least the clique size
 		$S = 4+2|V|\binom{|E|}{2}$. One may verify that for any graph,
-		$S > |E|$. However, $|E|$ is a trivial upperbound on the \gb problem
+		$S > |E|$. However, $|E|$ is a trivial upper bound on the \gb problem
 		on $(V, E)$ (in which we cut \textit{every} edge in $E$),
-		which, by \autoref{geb-leq-gb} is an upperbound on the optimal
+		which, by \autoref{geb-leq-gb} is an upper bound on the optimal
 		partitioning of the edges of $\mathcal{K}(G)$. Since we assumed our
 		partitioning $\pi$ is optimal, i.e. has cut size
 		exactly equal to $\sgeb(\mathcal{K}(G))$, this implies that
@@ -350,7 +336,7 @@
 			across all cliques there are at most $|E|$ cut vertices, but for a
 			lower bound this will suffice), and the edges between two such
 			vertices may be blue, but none of the other $S - |E|$ vertices are
-			cut so, so all other edges should be red, and a lower
+			cut, so all other edges should be red, and a lower
 			bound on the number of red edges in $\pi$ is:
 
 			$$r\Big( \binom{S}{2} - \binom{|E|}{2}\Big)$$
@@ -359,14 +345,14 @@
 			by the following reasoning: we color each blue-dominated clique
 			entirely blue, and as many edges as possible in each red-dominated
 			clique (at most $\binom{|E|}{2}$, as before). This gives as
-			upperbound:
+			upper bound:
 
 			$$b\binom{S}{2} + r\binom{|E|}{2}$$
 
 			But since $\pi$ was an optimal \textit{equi}partitioning of the
 			edges of $\mathcal{K}(G)$, certainly the lower bound on the amount
 			of red edges must be smaller than or equal to the upper bound on
-			the amount of blue edges:
+			the number of blue edges:
 
 			$$r\Big( \binom{S}{2} - \binom{|E|}{2}\Big)
 				\leq b\binom{S}{2} + r\binom{|E|}{2}$$
@@ -417,11 +403,11 @@
 	We now consider the original \mbpt problem. As mentioned in
 	\autoref{1-preliminaries} this is equivalent to partitioning the edges of
 	a graph. We would like to immediately draw an equivalence between \mbpt
-	and \geb, but note that for a matrix $M$ the associated graph $G(M)$ is
+	and \geb, but note that for a matrix $A$ the associated graph $G(A)$ is
 	always bipartite. However, we can resolve this:
 
 	\begin{definition}
-		Given a graph $G = (V, E)$, it's \textit{edge split graph}
+		Given a graph $G = (V, E)$, its \textit{edge split graph}
 		$\mathcal{S}(G) = (V', E')$ is given as:
 
 		$$V' = V \cup \{\, v_e \,\mid\, e \in E \,\}$$
@@ -482,10 +468,10 @@
 					$\pi'(\{u, v_e\}) = \pi'(\{s, v_f\}) = 0$ and that
 					$\pi'(\{v_e, w\}) = \pi'(\{v_f, t\}) = 1$.
 
-					Now make a new coloring $\pi''$ which is identical to
+					Now construct a new coloring $\pi''$ which is identical to
 					$\pi'$ except that $\pi''(\{v_e, w\}) = 0$ and
 					$\pi''(\{s, v_f\}) = 1$. That is, we color the edges
-					corresponding $e$ as $0$ and $f$ as $1$.
+					corresponding to $e$ as $0$, and to $f$ as $1$.
 
 					So $\pi'$ and $\pi''$ are identical on the neighbourhoods
 					of $V' \setminus \{ v_e, w, s, v_f\}$, and hence cut the
@@ -517,10 +503,10 @@
 	\begin{proof}
 		We will show that $\geb \leq_{\mathcal{P}} \mbpt$. Given a graph $G$,
 		let $G'=\mathcal{S}(G)=(L\cup R, E')$. Create a $|L| \times |R|$ matrix
-		$M$ with $M_{ij} = 1$ if $i \in L$ and $j \in R$ are connected, and $0$
+		$A$ with $A_{ij} = 1$ if $i \in L$ and $j \in R$ are connected, and $0$
 		otherwise.
 
-		We can now solve the \mbpt problem on $M$, and using the correspondence
+		We can now solve the \mbpt problem on $A$, and using the correspondence
 		between matrices and bipartite graphs described in
 		\autoref{1-preliminaries}, we can turn this into an equipartitioning of
 		$E'$, since we have a correspondence between the partitioning of edges
@@ -537,5 +523,3 @@
 		Now \autoref{split-graph} gives us a constructive algorithm to
 		transition between $G'$ and $G$, solving \geb on $G$.
 	\end{proof}
-
-\end{document}

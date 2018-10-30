@@ -1,0 +1,126 @@
+\section{Experimental results}
+\label{sec:experiments}
+To test the capabilities of the new exact matrix partitioner MP
+and to compare it with MondriaanOpt, we performed numerical experiments
+on a subset of small and medium-sized test matrices from the SuiteSparse
+Matrix Collection (formerly known as the University
+of Florida Sparse Matrix Collection~\cite{davis11}).
+We chose as test set the subset of all sparse matrices with at most 100,000 nonzeros,
+which contains 1602 matrices (after having removed five matrices with duplicate names).
+Currently, the whole collection contains 2833 matrices.
+To keep the total CPU time used within reasonable bounds, we allotted
+a maximum of 24 hours of CPU time to each partitioning run.
+
+All computations were carried out on thin nodes with 24 cores of the Dutch national supercomputer
+Cartesius at  SURFsara in Amsterdam, with a core clock speed of 2.4 GHz (for Intel Sandy Bridge E5-2695 v2  CPUs)
+or 2.6 GHz (for Intel Ivy Bridge E5-2690 v3 CPUs). The memory for each 
+ thin node is 64 GB. Each batch of 24 jobs is assigned to a node by a runtime scheduler,
+which may lead to different types of CPUs being used, causing a slight inconsistency in our timings.
+
+We implemented the branch-and-bound algorithm from section~\ref{sec:opt} in our new program
+MP\footnote{MP is available from \url{https://github.com/TimonKnigge/matrix-partitioner}}.
+We chose a value of $\epsilon=0.03$ in Equation~\ref{eqn:imbal}, which is a common value
+allowing a trade-off between load imbalance and communication volume. 
+As a result of our numerical experiments, we may divide the matrices into three groups: (i) a group of 368 matrices which could be solved
+by both programs, MP and MondriaanOpt. We use these matrices to compare the speed of the two programs
+and to verify their correctness; (ii) a group of 471 matrices which could only be solved by MP;
+(iii) a group of 763 matrices which could not be solved by either program.
+All matrices that could be solved by MondriaanOpt within 24 hours could also be solved by 
+MP within 24 hours.
+
+For the 368 matrices that could be solved by both programs, all optimal volumes computed are identical
+for the two programs,
+which we take as an independent mutual confirmation of their correctness. We have taken great care
+in developing the programs to make them understandable and to document them well,
+to support our claim that they compute exact, optimal solutions.
+Both programs are available as open-source software
+and are open to inspection for correctness.
+The two programs do not necessarily compute the same solution, as there may be several
+optimal solutions. The optimal volume, however, is of course unique.
+
+The program MP is faster than MondriaanOpt in 306 cases (83\% of the cases).
+In 25 cases (6.7\%), it performs equally well, of which 22 cases with both programs needing exactly
+1 second (our clock resolution), and having a volume of 0.
+In 37 cases (10\%), MondriaanOpt is faster, of which 31 cases with volume 0.
+For volume 0, the sparse matrix can be split into several connected components
+(when viewed as a graph) of suitable sizes. This situation is easy to handle
+and it is quickly discovered by both programs.
+The geometric average of the ratio $T_{\mathrm{MP}} / T_{\mathrm{Opt}}$
+between the time of MP and that of MondriaanOpt is 0.0855, meaning that MP is about 11.7 times faster
+than MondriaanOpt.
+This average is based on 286 matrices that could be solved by both programs and for which $T_{\mathrm{MP}}, T_{\mathrm{Opt}}  \geq 1$.
+
+Table~\ref{tbl:matrices} shows the hardest cases that MP could still
+solve within our self-imposed time limit.
+These are in fact the matrices that take between 4 and 24 hours to be solved.
+Note that there is no simple parameter that characterises the most difficult  matrices
+for bipartitioning. Still we can say 
+that the hardest solvable matrices usually have a communication volume of 10 or more,
+with the exception
+of the matrix \texttt{mhd4800b}, which has a low volume of 2.
+Furthermore, they also have at least 1000 nonzeros, with two exceptions, \texttt{ch4-4-b2}
+and \texttt{GD97\_a}. This particular set is our challenge to future exact partitioners.
+
+
+\begin{table}[p]
+\caption{The top-40 of matrices with the longest computation time needed by
+the matrix partitioner MP. Given are the matrix name, number of rows, columns, and nonzeros,
+the optimal communication volume for the choice $\epsilon=0.03$,
+and the CPU time (in s) needed for computing 
+an optimal solution.}
+\label{tbl:matrices}
+
+\begin{center}
+\begin{tabular}{lrrrrr}
+\hline
+Name&\multicolumn{1}{c}{$m$}&
+\multicolumn{1}{c}{$n$}&
+\multicolumn{1}{c}{$nz$}&
+\multicolumn{1}{c}{$V_{\mathrm{MP}}$}&
+\multicolumn{1}{c}{$T_{\mathrm{MP}}$}\\
+\hline
+\hline
+\texttt{mhd1280a}&1280&1280&47906&44&15382\\
+\texttt{reorientation\_4}&2717&2717&33630&14&15839\\
+\texttt{lp\_stocfor3}&16675&23541&76473&14&16531\\
+\texttt{bp\_1000}&822&822&4661&35&17170\\
+\texttt{west0479}&479&479&1910&33&17858\\
+\texttt{ch4-4-b2}&96&72&288&24&18544\\
+\texttt{DK01R}&903&903&11766&20&18569\\
+\texttt{celegansneural}&294&270&2345&57&19061\\
+\texttt{c-28}&4598&4598&30590&10&19257\\
+\texttt{orbitRaising\_4}&915&915&7790&16&22536\\
+\texttt{circuit204}&1020&1020&5883&41&22812\\
+\texttt{GD97\_a}&84&84&332&24&23357\\
+\texttt{lp\_modszk1}&686&1620&3168&34&24476\\
+\texttt{pcb1000}&1565&2820&20463&40&26657\\
+\texttt{mhd4800b}&4800&4800&27520&2&29574\\
+\texttt{lp\_grow22}&440&946&8252&20&30335\\
+\texttt{bayer02}&13935&13935&63679&27&30674\\
+\texttt{kineticBatchReactor\_5}&7641&7641&80767&18&31632\\
+\texttt{can\_256}&256&256&2916&43&32977\\
+\texttt{dynamicSoaringProblem\_4}&3191&3191&36516&22&34058\\
+\texttt{qiulp}&1192&1900&4492&40&34828\\
+\texttt{lp\_bnl1}&642&1586&5532&47&36413\\
+\texttt{Hamrle2}&5952&5952&22162&16&36965\\
+\texttt{ex21}&656&656&19144&62&37236\\
+\texttt{fs\_541\_1}&541&541&4285&37&38634\\
+\texttt{fs\_541\_4}&541&541&4285&37&38750\\
+\texttt{fs\_541\_3}&541&541&4285&37&38836\\
+\texttt{fs\_541\_2}&541&541&4285&37&39259\\
+\texttt{c-29}&5033&5033&43731&28&40217\\
+\texttt{bp\_600}&822&822&4172&33&40328\\
+\texttt{model1}&362&798&3028&46&43785\\
+\texttt{ncvxqp9}&16554&16554&54040&30&51673\\
+\texttt{de063157}&936&1656&5119&36&56101\\
+\texttt{kineticBatchReactor\_4}&7105&7105&74869&18&58461\\
+\texttt{kineticBatchReactor\_9}&8115&8115&86183&18&62664\\
+\texttt{lp\_sctap2}&1090&2500&7334&40&67631\\
+\texttt{can\_229}&229&229&1777&38&76406\\
+\texttt{iiasa}&669&3639&7317&14&76561\\
+\texttt{lpi\_pilot4i}&410&1123&5264&47&79647\\
+\texttt{lp\_pilot4}&410&1123&5264&47&79910\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}

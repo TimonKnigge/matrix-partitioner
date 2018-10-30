@@ -20,3 +20,5 @@ mp
 *.aux
 *.log
 *.pdf
+*.bbl
+*.blg

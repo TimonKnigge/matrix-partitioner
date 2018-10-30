@@ -140,15 +140,20 @@
 	of these vertices. If $v_1$ is not cut then it must be fully red, making
 	$v_2$ partially red, etc..
 
-	\todo{Image, from slides? Maar die heeft 2 paths, dus kan later miss.beter}
-
 	So if a single path between $P_R$ and $P_B$ implies that we have to cut at
 	least one vertex, how do we extend this to multiple paths? Here we run in
 	to the same issue as with the matching bound: if we have two paths that
 	share a vertex, we can just cut that vertex to separate red and blue edges,
 	for a cost of $1$.
 
-	\todo{Hier is een plaatje ook wel leuk, maar niet echt nodig}
+	\begin{figure}[h]
+		\input{figure-3-flow.tikz}
+		\centering
+		\label{fig-flow}
+		\caption{Looking at the matrix, it is not a priori clear that row 3
+			and column 2 are connected. In the graph representation of the
+			matrix we can clearly see the connecting path.}
+	\end{figure}
 
 	Hence, to prove a lower bound of more than $1$ we have to require that the
 	paths are disjoint. In particular, the
@@ -160,7 +165,7 @@
 	are vertex disjoint outside of $R$ and $B$. In fact, a theorem by Menger
 	shows that this is actually exactly the size of the smallest vertex cut.
 
-	\begin{theorem}{(Menger, \cite{})}
+	\begin{theorem}{(Menger, \cite{menger1927allgemeinen})}
 		Let $G$ be a finite undirected graph, and let $u$ and $v$ be two
 		non-adjacent vertices in $G$, then the size of the smallest vertex cut
 		separating $u$ and $v$ equals the maximum number of vertex disjoint
@@ -182,7 +187,7 @@
 	Giving all arcs integer capacities, then the maximum flow between
 	$u_{out}$ and $v_{in}$ in $G'$ gives us the minimum vertex cut between
 	$u$ and $v$ in $G$.
-	A more thorough exposition may be found in \cite{} CLRS
+	A more thorough exposition may be found in \cite{thomas2001introduction}
 	in chapter 26.
 
 	However, while the maximum flow problem may be solved in polynomial time,

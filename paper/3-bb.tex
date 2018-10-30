@@ -28,7 +28,7 @@
 	be to branch on
 	which side of the partition we put each nonzero in. For an $n \times m$
 	matrix with $N$ nonzeros this results in $2^N$ leaf nodes. However,
-	\todo{waarom niet?, even goed praten waarom dit een slecht idee is}.
+	this is not our only option.
 	Instead, we can branch of the status of each of the
 	rows and columns of the matrix: each of them is either entirely red,
 	entirely blue, or `cut', i.e. it contains both colors. As a result, we
@@ -236,6 +236,8 @@
 
 	\subsection{Extended Packing Bound}
 
+	\todo{Write this whole section}
+
 	We now consider the problem of extending the packing bound over the whole
 	graph (rather than just neighbourhoods of $R$ and $B$). This idea is based
 	on a similar \todo{cite}
@@ -288,7 +290,8 @@
 	bipartition, we traverse first the subtree that assigns $u$ to the smallest
 	side in the bipartition.
 
-	As a footnote we will refer to the paper by \todo{Mumcuyan} et. al. (\cite{}) who show
+	As a footnote we will refer to the paper by Mumcuyan et. al.
+	(\cite{mumcuyan18}) who show
 	other branching strategies can be faster, and learn to predict the optimal
 	strategy based matrix statistics.
 	
@@ -305,5 +308,3 @@
 	as possible. Hence, we run our algorithm with an initial (strict) upper
 	bound of $U_1 = 1$, and rerun with
 	$U_{i+1} = \lceil \frac{5}{4} U_i \rceil$ until we have found a solution.
-	\todo{Als blijkt dat looptijd echt meer van volume afhankelijk is zou dat
-		hier goed uitkomen.}

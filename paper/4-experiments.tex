@@ -7,11 +7,11 @@ Matrix Collection (formerly known as the University
 of Florida Sparse Matrix Collection~\cite{davis11}).
 We chose as test set the subset of all sparse matrices with at most 100,000 nonzeros,
 which contains 1602 matrices. (After having removed five matrices with duplicate names:
-	\texttt{Pothen/barth}, \texttt{Pothen/barth4}, \texttt{Meszaros/fxm3\_6},
-    \texttt{Boeing/nasa1824}, \texttt{Pajek/football}.
+	\texttt{Pothen/\-barth}, \texttt{Pothen/\-barth4}, \texttt{Mesz\-aros/\-fxm3\_6},
+    \texttt{Boeing/\-nasa\-1824}, \texttt{Pajek/\-foot\-ball}.
 	We kept the \texttt{barth}, \texttt{barth4}, and \texttt{nasa1824} matrices
-          from the \texttt{Nasa} subcollection, and  \texttt{Andrianov/fxm3\_6} and
-          \texttt{Newman/football}.)
+          from the \texttt{Nasa} subcollection, and  \texttt{Andri\-anov/\-fxm3\_6} and
+          \texttt{New\-man/\-foot\-ball}.)
 Currently, the whole collection contains 2833 matrices.
 To keep the total CPU time used within reasonable bounds, we allotted
 a maximum of 24 hours of CPU time to each partitioning run.
@@ -80,7 +80,7 @@ Furthermore, they also have at least 1000 nonzeros, with two exceptions, \texttt
 and \texttt{GD97\_a}. This particular top-40 set is our challenge to future exact partitioners.
 
 
-\begin{table}[p]
+\begin{table*}[p]
 \caption{The top-40 of matrices with the longest computation time needed by
 the matrix partitioner MP. Given are the matrix name, number of rows, columns, and nonzeros,
 the optimal communication volume for the choice $\epsilon=0.03$,
@@ -141,4 +141,4 @@ Name&\multicolumn{1}{c}{$m$}&
 \hline
 \end{tabular}
 \end{center}
-\end{table}
+\end{table*}

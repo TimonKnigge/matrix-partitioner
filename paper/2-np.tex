@@ -339,7 +339,7 @@
 			cut, so all other edges should be red, and a lower
 			bound on the number of red edges in $\pi$ is:
 
-			$$r\Big( \binom{S}{2} - \binom{|E|}{2}\Big)$$
+			$$r \Big( \binom{S}{2} - \binom{|E|}{2}\Big)$$
 
 			Similarly, we can find an upper bound for the number of blue edges
 			by the following reasoning: we color each blue-dominated clique
@@ -501,7 +501,7 @@
 		\mbpt is \NP-Complete.
 	\end{theorem}
 	\begin{proof}
-		We will show that $\geb \leq_{\mathcal{P}} \mbpt$. Given a graph $G$,
+		We will show that $$\geb \leq_{\mathcal{P}} \mbpt$$ Given a graph $G$,
 		let $G'=\mathcal{S}(G)=(L\cup R, E')$. Create a $|L| \times |R|$ matrix
 		$A$ with $A_{ij} = 1$ if $i \in L$ and $j \in R$ are connected, and $0$
 		otherwise.
@@ -513,12 +513,12 @@
 		and the partitioning of nonzeros, and a correspondence between cutting
 		vertices and cutting rows and columns. This is displayed in the figure.
 
-		\begin{figure}[h]
+		\begin{figure*}
 			\input{figure-2-split.tikz}
 			\centering
 			\label{figmgeb}
 			\caption{Solving \geb using \mbpt.}
-		\end{figure}
+		\end{figure*}
 
 		Now \autoref{split-graph} gives us a constructive algorithm to
 		transition between $G'$ and $G$, solving \geb on $G$.

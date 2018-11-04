@@ -1,48 +1,56 @@
 \section{Introduction}
 \label{sec:intro}
-Sparse matrix partitioning is important for the parallel solution of sparse linear systems
-by direct or iterative methods. In iterative solvers, the basic kernel is the multiplication
-of a sparse matrix and a dense vector, the SpMV operation. A good partitioning of the sparse matrix
-and the vector will balance the computation load in a parallel SpMV by spreading the
-matrix nonzeros evenly over the parts assigned to the processors 
-of the parallel computer and it will also
-lead to less communication of the vector components between the processors.
+Sparse matrix partitioning is important for the parallel solution
+of sparse linear systems by direct or iterative methods. In
+iterative solvers, the basic kernel is the multiplication of a
+sparse matrix and a dense vector, the SpMV operation. A good
+partitioning of the sparse matrix and the vector will balance
+the computation load in a parallel SpMV by spreading the matrix
+nonzeros evenly over the parts assigned to the processors of the
+parallel computer and it will also lead to less communication of
+the vector components between the processors.
 
-In the past decades, much effort has been spent on developing and improving
-heuristic partitioning methods. In particular, hypergraph methods have been very
-successful because they model the communication volume (the total
-number of data words sent) exactly, so that they can try to minimize the true metric.
+In the past decades, much effort has been spent on developing and
+improving heuristic partitioning methods. In particular,
+hypergraph methods have been very successful because they model
+the communication volume (the total number of data words sent)
+exactly, so that they can try to minimize the true metric.
 Two-dimensional (2D) partitioning methods are superior to 1D methods,
-since they are more general and can split both the rows and columns of the matrix and
-hence in principle can provide better solutions.
+since they are more general and can split both the rows and columns
+of the matrix and hence in principle can provide better solutions.
 Heuristic algorithms for hypergraph-based sparse matrix partitioning
-have been implemented in the sequential software packages hMetis~\cite{karypis99b},
-PaToH~\cite{catalyurek99}, Mondriaan~\cite{vastenhouw05}, KaHyPar~\cite{akhremtsev17},
-and the parallel packages Par$k$way~\cite{trifunovic08} and Zoltan~\cite{devine06}.
-The current state-of-the art methods for 2D sparse matrix partitioning are the fine-grain~\cite{catalyurek01}
-and the medium-grain method~\cite{pelt14}. 
+have been implemented in the sequential software packages
+hMetis~\cite{karypis99b}, PaToH~\cite{catalyurek99},
+Mondriaan~\cite{vastenhouw05}, KaHyPar~\cite{akhremtsev17},
+and the parallel packages Par$k$way~\cite{trifunovic08} and
+Zoltan~\cite{devine06}.
+The current state-of-the art methods for 2D sparse matrix
+partitioning are the fine-grain~\cite{catalyurek01} and the
+medium-grain method~\cite{pelt14}. 
 
-How good are the current methods and is it still worthwhile to improve them?
-To answer this question we need to compare the quality of the outcome,
-i.e., the communication volume, to the optimal result.
-To enable such a comparison, we need an exact algorithm that provides the 
-minimum communication volume for a specfied maximum load imbalance.
-The first exact algorithm for this problem (with two parts)
-was proposed by Pelt and Bisseling~\cite{pelt15}.
-It is based on a branch-and-bound method that distinguishes  between
-three cases for every row and column of the sparse matrix:
-completely assigned to part 0, completely assigned to part 1, 
-or split between the two parts. This algorithm has been implemented
-in the program MondriaanOpt, included in the Mondriaan package,
-version 4.2. As of today, 356 matrices from the SuiteSparse 
-(formerly University of Florida) sparse matrix collection~\cite{davis11}
-have been bipartitioned to optimality by MondriaanOpt. 
-\footnote{The solutions can be found at
+How good are the current methods and is it still worthwhile to
+improve them? To answer this question we need to compare the
+quality of the outcome, i.e., the communication volume, to the
+optimal result. To enable such a comparison, we need an exact
+algorithm that provides the minimum communication volume for a
+specfied maximum load imbalance. The first exact algorithm
+for this problem (with two parts) was proposed by Pelt and
+Bisseling~\cite{pelt15}. It is based on a branch-and-bound
+method that distinguishes  between three cases for every row
+and column of the sparse matrix: completely assigned to part 0,
+completely assigned to part 1, or split between the two parts.
+This algorithm has been implemented in the program MondriaanOpt,
+included in the Mondriaan package, version 4.2. As of today,
+356 matrices from the SuiteSparse (formerly University of
+Florida) sparse matrix collection~\cite{davis11} have been
+bipartitioned to optimality by
+MondriaanOpt.\footnote{The solutions can be found at
 \url{http://www.staff.science.uu.nl/~bisse101/Mondriaan/Opt/}.}
-Being able to increase the size of the solution subset would be valuable
-for benchmarking heuristic partitioners, by providing more comparison data and also  
-for more realistic problem sizes. Heuristic partitioners are aimed at large 
-problems, though they will encounter smaller problems after their inital splits.
+Being able to increase the size of the solution subset would be
+valuable for benchmarking heuristic partitioners, by providing
+more comparison data and also for more realistic problem sizes.
+Heuristic partitioners are aimed at large problems, though they
+will encounter smaller problems after their inital splits.
 
 Optimal partitionings are easiest to compute for splitting into two parts:
 the required computation time
@@ -112,7 +120,7 @@ with a purely combinatorial branch-and-bound method,
 reaching up to 100 vertices and 1000 edges.
 Delling~\textit{et al.\ }\cite{delling14} solved larger problems
 using packing-tree bounds and graph contractions, and they solved 
-the open street map problem \texttt{luxembourg} with
+the open street map problem \allowbreak\texttt{luxembourg} with
 114,599 vertices and 119,666 edges in less than a minute.
 
 For hypergraphs, much less work has been

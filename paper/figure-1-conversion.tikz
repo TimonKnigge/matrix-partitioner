@@ -12,7 +12,8 @@
 		}
 	}
 }
-\begin{tikzpicture}%[thick,scale=0.8, every node/.style={transform shape}]
+\begin{scaletikzpicturetowidth}{\linewidth}
+\begin{tikzpicture}[scale=\tikzscale]
 
 	% Arrows giving direction of conversion
 	\begin{scope}
@@ -29,13 +30,13 @@
 
 	% Initial graph
 	\begin{scope}
-		\node[shape=circle,fill=black,draw=black,minimum size=13pt] (1)
+		\node[shape=circle,fill=black,draw=black,minimum size=8pt] (1)
 				at ($(-0.5,{sqrt(3)*-0.5})$) {};
-		\node[shape=circle,fill=black,draw=black,minimum size=13pt] (2)
+		\node[shape=circle,fill=black,draw=black,minimum size=8pt] (2)
 				at ($(-0.5,{sqrt(3)*0.5})$) {};
-		\node[shape=circle,fill=black,draw=black,minimum size=13pt] (3)
+		\node[shape=circle,fill=black,draw=black,minimum size=8pt] (3)
 				at (1, 0){};
-		\node[shape=circle,fill=black,draw=black,minimum size=13pt] (4)
+		\node[shape=circle,fill=black,draw=black,minimum size=8pt] (4)
 				at ($({1+sqrt(2)}, 0)$) {};
 
 		\draw[line width=1.5pt] (1) -- (2) -- (3) -- (1);
@@ -70,16 +71,17 @@
 
 	% Final graph
 	\begin{scope}[shift={(0, -5)}]
-		\node[shape=circle,fill=blue,draw=blue,minimum size=13pt] (1)
+		\node[shape=circle,fill=blue,draw=blue,minimum size=8pt] (1)
 				at ($(-0.5,{sqrt(3)*-0.5})$) {};
-		\node[shape=circle,fill=blue,draw=blue,minimum size=13pt] (2)
+		\node[shape=circle,fill=blue,draw=blue,minimum size=8pt] (2)
 				at ($(-0.5,{sqrt(3)*0.5})$) {};
-		\node[shape=circle,fill=red,draw=red,minimum size=13pt] (3)
+		\node[shape=circle,fill=red,draw=red,minimum size=8pt] (3)
 				at (1, 0){};
-		\node[shape=circle,fill=red,draw=red,minimum size=13pt] (4)
+		\node[shape=circle,fill=red,draw=red,minimum size=8pt] (4)
 				at ($({1+sqrt(2)}, 0)$) {};
 
 		\draw[line width=1.5pt] (1) -- (2) -- (3) -- (1);
 		\draw[line width=1.5pt] (3) -- (4);
 	\end{scope}
 \end{tikzpicture}
+\end{scaletikzpicturetowidth}

@@ -1,7 +1,4 @@
-\begin{tikzpicture}
-[
-	box/.style={rectangle,draw=black,thick, minimum size=1cm},
-]
+\begin{tikzpicture}[box/.style={rectangle,draw=black,thick, minimum size=1cm}]
 
 \begin{scope}[shift={(-7, 1)}]
 \foreach \x in {0,1,2}{

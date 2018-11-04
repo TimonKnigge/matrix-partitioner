@@ -1,4 +1,3 @@
-\usepackage[a4paper, margin=1.37in]{geometry}
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
@@ -8,7 +7,6 @@
 \usepackage{fancyhdr}
 \usepackage{xifthen}
 \usepackage{tabularx,lipsum,environ,amsmath,amssymb}
-\usepackage{cite}
 \usepackage[T1]{fontenc}
 \usepackage{todonotes}
 \usepackage{hyperref}
@@ -51,7 +49,7 @@
   \BODY% Parse input
   \par\addvspace{.5\baselineskip}
   \noindent
-  \begin{tabularx}{\textwidth}{@{\hspace{\parindent}} l X c}
+  \begin{tabularx}{\linewidth}{@{\hspace{\parindent}} l X c}
     \multicolumn{2}{@{\hspace{\parindent}}l}{\textsc{\@problemtitle}} \\% Title
     \textbf{Input:} & \@probleminput \\% Input
     \textbf{Question:} & \@problemquestion% Question
@@ -102,3 +100,17 @@
  }
 \newcommand{\sgeb}{\textsc{GEB} }
 \newcommand{\sgb}{\textsc{GB} }
+
+% Scaling for tikz
+\makeatletter
+\newsavebox{\measure@tikzpicture}
+\NewEnviron{scaletikzpicturetowidth}[1]{%
+  \def\tikz@width{#1}%
+  \def\tikzscale{1}\begin{lrbox}{\measure@tikzpicture}%
+  \BODY
+  \end{lrbox}%
+  \pgfmathparse{#1/\wd\measure@tikzpicture}%
+  \edef\tikzscale{\pgfmathresult}%
+  \BODY
+}
+\makeatother

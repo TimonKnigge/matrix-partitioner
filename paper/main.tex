@@ -1,17 +1,27 @@
-\documentclass{article}
+\documentclass[5p,times]{elsarticle}
 
 \input{preamble.tex}
 
-\title{An improved exact algorithm and an \NP-completeness proof for sparse matrix bipartitioning}
-\author{Timon Knigge and Rob H. Bisseling}
-
 \begin{document}
 
-	\maketitle
+	\title{An improved exact algorithm and an \NP-completeness proof for sparse matrix bipartitioning}
+
+	\author[timon]{Timon E. Knigge\corref{cor}}
+	\ead{knigget@student.ethz.ch}
+	\address[timon]{ETH Z\"urich\\
+				Z\"urich, Switzerland}
+
+	\author[rob]{Rob H. Bisseling}
+	\ead{R.H.Bisseling@uu.nl}
+	\address[rob]{Mathematical Institute,
+				Utrecht University\\
+				Utrecht, The Netherlands}
+
+	\cortext[cor]{Corresponding author}
 
 	\begin{abstract}
 		We formulate the sparse matrix bipartitioning problem of
-		minimising the communication volume in parallel sparse
+		minimizing the communication volume in parallel sparse
 		matrix-vector multiplication. We prove its \NP-completeness
 		in the perfectly balanced case, where both parts of the
 		partitioned matrix must have an equal number of nonzeros,
@@ -31,6 +41,13 @@
 		program is about 13.8 times faster than the previous program
 		MondriaanOpt.
 	\end{abstract}
+	\begin{keyword}
+		Sparse Matrix \sep Partitioning \sep Exact Algorithm \sep
+		Branch-and-Bound \sep NP-Complete
+	\end{keyword}
+
+	\maketitle
+
 
 	\input{1-intro.tex}
 	\input{2-np.tex}
@@ -39,7 +56,7 @@
 	\input{5-conclusions.tex}
 	\input{6-acks.tex}
 
-	\bibliographystyle{plain}
+	\bibliographystyle{elsarticle-num}
 	\bibliography{improved}
 
 \end{document}

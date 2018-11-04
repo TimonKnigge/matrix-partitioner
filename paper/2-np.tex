@@ -15,10 +15,10 @@
 
 	\begin{problem}
 		\problemtitle{\mbpt}
-		\probleminput{An $n\times m$ matrix $A$, whose nonzeros are precisely
+		\probleminput{An $m \times n$ matrix $A$, whose nonzeros are precisely
 			indexed by the set
-			$Z \subseteq \{\, 1, \dots, n \,\} \times
-				\{\, 1, \dots, m \,\}$, and an integer $V$, the required
+			$Z \subseteq \{\, 1, \dots, m \,\} \times
+				\{\, 1, \dots, n \,\}$, and an integer $V$, the required
 			maximum volume.}
 		\problemquestion{Does there exist a disjoint partitioning of $Z$
 			into $Z_1 \cup Z_2$ such that $|Z_1| = |Z_2|$ and volume
@@ -35,9 +35,9 @@
 	nonzero at the end again.
 
 	When thinking about the matrix bipartitioning problem, it is helpful
-	to reformulate it in terms of graphs. Given an $n \times m$ matrix $A$
+	to reformulate it in terms of graphs. Given an $m \times n$ matrix $A$
 	we can define a bipartite adjacency graph $G(A) = (V(A), E(A))$ with
-	$n$ vertices representing the rows of $A$, and $m$ vertices representing
+	$m$ vertices representing the rows of $A$, and $n$ vertices representing
 	the columns, where a row vertex $r$ and a column vertex $c$ are connected
 	if and only if $A_{rc}$ is nonzero.
 
@@ -55,8 +55,8 @@
 	\end{figure}
 	
 	It should be clear this procedure is also reversible, i.e. for any
-	bipartite graph $G$ on $n$ and $m$ vertices,
-	we can construct a corresponding matrix $A$ of size $n \times m$ which has
+	bipartite graph $G$ on $m$ and $n$ vertices,
+	we can construct a corresponding matrix $A$ of size $m \times n$ which has
 	nonzeros precisely for the vertices that are connected in $G$. While the
 	nonzero entries of this matrix can be any value, the associated nonzero
 	pattern is uniquely determined by the edges of $G$.
@@ -101,8 +101,8 @@
 	partition is called `cut', the goal is to minimize the number of
 	cut edges. We similarly write a partitioning of $V$ as
 	a map $\tau : V \to \{0, 1\}$. We can also think of $\tau$ as coloring
-	the vertices in $V$, where one side of the partition has color red, and one
-	side has color blue. However this should not be confused with the classical
+	the vertices in $V$, where one side of the partition has the color red, and one
+	side has the color blue. However this should not be confused with the classical
 	graph coloring problem, since we allow neighbouring vertices to have the
 	same color.
 
@@ -116,7 +116,7 @@
 	two vertices in the cliques $K_u$ and $K_v$ together into a single
 	vertex. We then solve the \geb on the resulting graph $(V', E')$, and
 	translate the resulting coloring of its edges into a coloring of the
-	vertices of $(V, E)$. (Here, the colors correspond to sides in the
+	vertices of $(V, E)$. (Here, the colors correspond to the two parts in the
 	partition.) We note that if we color each clique in $(V', E')$
 	monochromatically with the color of its vertex in $(V, E)$, then
 	an edge between two differently colored vertices in $(V, E)$ will
@@ -350,7 +350,7 @@
 			$$b\binom{S}{2} + r\binom{|E|}{2}$$
 
 			But since $\pi$ was an optimal \textit{equi}partitioning of the
-			edges of $\mathcal{K}(G)$, certainly the lower bound on the amount
+			edges of $\mathcal{K}(G)$, certainly the lower bound on the number
 			of red edges must be smaller than or equal to the upper bound on
 			the number of blue edges:
 
@@ -366,7 +366,7 @@
 
 			Recall that we set $S = 4 + 2|V|\binom{|E|}{2}$. Since $S \geq 4$
 			we have $S \leq \binom{S}{2}$. Also, clearly $r \leq |V|$. So if
-			\autoref{ineq-pf} holds, then certainly the following holds:
+			Equation~(\ref{ineq-pf}) holds, then certainly the following holds:
 
 			$$(r-b)S \leq 2|V|\binom{|E|}{2}$$
 

@@ -11,7 +11,7 @@ lead to less communication of the vector components between the processors.
 In the past decades, much effort has been spent on developing and improving
 heuristic partitioning methods. In particular, hypergraph methods have been very
 successful because they model the communication volume (the total
-number of data words sent) exactly, so that they can try to minimise the true metric.
+number of data words sent) exactly, so that they can try to minimize the true metric.
 Two-dimensional (2D) partitioning methods are superior to 1D methods,
 since they are more general and can split both the rows and columns of the matrix and
 hence in principle can provide better solutions.
@@ -66,9 +66,9 @@ and its decision problem is expected to be \NP-complete,
 but this has not been proven yet.
 
 The novelty of this paper is twofold: (i) we present an improvement
-of the previous exact algorithm from~\cite{pelt15} by generalising
+of the previous exact algorithm from~\cite{pelt15} by generalizing
 a matching-based lower bound on the necessary communication
-to a stronger maximum flow-based bound; and by generalising a packing
+to a stronger maximum flow-based bound; and by generalizing a packing
 bound (using ideas from ~\cite{delling14}); (ii) we formulate the balanced sparse matrix bipartitioning problem
 and prove its \NP-completeness.
 
@@ -97,14 +97,14 @@ Eqn~(\ref{eqn:imbal}) represents a constraint on the load balance
 of two processors of a parallel computer executing the SpMV. 
 
 In this paper, we will only consider the communication volume
-as the metric to be minimised. 
+as the metric to be minimized. 
 Note that other possible objectives, such as 
-minimising the maximum communication volume per processor
-or minimising the total number of messages, 
+minimizing the maximum communication volume per processor
+or minimizing the total number of messages, 
 may also be relevant for a larger numbers of parts,
 but not for two parts.
 
-Many exact partitioning algorithms have been developed for graphs~\cite{karisch00,sensen01,felner05,hager13,delling14}. All these algorithms minimise the edge cut,
+Many exact partitioning algorithms have been developed for graphs~\cite{karisch00,sensen01,felner05,hager13,delling14}. All these algorithms minimize the edge cut,
 not the communication volume.
 Felner~\cite{felner05} solves a graph partitioning problem
 with uniform edge weights to optimality
@@ -167,7 +167,7 @@ Section~\ref{sec:np} presents the \NP-completeness proof
 for sparse matrix bipartitioning.
 Section~\ref{sec:opt} briefly reviews the
 branch-and-bound algorithm of~\cite{pelt15}
-that was implemented in MondriaanOpt, and presents the generalised bounds
+that was implemented in MondriaanOpt, and presents the generalized bounds
 and their implementation.
 Section~\ref{sec:experiments} presents the experimental results,
 comparing MP to MondriaanOpt for 233 small matrices, 

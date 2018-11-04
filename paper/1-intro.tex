@@ -3,14 +3,14 @@
 Sparse matrix partitioning is important for the parallel solution of sparse linear systems
 by direct or iterative methods. In iterative solvers, the basic kernel is the multiplication
 of a sparse matrix and a dense vector, the SpMV operation. A good partitioning of the sparse matrix
-and vector will balance the computation load in a parallel SpMV by spreading the
+and the vector will balance the computation load in a parallel SpMV by spreading the
 matrix nonzeros evenly over the parts assigned to the processors 
 of the parallel computer and it will also
 lead to less communication of the vector components between the processors.
 
 In the past decades, much effort has been spent on developing and improving
 heuristic partitioning methods. In particular, hypergraph methods have been very
-succesful because they model the communication volume (the total
+successful because they model the communication volume (the total
 number of data words sent) exactly, so that they can try to minimise the true metric.
 Two-dimensional (2D) partitioning methods are superior to 1D methods,
 since they are more general and can split both the rows and columns of the matrix and
@@ -40,11 +40,11 @@ have been bipartitioned to optimality by MondriaanOpt.
 \footnote{The solutions can be found at
 \url{http://www.staff.science.uu.nl/~bisse101/Mondriaan/Opt/}.}
 Being able to increase the size of the solution subset would be valuable
-for benchmarking heuristic partioners, by providing more comparison data and also  
+for benchmarking heuristic partitioners, by providing more comparison data and also  
 for more realistic problem sizes. Heuristic partitioners are aimed at large 
-problesm, though they will encounter smaller problems after their inital splits.
+problems, though they will encounter smaller problems after their inital splits.
 
-Optimal partitionings are easiest to compute for two parts:
+Optimal partitionings are easiest to compute for splitting into two parts:
 the required computation time
 grows quickly with a larger number of parts, as discussed in~\cite{pelt15}.
 Furthermore, heuristic partitioners often are based on recursive bipartitioning,
@@ -54,22 +54,23 @@ Therefore, both the exact partitioner implemented in MondriaanOpt and the improv
 MP (for Matrix Partitioner)
 presented in this article, compute optimal solutions for bipartitioning.
 
-Another question that arises is about the NP-completeness~\cite{garey79}
+Another question that arises is about the \NP-completeness~\cite{garey79}
 of the sparse matrix bipartitioning problem.
 It is known that the decision problem of
 graph bipartitioning with a tolerated imbalance
-is NP-complete~\cite[Theorem 3.1]{bui92}
+is \NP-complete~\cite[Theorem 3.1]{bui92}
 and so is hypergraph partitioning~\cite[Chapter 6]{lengauer90}, 
 but sparse matrix bipartitioning is a special
-case of hypergraph bipartitioning (with vertices contained in only two hyperedges),
-and its decision problem is expected to be NP-complete,
+case of hypergraph bipartitioning (for instance, with vertices contained in only two hyperedges),
+and its decision problem is expected to be \NP-complete,
 but this has not been proven yet.
 
 The novelty of this paper is twofold: (i) we present an improvement
 of the previous exact algorithm from~\cite{pelt15} by generalising
 a matching-based lower bound on the necessary communication
-to a stronger maximum flow-based bound; (ii) we formulate the balanced sparse matrix bipartitioning problem
-and prove its NP-completeness.
+to a stronger maximum flow-based bound; and by generalising a packing
+bound (using ideas from ~\cite{delling14}); (ii) we formulate the balanced sparse matrix bipartitioning problem
+and prove its \NP-completeness.
 
 The sparse matrix bipartitioning problem that
 we solve by an exact algorithm can be formulated as follows.
@@ -138,11 +139,14 @@ and the nonzeros in a column by a column-net.
 Thus, we obtain a hypergraph with $|A|$ vertices and $m+n$ nets,
 with the special property that each vertex is
 contained in precisely two nets.
+One of these nets thus belongs to a group of $m$ row-nets, and the other to
+a group of $n$ column-nets. Furthermore, no two vertices have the same pair
+of nets.
 An exact general hypergraph partitioner could then be used to solve
 the problem to optimality. 
 This, however, is less efficient than direct exact sparse matrix partitioning,
-since the hypergraph partitioner would not exploit the special property.
-In contrast, the direct matrix approach imposes this property
+since the hypergraph partitioner would not exploit the special properties.
+In contrast, the direct matrix approach imposes them
 by construction.
 
 Our previous work~\cite{pelt15} presented the first direct
@@ -159,11 +163,12 @@ are orthogonal to these extensions,
 so that they can be combined.  
 
 The remainder of this paper is organised as follows:
-Section~\ref{sec:np} presents the NP-completeness proof 
+Section~\ref{sec:np} presents the \NP-completeness proof 
 for sparse matrix bipartitioning.
 Section~\ref{sec:opt} briefly reviews the
 branch-and-bound algorithm of~\cite{pelt15}
-that was implemented in MondriaanOpt.
+that was implemented in MondriaanOpt, and presents the generalised bounds
+and their implementation.
 Section~\ref{sec:experiments} presents the experimental results,
 comparing MP to MondriaanOpt for 233 small matrices, 
 and giving results for 599 larger matrices that could not be solved

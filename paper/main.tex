@@ -2,12 +2,35 @@
 
 \input{preamble.tex}
 
-\title{An improved exact algorithm and an NP-completeness proof for sparse matrix partitioning}
+\title{An improved exact algorithm and an \NP-completeness proof for sparse matrix bipartitioning}
 \author{Timon Knigge and Rob H. Bisseling}
 
 \begin{document}
 
 	\maketitle
+
+	\begin{abstract}
+		We formulate the sparse matrix bipartitioning problem of
+		minimising the communication volume in parallel sparse
+		matrix-vector multiplication. We prove its \NP-completeness
+		in the perfectly balanced case, where both parts of the
+		partitioned matrix must have an equal number of nonzeros,
+		by reduction from the graph bisection problem.
+
+		We present an improved exact branch-and-bound algorithm
+		which finds the minimum communication volume for a given
+		maximum allowed imbalance. The algorithm is based on a
+		maximum-flow bound and a packing bound, which extend
+		previous matching and packing bounds.
+
+		We implemented the algorithm in a new program called MP
+		(Matrix Partitioner), which solved 832 matrices from the
+		SuiteSparse collection to optimality, each within 24 hours
+		of CPU-time. Furthermore, MP solved the difficult problem
+		of the matrix \texttt{cage6} in about 3 days. The new
+		program is about 12.7 times faster than the previous program
+		MondriaanOpt.
+	\end{abstract}
 
 	\input{1-intro.tex}
 	\input{2-np.tex}

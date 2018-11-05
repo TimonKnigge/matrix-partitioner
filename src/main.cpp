@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <unordered_map>
 #include <vector>
@@ -12,27 +13,61 @@
 
 constexpr float eps_default = 0.03f;
 constexpr long long timelimit_default = 0LL;
+constexpr char help_text[] = "\
+ MP - Matrix Partitioner\n\n\
+ Usage:\
+\t./mp [-e eps] [-t tl] <input >output 2>debug\n\n\
+ The program reads a matrix in MatrixMarket format\n\
+ from stdin and writes the solution to stdout. Debug\n\
+ is written to stderr.\n\n\
+ Flags:\n\
+\t-e eps\tMaximum tolerated load imbalance.\n\
+\t\tDefaults to 0.03.\n\
+\t-t tl\tTimelimit, in seconds. Defaults to\n\
+\t\t0 for no limit.";
 
-void parse_arguments(int argc, char** argv, float &eps, long long &timelimit) {
-	if (argc > 1) {
-		eps = atof(argv[1]);
-		std::cerr << "Read eps = " << eps << " from argv" << std::endl;
+// Very simple argument parser. Deals with errors
+// by ignoring them.
+struct cmd_args {
+	std::vector<std::string> args;
+	cmd_args(int argc, char** argv) {
+		for (int i = 0; i < argc; ++i)
+			args.push_back(argv[i]);
 	}
-	if (argc > 2) {
-		timelimit = atoll(argv[2]);
-		std::cerr << "Read timelimit of " << timelimit << " seconds from argv"
-			<< std::endl;
+	bool flag(const std::string &f) {
+		return std::find(args.begin(), args.end(), f) != args.end();
 	}
-}
+	float get_float(const std::string &f, float def) {
+		auto it = std::find(args.begin(), args.end(), f);
+		if (it == args.end() || (++it) == args.end())
+			return def;
+		else
+			return stof(*it);
+	}
+	long long get_ll(const std::string &f, long long def) {
+		auto it = std::find(args.begin(), args.end(), f);
+		if (it == args.end() || (++it) == args.end())
+			return def;
+		else
+			return stoll(*it);
+	}
+};
 
 int main(int argc, char** argv) {
+	// Detach from C I\O.
 	std::ios::sync_with_stdio(false);
 	std::cin.tie(nullptr);
 
 	// Parse the input arguments.
-	float eps = eps_default;
-	long long timelimit = timelimit_default;
-	parse_arguments(argc, argv, eps, timelimit);
+	cmd_args args(argc, argv);
+	if (args.flag("-h")) {
+		std::cerr << help_text << std::endl;
+		return 0;
+	}
+	float eps = args.get_float("-e", eps_default);
+	long long timelimit = args.get_ll("-t", timelimit_default);
+	std::cerr << "Running with eps=" << eps << ", and TL="
+		<< timelimit << std::endl;
 
 	// Read matrix.
 	mp::matrix mat = mp::read_matrix(std::cin);

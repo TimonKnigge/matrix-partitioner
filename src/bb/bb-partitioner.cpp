@@ -195,7 +195,7 @@ int bbpartitioner::solve(std::vector<int> &rcs, partial_partition &pp,
 
 		progress_counter++;
 		if (progress_counter % PERIOD_SMALL == 0LL) {
-			if (limit > 1 && clock() > limit) {
+			if (limit > 0 && clock() > limit) {
 				// Out of time.
 				return -optimal_value;
 			}

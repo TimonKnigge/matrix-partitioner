@@ -1,0 +1,45 @@
+\begin{tikzpicture}
+[
+	box/.style={rectangle,draw=black,thick, minimum size=0.5cm},
+]
+		
+	\begin{scope}
+		\node at (2.5, 0.5){\huge$\rightarrow$};
+	\end{scope}
+
+	\begin{scope}[shift={(0, 0)}]
+		\foreach \x in {0,0.5,1}{
+			\foreach \y in {0,0.5,1}
+				\node[box] at (\x,\y){};
+		}
+		\node[box,fill=gray] at (0, 1){};
+		\node[box,fill=gray] at (0.5, 1){};
+		\node[box,fill=gray] at (1, 0.5){};
+		\node[box,fill=gray] at (0.5, 0){};
+		\node[] at (-0.5,	0) {$r_3$};
+		\node[] at (-0.5,	0.5) {$r_2$};
+		\node[] at (-0.5,	1) {$r_1$};
+		\node[] at (0,	1.5) {$c_1$};
+		\node[] at (0.5,	1.5) {$c_2$};
+		\node[] at (1,	1.5) {$c_3$};
+	\end{scope}
+
+
+	\begin{scope}[shift={(4, 0)}]
+		\node[shape=circle,fill=white,draw=black,minimum size=8pt] (1)
+			at (0, 1.5) {$r_1$};
+		\node[shape=circle,fill=white,draw=black,minimum size=8pt] (2)
+			at (0, 0.5) {$r_2$};
+		\node[shape=circle,fill=white,draw=black,minimum size=8pt] (3)
+			at (0, -0.5) {$r_3$};
+		\node[shape=circle,fill=white,draw=black,minimum size=8pt] (4)
+			at (2, 1.5) {$c_1$};
+		\node[shape=circle,fill=white,draw=black,minimum size=8pt] (5)
+			at (2, 0.5) {$c_2$};
+		\node[shape=circle,fill=white,draw=black,minimum size=8pt] (6)
+			at (2, -0.5) {$c_3$};
+
+		\draw[line width=1.5pt] (4) -- (1) -- (5) -- (3);
+		\draw[line width=1.5pt] (2) -- (6);
+	\end{scope}
+\end{tikzpicture}

@@ -1,0 +1,114 @@
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{xifthen}
+\usepackage{tabularx,lipsum,environ,amsmath,amssymb}
+\usepackage[T1]{fontenc}
+\usepackage{todonotes}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{aliascnt}
+\usepackage{url}
+\usepackage{graphicx}
+
+\usetikzlibrary{shapes,arrows,matrix,positioning,calc,positioning,automata,shadows,fit}
+
+% Matrix drawing
+\newcommand{\msize}{2em}
+\tikzstyle{redblock} = [draw, fill=red, rectangle, minimum width=\msize, minimum height=\msize]
+\tikzstyle{blueblock} = [draw, fill=blue, rectangle, minimum width=\msize, minimum height=\msize]
+\tikzstyle{grayblock} = [draw, fill=gray, rectangle, minimum width=\msize, minimum height=\msize]
+\tikzstyle{whiteblock} = [draw, fill=white, rectangle, minimum width=\msize, minimum height=\msize]
+
+\newcommand{\redb}{\node[redblock] {};}
+\newcommand{\blueb}{\node[blueblock] {};}
+\newcommand{\grayb}{\node[grayblock] {};}
+\newcommand{\whiteb}{\node[whiteblock] {};}
+	
+%	\begin{tikzpicture}
+%	\matrix[matrix of nodes] {
+%		\redb  &\redb  &\whiteb&\whiteb\\
+%		\redb  &\redb  &\whiteb&\blueb \\
+%		\whiteb&\whiteb&\blueb &\blueb \\
+%		\whiteb&\whiteb&\blueb &\whiteb\\
+%	};
+%	\end{tikzpicture}
+
+% NP PROBLEM
+\makeatletter
+\newcommand{\problemtitle}[1]{\gdef\@problemtitle{#1}}% Store problem title
+\newcommand{\probleminput}[1]{\gdef\@probleminput{#1}}% Store problem input
+\newcommand{\problemquestion}[1]{\gdef\@problemquestion{#1}}% Store problem question
+\NewEnviron{problem}{
+  \problemtitle{}\probleminput{}\problemquestion{}% Default input is empty
+  \BODY% Parse input
+  \par\addvspace{.5\baselineskip}
+  \noindent
+  \begin{tabularx}{\linewidth}{@{\hspace{\parindent}} l X c}
+    \multicolumn{2}{@{\hspace{\parindent}}l}{\textsc{\@problemtitle}} \\% Title
+    \textbf{Input:} & \@probleminput \\% Input
+    \textbf{Question:} & \@problemquestion% Question
+  \end{tabularx}
+  \par\addvspace{.5\baselineskip}
+}
+
+% THEOREM ENVIRONMENTS
+\newtheorem{theorem}{Theorem}[section]
+
+\newaliascnt{lemma}{theorem}
+\newtheorem{lemma}[lemma]{Lemma}
+\aliascntresetthe{lemma}
+\providecommand*{\lemmaautorefname}{Lemma}
+
+\newaliascnt{proposition}{theorem}
+\newtheorem{proposition}[proposition]{Proposition}
+\aliascntresetthe{proposition}
+\providecommand*{\propositionautorefname}{Proposition}
+
+\newaliascnt{corollary}{theorem}
+\newtheorem{corollary}[corollary]{Corollary}
+\aliascntresetthe{corollary}
+\providecommand*{\corollaryautorefname}{Corollary}
+
+\newaliascnt{definition}{theorem}
+\newtheorem{definition}[definition]{Definition}
+\aliascntresetthe{definition}
+\providecommand*{\definitionautorefname}{Definition}
+
+%\newtheorem{lemma}[theorem]{Lemma}
+%\newtheorem{proposition}[theorem]{Proposition}
+%\newtheorem{corollary}[theorem]{Corollary}
+%\newtheorem{definition}[theorem]{Definition}
+
+% NP Complete
+\newcommand{\NP}{$\mathcal{NP}$}
+
+% Do not split footnotes over multiple pages
+\interfootnotelinepenalty=10000
+
+% Decision problems
+\newcommand{\mbpt}{\textsc{Matrix \allowbreak Bipartition} }
+\newcommand{\gb}{\textsc{Graph \allowbreak Bisection} }
+\newcommand{\geb}{\textsc{Graph \allowbreak Edge-\allowbreak Bisection} }
+\newcommand{\bgeb}{
+	\textsc{Bipartite \allowbreak Graph \allowbreak Edge-\allowbreak Bisection}
+ }
+\newcommand{\sgeb}{\textsc{GEB} }
+\newcommand{\sgb}{\textsc{GB} }
+
+% Scaling for tikz
+\makeatletter
+\newsavebox{\measure@tikzpicture}
+\NewEnviron{scaletikzpicturetowidth}[1]{%
+  \def\tikz@width{#1}%
+  \def\tikzscale{1}\begin{lrbox}{\measure@tikzpicture}%
+  \BODY
+  \end{lrbox}%
+  \pgfmathparse{#1/\wd\measure@tikzpicture}%
+  \edef\tikzscale{\pgfmathresult}%
+  \BODY
+}
+\makeatother

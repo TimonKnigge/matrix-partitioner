@@ -1,0 +1,25 @@
+[1] G. Karypis, V. Kumar, Multilevel k-way hypergraph partitioning, in: Proceedings 36th ACM/IEEE Conference on Design Automation, ACM Press, New York, 1999, pp. 343–348.
+[2] Ü. V. Çatalyürek, C. Aykanat, Hypergraph-partitioning-based decomposition for parallel sparse-matrix vector multiplication, IEEE Transactions on Parallel and Distributed Systems 10 (7) (1999) 673–693.
+[3] B. Vastenhouw, R. H. Bisseling, A two-dimensional data distribution method for parallel sparse matrix-vector multiplication, SIAM Review 47 (1) (2005) 67–95.
+[4] Y. Akhremtsev, T. Heuer, P. Sanders, S. Schlag, Engineering a direct k-way hypergraph partitioning algorithm, in: Proceedings of the Nineteenth Workshop on Algorithm Engineering and Experiments (ALENEX), 2017, pp. 28–42. doi:10.1137/1.9781611974768.3.
+[5] A. Trifunovi ́c, W. J. Knottenbelt, Parallel multilevel algorithms for hypergraph partitioning, Journal of Parallel and Distributed Computing 68 (5) (2008) 563–581.
+[6] K. D. Devine, E. G. Boman, R. Heaphy, R. H. Bisseling, U. V. Catalyurek, Parallel hypergraph partitioning for scientific computing, in: Proceedings IEEE International Parallel and Distributed Processing Symposium 2006, IEEE Press, 2006, p. 102.
+[7] Ü. V. Çatalyürek, C. Aykanat, A fine-grain hypergraph model for 2D decomposition of sparse matrices, in: Proceedings of the 15th International Parallel & Distributed Processing Symposium, IEEE Computer Society, 2001, p. 118.
+[8] D. M. Pelt, R. H. Bisseling, A medium-grain method for fast 2D bipartitioning of sparse matrices, in: Proceedings IEEE International Parallel and Distributed Processing Symposium 2014, IEEE Press, 2014, pp. 529–539.
+[9] D. M. Pelt, R. H. Bisseling, An exact algorithm for sparse matrix bipartitioning, Journal of Parallel and Distributed Computing 85 (2015) 79–90.
+[10] T. A. Davis, Y. Hu, The University of Florida sparse matrix collection, ACM Transactions on Mathematical Software 38 (1) (2011) 1:1–1:25.
+[11] M. R. Garey, D. S. Johnson, Computers and Intractability; A Guide to the Theory of NP-Completeness, W. H. Freeman & Co., New York, NY, USA, 1979.
+[12] T. N. Bui, C. Jones, Finding good approximate vertex and edge partitions is NP-hard, Information Processing Letters 42 (3) (1992) 153–159. doi:10.1016/0020-0190(92)90140-Q.
+[13] T. Lengauer, Combinatorial algorithms for integrated circuit layout, John Wiley and Sons, Chichester, UK, 1990.
+[14] D. Delling, D. Fleischman, A. V. Goldberg, I. Razenshteyn, R. F. Werneck, An exact combinatorial algorithm for minimum graph bisection, Mathematical Programming (2014) 1–42.
+[15] S. E. Karisch, F. Rendl, J. Clausen, Solving graph bisection problems with semidefinite programming, INFORMS Journal on Computing 12 (3) (2000) 177–191.
+[16] N. Sensen, Lower bounds and exact algorithms for the graph partitioning problem using multicommodity flows, in: Algorithms - Proceedings ESA 2001, Vol. 2161 of Lecture Notes in Computer Science, Springer, 2001, pp. 391–403.
+[17] A. Felner, Finding optimal solutions to the graph partitioning problem with heuristic search, Annals of Mathematics and Artificial Intelligence 45 (3–4) (2005) 293–322.
+[18] W. W. Hager, D. T. Phan, H. Zhang, An exact algorithm for graph partitioning, Mathematical Programming 137 (1-2) (2013) 531–556.
+[19] A. E. Caldwell, A. B. Kahng, I. L. Markov, Optimal partitioners and end-case placers for standard-cell layout, IEEE Trans. on CAD of Integrated Circuits and Systems 19 (11) (2000) 1304–1313.
+[20] D. Kucar, S. Areibi, A. Vannelli, Hypergraph partitioning techniques, Dynamics of Continuous, Discrete and Impulsive Systems Series A: Mathematical Analysis 11 (2–3a) (2004) 339–367.
+[21] R. H. Bisseling, J. Byrka, S. Cerav-Erbas, N. Gvozdenovi ́c, M. Lorenz, R. Pendavingh, C. Reeves, M. Röger, A. Verhoeven, Partitioning a call graph, in: Proceedings Study Group Mathematics with Industry 2005, Amsterdam, CWI, Amsterdam, 2005, pp. 95–107.
+[22] A. Mumcuyan, B. Usta, K. Kaya, H. Yenigün, Optimally bipartitioning sparse matrices with reordering and parallelization, Concurrency and Computation: Practice and Experience 30 (21) (2018) e4687. doi:10.1002/cpe.4687.
+[23] M. R. Garey, D. S. Johnson, L. Stockmeyer, Some simplified NP-complete graph problems, Theoretical Computer Science 1 (3) (1976) 237–267.
+[24] K. Menger, Zur allgemeinen Kurventheorie, Fundamenta Mathematicae 10 (1) (1927) 96–115.
+[25] T. H. Cormen, C. E. Leiserson, R. L. Rivest, C. Stein, Introduction to algorithms, Vol. 6, MIT press Cambridge, 2001.

@@ -1,0 +1,525 @@
+	\section{Hardness results}
+	\label{sec:np}
+	In this section we will formally analyze the matrix partitioning
+	problem and prove that it is \NP-Complete, even if we fix the
+	the number of processors to $k = 2$. We will assume we are looking
+	for a perfect partitioning, i.e. with imbalance parameter $\epsilon = 0$.
+
+	\subsection{Preliminaries}
+	\label{1-preliminaries}
+	To begin, let us define a formal decision-variant of the matrix
+	partitioning problem for $k = 2$, based on the optimization
+	variant described in \autoref{sec:intro} where the goal
+	is to minimize the total communication volume. We formulate our
+	decision problems in the style of \cite{garey79}.
+
+	\begin{problem}
+		\problemtitle{\mbpt}
+		\probleminput{An $m \times n$ matrix $A$, whose nonzeros are precisely
+			indexed by the set
+			$Z \subseteq \{\, 1, \dots, m \,\} \times
+				\{\, 1, \dots, n \,\}$, and an integer $V$, the required
+			maximum volume.}
+		\problemquestion{Does there exist a disjoint partitioning of $Z$
+			into $Z_1 \cup Z_2$ such that $|Z_1| = |Z_2|$ and volume
+			$VOL(Z_1, Z_2) \leq V$?}
+	\end{problem}
+
+	Here $VOL(Z_1, Z_2)$ counts the number of rows and columns that
+	have nonzeros in $Z_1$ and $Z_2$, as before. Note that unlike before,
+	we require $|Z_1|$ and $|Z_2|$ to be exactly equal, which implicitly
+	requires that the number of nonzeros is even. This is not a very big
+	problem however: if $|Z|$ is odd, we can add one more dummy row and column
+	with a single nonzero. Then we can proceed under the assumption that $|Z|$
+	is even and at least one equipartitioning exists, and remove the dummy
+	nonzero at the end again.
+
+	When thinking about the matrix bipartitioning problem, it is helpful
+	to reformulate it in terms of graphs. Given an $m \times n$ matrix $A$
+	we can define a bipartite adjacency graph $G(A) = (V(A), E(A))$ with
+	$m$ vertices representing the rows of $A$, and $n$ vertices representing
+	the columns, where a row vertex $r$ and a column vertex $c$ are connected
+	if and only if $A_{rc}$ is nonzero.
+
+	This equivalence extends to the partitioning problem. A bipartitioning of
+	the nonzeros of $A$ corresponds to a bipartitioning of the edges of $G(A)$,
+	and the rows and columns contributing to the final volume correspond
+	precisely to the vertices with edges in both sides of the partition. See
+	also the figure.
+
+	\begin{figure}[h]
+		\input{figure-0-mat-equiv.tikz}
+		\centering
+		\label{mat-equiv-fig}
+		\caption{Graph and matrix equivalence.}
+	\end{figure}
+	
+	It should be clear this procedure is also reversible, i.e. for any
+	bipartite graph $G$ on $m$ and $n$ vertices,
+	we can construct a corresponding matrix $A$ of size $m \times n$ which has
+	nonzeros precisely for the vertices that are connected in $G$. While the
+	nonzero entries of this matrix can be any value, the associated nonzero
+	pattern is uniquely determined by the edges of $G$.
+
+	To this end we define an equivalent bipartitioning problem on graphs that
+	we will base our reduction on:
+
+	\begin{problem}
+		\problemtitle{\geb}
+		\probleminput{Given a graph
+			$G = (V, E)$ and an integer
+			$M$.}
+		\problemquestion{Does there exist a disjoint partitioning of $E$
+			into $E_1 \cup E_2$ such that $|E_1| = |E_2|$ and
+			$\big|\big(\bigcup_{e\in E_1} e \big) \cap
+				\big(\bigcup_{e\in E_2} e \big)\big| \leq M$?\footnote{
+			Writing an edge as the set $\{ u, v\} \subset V$, then
+			$\bigcup_{e \in E_1} e$ gives precisely the set of vertices touched
+			by $E_1$.}}
+	\end{problem}
+
+	We call a vertex with adjacent edges from both partitions `cut'. The
+	goal is to minimize the number of cut vertices. Additionally, when we
+	explicitly need the partitioning/coloring of $E$, we will write it 
+	as a map $\pi : E \to \{0,1\}$.
+
+	\subsection{\geb is \NP-Complete}
+	We will perform a reduction from \gb which was proven \NP-Complete in
+	\cite{gb-np-complete} under the name \textsc{Minimum \allowbreak
+	cut \allowbreak into \allowbreak equal-\allowbreak sized \allowbreak
+	subsets}.
+
+	\begin{problem}
+		\problemtitle{\gb}
+		\probleminput{A graph $G = (V, E)$, an integer $M$.}
+		\problemquestion{Does there exist a disjoint partition of $V$
+			into $V_1 \cup V_2$ with $|V_1| = |V_2|$ and such that
+			$|\{\, \{u, v\} \,\mid\, u \in V_1, v\in V_2 \,\}| \leq M$?}
+	\end{problem}
+
+	Analogously to \geb, an edge with endpoints in both sides of the
+	partition is called `cut', the goal is to minimize the number of
+	cut edges. We similarly write a partitioning of $V$ as
+	a map $\tau : V \to \{0, 1\}$. We can also think of $\tau$ as coloring
+	the vertices in $V$, where one side of the partition has the color red, and one
+	side has the color blue. However this should not be confused with the classical
+	graph coloring problem, since we allow neighbouring vertices to have the
+	same color.
+
+	Let us give a sketch of our proof strategy:
+	given an instance $(G, M)$ of the \gb problem, we
+	will build a new graph $G'$, whose optimal solution under the 
+	\geb problem will give us an optimal solution under \gb on $G$.
+
+	Specifically, for each vertex $u \in V$ we create a clique $K_u$ of size
+	$S$ (specified later). For every edge $\{u, v\} \in E$, we merge
+	two vertices in the cliques $K_u$ and $K_v$ together into a single
+	vertex. We then solve the \geb on the resulting graph $(V', E')$, and
+	translate the resulting coloring of its edges into a coloring of the
+	vertices of $(V, E)$. (Here, the colors correspond to the two parts in the
+	partition.) We note that if we color each clique in $(V', E')$
+	monochromatically with the color of its vertex in $(V, E)$, then
+	an edge between two differently colored vertices in $(V, E)$ will
+	correspond precisely with a vertex shared by two differently colored
+	cliques in $(V', E')$.
+	An example is given in \autoref{figure-graph-clique-conversion}.
+
+	\begin{figure}[h]
+		\input{figure-1-conversion.tikz}
+		\centering
+		\caption{Solving \gb using \geb.}
+		\label{figure-graph-clique-conversion}
+	\end{figure}
+
+	We note that
+	the \geb problem gives us no guarantee that each clique is colored
+	monochromatically, but we will work around this later.
+
+	Formally, let us define the \textit{clique expansion} of a graph as
+	follows:
+
+	\begin{definition}
+		\label{clique-expansion}
+		Given a graph $G = (V, E)$,
+		let $S = 4 + 2|V|\binom{|E|}{2}$.
+		We define its clique expansion
+		$\mathcal{K}(G) = (V', E')$ as first taking a disjoint union of $|V|$
+		copies of the complete graph $K_S$ on $S$ vertices. Then, labelling the
+		edges in $E$ as $e_1, e_2, \dots, e_{|E|}$, for each edge
+		$e_i = \{u, v\}$
+		we merge the $i^{th}$ vertex of the $K_S$ representing $u$ with the
+		$i^{th}$ vertex of the $K_S$ representing $v$.
+	\end{definition}
+
+	Here, the clique size $S$ will allow us to prove several
+	useful propositions later. Notice that by construction, each pair of
+	cliques is merged at most once, each time in a previously unmerged vertex.
+	As a consequence, while cliques share vertices, they do not share edges.
+
+	Additionally, throughout this section we will make a slight abuse of
+	terminology. A clique usually (and up until now) refers to any collection
+	of pairwise connected vertices. However, from now on, when we talk about
+	`cliques' in $\mathcal{K}(G)$ we will be referring specifically to the
+	maximal cliques corresponding to vertices, i.e. the cliques
+	$\{\, K_u \,\mid\, u \in V \,\}$ in $\mathcal{K}(G)$.
+
+	\begin{proposition}
+		\label{poly-size}
+		The size of $\mathcal{K}(G) = (V', E')$ is polynomial in the size of
+		$G = (V, E)$.
+	\end{proposition}
+	\begin{proof}
+		By construction, each vertex in $V$ induces a subgraph with
+		$O(|V||E|^2)$
+		vertices and $O(|V|^2|E|^4)$ edges. After merging, the graph will only
+		become smaller. So $|V'|$ is $O(|V|^2 |E|^2)$ and $|E'|$ is
+		$O(|V|^3|E|^4)$.
+	\end{proof}
+
+	So $\mathcal{K}(G)$ is of polynomial size and we can solve the \geb problem
+	on it. We now want to show that both problems have equal optimal solutions
+	(in the sense of an optimization problem, not a decision problem). For
+	a graph $G=(V, E)$, let $\sgb(G)$ denote the optimal solution of the \gb
+	problem on $G$, and let $\sgeb(\mathcal{K}(G))$ denote the optimal solution
+	of the \geb problem on its \textit{clique expansion} $\mathcal{K}(G)$.
+	Here, the solution refers to the communication volume.
+
+	\begin{proposition}
+		\label{geb-leq-gb}
+		For any graph $G$ we have $\sgeb(\mathcal{K}(G)) \leq \sgb(G)$.
+	\end{proposition}
+	\begin{proof}
+		Consider any valid equipartitioning $\tau$ of $G = (V, E)$ of cost
+		$C$ (that is, there are
+		exactly $C$ edges $\{u, v\}$ with $\tau(u) \neq \tau(v)$).
+		For any vertex $u$,
+		color all edges in the corresponding clique $K_u$ in $\mathcal{K}(G)
+			= (V', E')$ with the same color, i.e. for any edge $e$ in $K_u$
+		let $\pi(e) := \tau(u)$.
+
+		Since each clique $K_u$ in $\mathcal{K}(G)$ has the same number of
+		edges ($\binom{S}{2}$), and by
+		assumption the partitioning of $V$ is into two equal sized subsets, the
+		strategy described above partitions $E'$ into two equal sized subsets.
+
+		Now let $s$ be a vertex in $\mathcal{K}(G)$. If $s$ is contained in
+		only one clique, it is not cut,
+		since we color the edges of
+		each $K_u$ monochromatically. If $s$ is shared by two
+		cliques $K_u$ and $K_v$, then $s$ corresponds to the edge
+		$e = \{u, v\} \in E$, and
+		we can see that this vertex is cut by $\pi$
+		if and only if $e$ is cut by $\tau$ (since $K_u$ and
+		$K_v$ are colored like $u$ and $v$ respectively).
+		Since by construction,
+		each vertex is in at most two cliques, there is no ambiguity.
+
+		So the number of cut vertices in the induced partitioning $\pi$ of the
+		edges of
+		$\mathcal{K}(G)$ is exactly the number of cut edges in the original
+		partitioning $\pi$ of the vertices of $G$. We can then minimize
+		over all valid partitionings of $G$ to achieve the desired inequality.
+	\end{proof}
+
+	Unfortunately the converse is harder to prove since we cannot guarantee
+	that an optimal partitioning of $\mathcal{K}(G)$ colors each clique
+	monochromatically. It turns
+	out however, that we can still deterministically associate a color with
+	each clique, provided we have an \textbf{optimal partitioning}.
+
+	\begin{definition}
+		Let $K$ be a clique and suppose we have a coloring of its edges. The
+		dominating color of $K$ is a color $c$ such that there exists a vertex
+		in $K$ with all of its adjacent edges colored $c$.
+	\end{definition}
+
+	While this property is clearly not well-defined in general, it is for our
+	restricted case:
+
+	\begin{lemma}
+		\label{dom-col}
+		Given a graph $G = (V, E)$ and an optimal partitioning $\pi$
+		of the edges of its clique
+		expansion $\mathcal{K}(G)$. Then each clique $K_u$ in $\mathcal{K}(G)$
+		has a well-defined dominating color.
+	\end{lemma}
+	\begin{proof}
+		Fix a clique $K_u$ in $\mathcal{K}(G)$. We need to prove existence and
+		uniqueness of its dominating color.
+
+		First, uniqueness is trivial. To the contrary, assume there are two
+		vertices $r, b$ in $K_u$ such that $r$ has only red edges adjacent,
+		and $b$ only blue edges. Since $K_u$ is a clique, the edge $\{r, b\}$
+		exists, which must be both red and blue, a contradiction.
+
+		As for existence, assume to the contrary that every vertex in $K_u$
+		has both blue and red edges adjacent. But this means each vertex in
+		$K_u$ is cut by the partitioning $\pi$, and so the cost of
+		this partitioning of $\mathcal{K}(G)$ is at least the clique size
+		$S = 4+2|V|\binom{|E|}{2}$. One may verify that for any graph,
+		$S > |E|$. However, $|E|$ is a trivial upper bound on the \gb problem
+		on $(V, E)$ (in which we cut \textit{every} edge in $E$),
+		which, by \autoref{geb-leq-gb} is an upper bound on the optimal
+		partitioning of the edges of $\mathcal{K}(G)$. Since we assumed our
+		partitioning $\pi$ is optimal, i.e. has cut size
+		exactly equal to $\sgeb(\mathcal{K}(G))$, this implies that
+
+		$$|E| \geq \sgb(G) \geq \sgeb(\mathcal{K}(G)) \geq S > |E|$$
+
+		which is a contradiction, so there must exist a vertex that only has
+		adjacent edges of a single color (in fact, we have shown $K_u$ must
+		contain at least $S - |E| > 0$ such vertices).
+	\end{proof}
+
+	In addition to the above, we would like to note in particular that by
+	definition, if $K_u$ has dominating color $c$, then any vertex in $K_u$
+	has at least one adjacent edge with color $c$.
+
+	Our strategy should now be obvious. We will color vertices in $G$ by
+	the dominating color of their cliques in an optimal partitioning of
+	$\mathcal{K}(G)$.
+
+	\begin{proposition}
+		\label{gb-leq-geb}
+		For any graph $G$ we have $\sgb(G) \leq \sgeb(\mathcal{K}(G))$.
+	\end{proposition}
+	\begin{proof}
+		Fix any optimal partitioning $\pi$ of $\mathcal{K}(G) = (V', E')$, and
+		let $\tau$ color each vertex $u$ in $G = (V, E)$ with the dominating
+		color of its associated clique $K_u$ in $\mathcal{K}(G)$. We would
+		like to
+		prove two things about this partitioning $\tau$:
+		that the number of cut edges in $G$ is no more than the number of
+		cut vertices in $\mathcal{K}(G)$, and that it equipartitions $V$.
+
+
+		\begin{lemma}
+			\label{gb-leq-geb-lemma-1}
+			The number of edges cut by $\tau$ in $G$ is no more than the number
+			of vertices cut by $\pi$ in $\mathcal{K}(G)$.
+		\end{lemma}
+		\begin{proof}
+			Suppose $\tau$ cuts edge $e_i = \{u, v\} \in E$, that is,
+			$\tau(u) \neq \tau(v)$. This means the dominating colors of
+			of $K_u$ and $K_v$ are different, say without loss of generality
+			that $K_u$ is red and $K_v$ is blue. Hence, the vertex $s$ in
+			$\mathcal{K}(G)$ that
+			corresponds to $e_i$, which we obtained during construction
+			by merging the $i^{th}$
+			vertex of $K_u$ with the $i^{th}$ vertex of $K_v$, must have
+			red edges adjacent, because it is contained in $K_u$, and blue
+			edges, because it is contained in $K_v$.
+
+			So $\pi$ cuts $s$.
+			Since for every edge $e_j \in E$ we merged different
+			vertices (specifically, for $e_j$ we used the $j^{th}$ vertex of
+			the two cliques), each edge in $E$ cut by $\tau$ has a unique
+			corresponding vertex $s$ in $\mathcal{K}(G)$ cut by $\pi$,
+			proving the lemma.
+		\end{proof}
+		\begin{lemma}
+			\label{gb-leq-geb-lemma-2}
+			$\tau$ equipartitions $V$.
+		\end{lemma}
+		\begin{proof}
+			Equivalently, we would like to prove that our optimal partitioning
+			$\pi$ of $\mathcal{K}(G)$ contains as many cliques with red as
+			their dominating color as it contains cliques with blue as their
+			dominating color.
+
+			Let $r,b \geq 0$, $r+b=|V|$ count these quantities, assuming
+			without loss of generality that $r \geq b$. Now consider a lower
+			bound on the number of red edges in a clique in $\mathcal{K}(G)$.
+			In each red clique we have at most
+			$|E|$ cut vertices (since we assumed our partitioning was optimal,
+			as in the proof of \autoref{dom-col}) (in fact,
+			across all cliques there are at most $|E|$ cut vertices, but for a
+			lower bound this will suffice), and the edges between two such
+			vertices may be blue, but none of the other $S - |E|$ vertices are
+			cut, so all other edges should be red, and a lower
+			bound on the number of red edges in $\pi$ is:
+
+			$$r \Big( \binom{S}{2} - \binom{|E|}{2}\Big)$$
+
+			Similarly, we can find an upper bound for the number of blue edges
+			by the following reasoning: we color each blue-dominated clique
+			entirely blue, and as many edges as possible in each red-dominated
+			clique (at most $\binom{|E|}{2}$, as before). This gives as
+			upper bound:
+
+			$$b\binom{S}{2} + r\binom{|E|}{2}$$
+
+			But since $\pi$ was an optimal \textit{equi}partitioning of the
+			edges of $\mathcal{K}(G)$, certainly the lower bound on the number
+			of red edges must be smaller than or equal to the upper bound on
+			the number of blue edges:
+
+			$$r\Big( \binom{S}{2} - \binom{|E|}{2}\Big)
+				\leq b\binom{S}{2} + r\binom{|E|}{2}$$
+
+			Reordering terms:
+
+			\begin{equation}
+				\label{ineq-pf}
+				(r-b)\binom{S}{2} \leq 2r\binom{|E|}{2}
+			\end{equation}
+
+			Recall that we set $S = 4 + 2|V|\binom{|E|}{2}$. Since $S \geq 4$
+			we have $S \leq \binom{S}{2}$. Also, clearly $r \leq |V|$. So if
+			Equation~(\ref{ineq-pf}) holds, then certainly the following holds:
+
+			$$(r-b)S \leq 2|V|\binom{|E|}{2}$$
+
+			Substituting $S$ and rewriting we get:
+
+			$$4(r-b) + 2(r-b-1)|V|\binom{|E|}{2} \leq 0$$
+ 
+			Since $r \geq b$, clearly this can only hold if $r=b$.
+		\end{proof}
+
+		Together \autoref{gb-leq-geb-lemma-1} and \autoref{gb-leq-geb-lemma-2}
+		imply that we can turn any optimal solution to the \geb problem on
+		$\mathcal{K}(G)$ into a solution of equal value to the \gb problem on
+		$G$, proving \autoref{gb-leq-geb}.
+	\end{proof}
+
+	We can now conclude:
+
+	\begin{theorem}
+		\geb is \NP-Complete.
+	\end{theorem}
+	\begin{proof}
+		We claim that $\gb \leq_{\mathcal{P}} \geb$.
+		For a given instance of \gb $(G, M)$, by \autoref{geb-leq-gb} and
+		\autoref{gb-leq-geb} we know
+		$\sgb(G) \leq M$ if and only if $\sgeb(\mathcal{K}(G)) \leq M$. So
+		if we can solve \geb on $\mathcal{K}(G)$ (which has size polynomial
+		in the size of $G$, by \autoref{poly-size}) in polynomial time, we can
+		also solve \gb on $G$ in polynomial time.
+	\end{proof}
+
+	\subsection{\mbpt is \NP-Complete}
+
+	We now consider the original \mbpt problem. As mentioned in
+	\autoref{1-preliminaries} this is equivalent to partitioning the edges of
+	a graph. We would like to immediately draw an equivalence between \mbpt
+	and \geb, but note that for a matrix $A$ the associated graph $G(A)$ is
+	always bipartite. However, we can resolve this:
+
+	\begin{definition}
+		Given a graph $G = (V, E)$, its \textit{edge split graph}
+		$\mathcal{S}(G) = (V', E')$ is given as:
+
+		$$V' = V \cup \{\, v_e \,\mid\, e \in E \,\}$$
+		$$E' = \bigcup_{e = \{u, w\} \in E} \{\,\{u, v_e\}\, \{v_e, w\}\,\}$$
+	\end{definition}
+
+	In other words, we replace each edge by a path of length two. The resulting
+	graph is clearly bipartite (with sides $V$ and $V' \setminus V$). Using
+	this bipartite extension of a graph, we can build a matrix and use \mbpt
+	to solve \geb.
+
+	First, we prove that we can safely take the \textit{edge split graph}
+	without affecting the \geb problem.
+
+	\begin{proposition}
+		\label{split-graph}
+		For any graph $G$ we have $\sgeb(G) = \sgeb(\mathcal{S}(G))$.
+	\end{proposition}
+
+	\begin{proof}
+		Let $G = (V, E)$ and $\mathcal{S}(G) = (V', E')$.
+		\begin{enumerate}
+			\item[$(\geq)$] Let $\pi$ be an optimal coloring of $E$. We define
+					a coloring $\pi'$ of $E'$ as follows. Let
+					$e' = \{u, v_e\} \in E'$ with $u \in V \subseteq V'$ and
+					$v_e \in V' \setminus V$. So $e'$ is half of the length two
+					path associated with $e$ in $G$. We set
+					$\pi'(e') = \pi(e)$, that is, we give each edge in $E'$ the
+					color of the edge in $E$ that induced it.
+
+					Then no vertices in $V'\setminus V$ were cut, since
+					both edges in a path have the same color, and the vertices
+					cut by $\pi'$ in $V \subseteq V'$ are precisely those
+					cut by $\pi$ in $V$.
+			\item[$(\leq)$] Let $\pi'$ be any optimal coloring of $E'$. Now for
+					each edge $e \in E$ there are three possibilities:
+					\begin{itemize}
+						\item Both corresponding edges in $E'$ are colored red
+							by $\pi'$.
+						\item Both corresponding edges in $E'$ are colored blue
+							by $\pi'$.
+						\item The corresponding edges in $E'$ are colored with
+							two colors.
+					\end{itemize}
+					Let these quantities be counted by $n_r, n_b$ and $n_{rb}$
+					respectively. Then $|E| = n_r + n_b + n_{rb}$. But since
+					$\pi'$ colors as many edges in $E'$ red as blue, we also
+					have that $2n_r + n_{rb} = 2n_b + n_{rb}$, hence
+					$n_r = n_b$. So $n_{rb} = |E| - (n_r + n_b)$. Since $|E|$
+					is even (otherwise no valid equipartitioning exists),
+					$n_{rb}$ is the difference between two even numbers, and
+					hence even.
+
+					Now we will repeatedly apply the following procedure: pick
+					two edges $e = \{u, w\}$ and $f = \{s, t\}$ in $E$
+					from the third category, and assume
+					without loss of generality that
+					$\pi'(\{u, v_e\}) = \pi'(\{s, v_f\}) = 0$ and that
+					$\pi'(\{v_e, w\}) = \pi'(\{v_f, t\}) = 1$.
+
+					Now construct a new coloring $\pi''$ which is identical to
+					$\pi'$ except that $\pi''(\{v_e, w\}) = 0$ and
+					$\pi''(\{s, v_f\}) = 1$. That is, we color the edges
+					corresponding to $e$ as $0$, and to $f$ as $1$.
+
+					So $\pi'$ and $\pi''$ are identical on the neighbourhoods
+					of $V' \setminus \{ v_e, w, s, v_f\}$, and hence cut the
+					same vertices there. Notice that $v_e$ and $v_f$ were cut,
+					but
+					aren't anymore. And $w$ and $s$ may have gone from
+					`not cut' to `cut',
+					but this does not matter since `uncutting' $v_e$ and $v_f$
+					compensates for this. So $\pi''$ does not cut more
+					vertices than $\pi'$.
+
+					Each time we apply this procedure we reduce $n_{rb}$ by
+					two, and since it is finite and even, we eventually arrive
+					at a coloring where each pair of edges $\{u, v_e\},
+					\{v_e, w\}$ has the same color, without increasing the
+					number of cut vertices. We can then map this to
+					a coloring $\pi$ of $E$, like in $(\geq)$.
+		\end{enumerate}
+	\end{proof}
+
+	Now we can turn any graph into a bipartite graph without changing its
+	smallest edge bisection. Using this we can prove the main theorem of this
+	section:
+
+	\begin{theorem}
+		\label{main-thm}
+		\mbpt is \NP-Complete.
+	\end{theorem}
+	\begin{proof}
+		We will show that $$\geb \leq_{\mathcal{P}} \mbpt$$ Given a graph $G$,
+		let $G'=\mathcal{S}(G)=(L\cup R, E')$. Create a $|L| \times |R|$ matrix
+		$A$ with $A_{ij} = 1$ if $i \in L$ and $j \in R$ are connected, and $0$
+		otherwise.
+
+		We can now solve the \mbpt problem on $A$, and using the correspondence
+		between matrices and bipartite graphs described in
+		\autoref{1-preliminaries}, we can turn this into an equipartitioning of
+		$E'$, since we have a correspondence between the partitioning of edges
+		and the partitioning of nonzeros, and a correspondence between cutting
+		vertices and cutting rows and columns. This is displayed in the figure.
+
+		\begin{figure*}
+			\input{figure-2-split.tikz}
+			\centering
+			\label{figmgeb}
+			\caption{Solving \geb using \mbpt.}
+		\end{figure*}
+
+		Now \autoref{split-graph} gives us a constructive algorithm to
+		transition between $G'$ and $G$, solving \geb on $G$.
+	\end{proof}

@@ -1,0 +1,5 @@
+- The sparse matrix bipartitioning problem for an equal number of nonzeros is NP-complete.
+- An improved exact branch-and-bound bipartitioning algorithm is presented.
+- The improvement is obtained by stronger flow-based and packing bounds.
+- 839 matrices from the SuiteSparse matrix collection have been solved to optimality.
+- The new matrix partitioner MP is 13.8 times faster than the MondriaanOpt partitioner.

@@ -2,6 +2,11 @@
 
 import sys
 
+def imbalance(matrix):
+	ceq = lambda i: sum(sum(val[0] == i for _, val in row) for row in matrix)
+	d, f = abs(ceq('1') - ceq('2')), ceq('3')
+	return d-f if d >= f else (f-d)%2
+
 def read_matrix(filename):
 	""" Reads a matrix (in MM format) from the given file. Returns (R, C, NZ, M),
 		with M in row-major order. """

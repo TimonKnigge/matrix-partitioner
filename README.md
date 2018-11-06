@@ -32,3 +32,8 @@ Example usage:
 ```Bash
 ./mp -e 0.03 -t 60 < mtx/mymatrix.mtx > mtx/mymatrix_partitioned.mtx 2> mymatrix_debug.txt
 ```
+
+The output matrix is in integer coordinate format, with a `1` (resp. `2`)
+indicating the nonzero goes to the first (resp. second) side of the
+bipartitioning, and a `3` indicating the nonzero can be assigned arbitrarily
+without violating the load balancing constraint.

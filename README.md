@@ -10,7 +10,7 @@ and writes the resulting partitioning to standard out, also in MatrixMarket
 format.
 During the partitioning, debug information is written to standard error.
 
-```Bash
+```
 timon@timon-laptop ~/mp $ ./mp -h
  MP - Matrix Partitioner
 

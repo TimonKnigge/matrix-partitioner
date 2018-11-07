@@ -1,5 +1,8 @@
 # matrix-partitioner
-Implementation of the matrix partitioning algorithm described in my thesis.
+Implementation of the matrix partitioning algorithm described
+[our paper](https://arxiv.org/abs/1811.02043). A database of optimally
+partitioned matrices may be found at
+[this location](http://www.staff.science.uu.nl/~bisse101/Mondriaan/Opt/).
 
 ### Usage
 

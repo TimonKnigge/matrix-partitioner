@@ -17,6 +17,7 @@ src/%.o: src/%.cpp
 clean:
 	find ./ -type f -name '*.o' -delete
 	find ./ -type f -name '*.d' -delete
+	find ./ -type f -name '*.gcda' -delete
 
 CFLAGS+=-MMD
 -include $(OBJ_FILES:.o:.d)

@@ -126,12 +126,15 @@ void bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
 		++current_rcs;
 
 		// Check if we are at the bottom of the tree, and possibly store the solution
-		if (current_rcs == rcs.size() && optimal_value > lb) {
-			optimal_value = lb;
-			for (size_t i = 0; i < optimal_status.size(); ++i)
-				optimal_status[i] = pp.get_status(i);
-			std::cerr << "Improved solution found with cost " << lb
-				<< std::endl;
+		if (current_rcs == rcs.size()) {
+			if (optimal_value > lb) {
+				optimal_value = lb;
+				for (size_t i = 0; i < optimal_status.size(); ++i)
+					optimal_status[i] = pp.get_status(i);
+				std::cerr << "Improved solution found with cost " << lb
+					<< std::endl;
+			}
+			return;
 		}
 
 		// Try completing the current partial partition. We only do this
@@ -154,7 +157,7 @@ void bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
 			}
 			// If we know for certain that no completion exists
 			// we can safely increase the lower bound by one.
-			if (stat == partial_partition::completion::impossible) {
+			if (stat == partial_partition::completion::notfound) {
 				lb += 1;
 			}
 		}

@@ -20,6 +20,7 @@ partial_partition::partial_partition(const matrix &_m, bbparameters _param,
 			dfs_stack(_m.R + _m.C),
 			dfs_index(_m.R + _m.C, -1),
 			dfs_tree_size(_m.R + _m.C, 0),
+			component_ids(_m.R + _m.C),
 			m(_m) {
 	color_count[RED].assign(m.R + m.C, 0);
 	color_count[BLUE].assign(m.R + m.C, 0);
@@ -415,7 +416,7 @@ std::vector<int> partial_partition::grow_trees(int c) {
 			// the edge FIRST. If it is unassigned and unclaimed we may
 			// claim AND expand.
 			mp::status vs = get_status(v);
-			if (vs == color_to_status(c) || vs == color_to_status(1-c)) {
+			if (vs == mp::status::red || vs == mp::status::blue) {
 				// Nothing, it is already red/blue and we can do nothing.
 			} else if (vs == status::cut || vs == status::implicitly_cut
 					|| !vcg.is_free(v)) {
@@ -459,8 +460,101 @@ std::vector<int> partial_partition::grow_trees(int c) {
 	return subgraph_sizes;
 }
 
+struct component {
+	int side = -1, size = 0;
+	int l, r;
+	component(int start) : l(start), r(start) { };
+};
 partial_partition::completion partial_partition::find_completion(
 		const std::vector<int> &rcs, std::vector<status> &assignment) {
+	// If there exists a non-trivial vertex cut, we cannot extend this
+	// partial partition without cutting extra rows or columns.
+	if (vcg.get_minimum_vertex_cut() > 0)
+		return partial_partition::completion::impossible;
+
+	// To avoid redundant computation we ignore partial partitions with
+	// implicitly rows/columns.
+	if (implicitly_cut > 0)
+		return partial_partition::completion::impossible;
+
+	// If, through the packing bound, we already found that it is necessary
+	// to cut more rows or columns to achieve a balanced partition, then
+	// we can also pass.
+	if (lower_bound_cache > cut)
+		return partial_partition::completion::impossible;
+
+	// Collect red, blue and free components.
+	dfs_index.reset_all();
+	std::stack<int> st;
+
+	int current_size[2] = {partition_size[RED], partition_size[BLUE]};
+	int ids_size = 0; // Found vertices are in component_ids[0 ids_size)
+	std::vector<component> comps; // Descriptors of all components.
+
+	for (auto it = rcs.rbegin(); it != rcs.rend(); ++it) {
+		int rc = *it;
+		mp::status stat = get_status(rc);
+
+		// If we reached the assigned vertices we can break.
+		if (stat == mp::status::red || stat == mp::status::blue
+				|| stat == mp::status::cut)
+			break;
+
+		// If we already visited this component, we continue.
+		if (dfs_index.get((size_t)rc) >= 0)
+			continue;
+
+		// Otherwise, we explore the component with a DFS.
+		int side = -1, size = 0;
+		st.push(rc);
+		dfs_index.set((size_t)rc, 0);
+		comps.emplace_back(ids_size);
+		while (!st.empty()) {
+			// Consider the edge {u, m[u][i]}
+			int u = st.top(), i = dfs_index.get((size_t)st.top());
+
+			// Finished exploring this vertex.
+			if (i == (int)m[u].size()) {
+				st.pop();
+				component_ids[ids_size++] = u;
+				continue;
+			}
+			dfs_index.set((size_t)u, i+1);
+
+			// Find the end point and reverse index of the edge.
+			int v = m[u][i].rc;
+			int vi = m[u][i].index;
+			mp::status vs = get_status(v);
+
+			if (vs == mp::status::red || vs == mp::status::blue) {
+				// This edge is already colored, so we cannot claim
+				// it. But we record its color.
+				side = (vs == mp::status::red ? RED : BLUE);
+			} else if (vs == status::cut) {
+				// We can claim the edge but cannot extend the dfs.
+				size += 1;
+			} else {
+				// Let's begin by checking the index of the target. If it
+				// is -1 then we can expand. If it is not more than the
+				// reverse index then we can at least claim the edge.
+				int vsi = dfs_index.get((size_t)v);
+				if (vsi <= vi)
+					size += 1;
+				if (vsi < 0) {
+					dfs_index.set((size_t)v, 0);
+					st.push(v);
+				}
+			}
+		}
+
+		// Record the component.
+		if (side >= 0)
+			current_size[side] += size;
+		comps.back().side = side;
+		comps.back().size = size;
+		comps.back().r = ids_size;
+	}
+
 	return partial_partition::completion::inconclusive;
 }
 

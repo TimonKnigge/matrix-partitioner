@@ -52,6 +52,10 @@ class partial_partition {
 	std::vector<std::stack<int>> dfs_stack;
 	mp::rvector<int> dfs_index, dfs_tree_size;
 
+	// List of vertices representing the components found by the dfs
+	// for finding completions.
+	std::vector<int> component_ids;
+
 	// Compute a lower bound on the size of any extension of this partial
 	// partition. Called by assign.
 	int incremental_lower_bound(int rc, status s, int ub);
@@ -96,7 +100,7 @@ class partial_partition {
 	// Attempt to find an extension of the current partial partition that
 	// does not cut any additional rows or columns. Implicitly assumes
 	// the free rows and columns are at the end of rcs.
-	enum completion { inconclusive = 0, impossible = 1, found = 2 };
+	enum completion { inconclusive = 0, impossible = 1, found = 2, notfound = 3 };
 	partial_partition::completion find_completion(
 			const std::vector<int> &rcs, std::vector<status> &assignment);
 

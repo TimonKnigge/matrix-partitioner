@@ -15,6 +15,8 @@
 
 namespace mp {
 
+constexpr long long COMPLETION_OPCOUNT = 1e5;
+
 class partial_partition {
   private:
 	// Parameters describing the partitioning method.

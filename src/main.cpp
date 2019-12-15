@@ -53,6 +53,7 @@ struct cmd_args {
 	}
 };
 
+
 int main(int argc, char** argv) {
 	// Detach from C I\O.
 	std::ios::sync_with_stdio(false);
@@ -86,7 +87,8 @@ int main(int argc, char** argv) {
 		true,		// extended packing bound
 		false,		// matching bound
 		true,		// flow bound
-		1,			// initial upperbound
+		true,		// use completions
+		1,		// initial upperbound
 		1.25f		// scaling factor
 	});
 	std::vector<mp::status> rowstat, colstat;

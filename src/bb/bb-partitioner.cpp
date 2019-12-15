@@ -139,7 +139,7 @@ void bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
 
 		// Try completing the current partial partition. We only do this
 		// after a cut or at the very beginning.
-		if ((current_rcs <= 1 || step.s == mp::status::cut)
+		if (param.co && (current_rcs <= 1 || step.s == mp::status::cut)
 				&& lb < optimal_value && current_rcs+1 < rcs.size()) {
 			partial_partition::completion stat
 				= pp.find_completion(rcs, optimal_status);
@@ -150,10 +150,9 @@ void bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
 				// and return. By returning we make sure the rest of
 				// this subtree is discarded.
 				optimal_value = lb;
-				for (size_t i = current_rcs; i < rcs.size(); ++i)
-					optimal_status[rcs[i]] = pp.get_status(rcs[i]);
 				std::cerr << "Improved solution found with cost " << lb
 					<< " (by completion)" << std::endl;
+				return;
 			}
 			// If we know for certain that no completion exists
 			// we can safely increase the lower bound by one.
@@ -161,7 +160,6 @@ void bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
 				lb += 1;
 			}
 		}
-
 
 		// Try branching again.
 		if (pick_next(current_rcs, rcs, pp, lb, optimal_value)) {

@@ -9,6 +9,7 @@ std::pair<bool, std::string> bbparameters::valid() const {
 		"used in combination with the flow bound."};
 	if (Uf <= 1.0f) return {false, "Scaling factor must be larger than 1."};
 	if (U0 <= 0) return {false, "Initial upperbound must be positive."};
+	if (co && !(epb && fb)) return {false, "Completions need flow and extended packing bounds."};
 	return {true, ""};
 }
 

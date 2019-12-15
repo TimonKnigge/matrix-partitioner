@@ -4,6 +4,7 @@
 #include <numeric>
 #include <queue>
 
+#include "./subset-sum-computer.h"
 #include "../datastructures/matrix-util.h"
 #include "../datastructures/min-heap.h"
 #include "../io/output.h"
@@ -555,7 +556,79 @@ partial_partition::completion partial_partition::find_completion(
 		comps.back().r = ids_size;
 	}
 
-	return partial_partition::completion::inconclusive;
+	if (current_size[RED] > max_partition_size
+			|| current_size[BLUE] > max_partition_size) {
+		// This code should in principle be unreachable since the
+		// packing bound should have filtered such partial partitions
+		// out already.
+		std::cerr << "Unreachable code reached .." << std::endl;
+		return partial_partition::completion::notfound;
+	}
+
+	// Retrieve the components that are non-empty and
+	// unassigned.
+	sort(comps.begin(), comps.end(), [](const component &l, const component &r) {
+		if (l.side != r.side) return l.side < r.side;
+		return l.size > r.size;
+	});
+	{
+		// Do a quick sanity check if we have enough time to run the completions code.
+		long long n = 0, A = 0;
+		for (; n < (long long)comps.size() && comps[n].side == -1 && comps[n].size > 0; ++n)
+			A += comps[n].size;
+
+		// We have a subset sum problem with n values that sum to A.
+		// Meet in the middle -> O(n2^(n/2)) runtime
+		// DP table -> O(nA) runtime
+		// Just plug in the values and see if this estimate makes sense.
+		if (std::min(A * n, n * (1LL<<(n/2))) > COMPLETION_OPCOUNT)
+			return partial_partition::completion::inconclusive;
+	}
+	std::vector<int> free_comps;
+	for (size_t i = 0; i < comps.size() && comps[i].side == -1 && comps[i].size > 0; ++i)
+		free_comps.push_back(comps[i].size);
+
+	// Looks like we already have a valid partition. Assign it and return it.
+	if (free_comps.empty()) {
+		std::cerr << "(!) Partition has trivial completion." << std::endl;
+		for (size_t i = 0; i < assignment.size(); ++i)
+			assignment[i] = get_status(i);
+		for (const auto &c : comps) {
+			for (int i = c.l; i < c.r; ++i)
+				assignment[component_ids[i]]
+					= (c.side == RED ? mp::status::red : mp::status::blue);
+		}
+		return partial_partition::completion::found;
+	}
+
+	// Invoke the subset sum algorithm to find a partitioning.
+	std::vector<bool> part(free_comps.size());
+	if (mp::ss_partition(free_comps,
+				max_partition_size - current_size[RED],
+				max_partition_size - current_size[BLUE], part)) {
+		std::cerr << "(!) Found non-trivial completion." << std::endl;
+		// Successfully found a partitioning.
+		// Copy in existing values.
+		for (size_t i = 0; i < assignment.size(); ++i)
+			assignment[i] = get_status(i);
+		// Copy in forced assignments.
+		for (const auto &c : comps) {
+			if (c.side < 0) continue;
+			for (int i = c.l; i < c.r; ++i)
+				assignment[component_ids[i]]
+					= (c.side == RED ? mp::status::red : mp::status::blue);
+		}
+		// Finally, we copy in the components as assigned
+		// by the subset sum algorithm.
+		for (size_t i = 0; i < free_comps.size(); ++i) {
+			const auto &c = comps[i];
+			for (int j = c.l; j < c.r; ++j)
+				assignment[component_ids[j]]
+					= (part[i] ? mp::status::red : mp::status::blue);
+		}
+		return partial_partition::completion::found;
+	}
+	return partial_partition::completion::notfound;
 }
 
 

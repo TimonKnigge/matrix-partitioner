@@ -459,6 +459,13 @@ std::vector<int> partial_partition::grow_trees(int c) {
 	return subgraph_sizes;
 }
 
+partial_partition::completion partial_partition::find_completion(
+		const std::vector<int> &rcs, std::vector<status> &assignment) {
+	return partial_partition::completion::inconclusive;
+}
+
+
+
 status partial_partition::get_status(int rc) const {
 	return stat[rc];
 }

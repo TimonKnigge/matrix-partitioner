@@ -93,6 +93,13 @@ class partial_partition {
 	// cut graph.
 	std::vector<int> grow_trees(int c);
 
+	// Attempt to find an extension of the current partial partition that
+	// does not cut any additional rows or columns. Implicitly assumes
+	// the free rows and columns are at the end of rcs.
+	enum completion { inconclusive = 0, impossible = 1, found = 2 };
+	partial_partition::completion find_completion(
+			const std::vector<int> &rcs, std::vector<status> &assignment);
+
 	// Status of the given row/column.
 	status get_status(int rc) const;
 

@@ -114,25 +114,60 @@ bool bbpartitioner::pick_next(size_t &current_rcs, std::vector<int> &rcs,
 	return true;
 }
 
-int bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
+void bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
 		size_t &current_rcs, std::vector<int> &rcs, partial_partition &pp,
-		int upper_bound) {
+		int &optimal_value, std::vector<status> &optimal_status) {
 	recursion_step step = call_stack.top();
 	call_stack.pop();
 	
 	int lb = -1;
 	if (step.rt == recursion_type::descend) {
-		lb = pp.assign(step.rc, step.s, upper_bound);
+		lb = pp.assign(step.rc, step.s, optimal_value);
+		++current_rcs;
+
+		// Check if we are at the bottom of the tree, and possibly store the solution
+		if (current_rcs == rcs.size() && optimal_value > lb) {
+			optimal_value = lb;
+			for (size_t i = 0; i < optimal_status.size(); ++i)
+				optimal_status[i] = pp.get_status(i);
+			std::cerr << "Improved solution found with cost " << lb
+				<< std::endl;
+		}
+
+		// Try completing the current partial partition. We only do this
+		// after a cut or at the very beginning.
+		if ((current_rcs <= 1 || step.s == mp::status::cut)
+				&& lb < optimal_value && current_rcs+1 < rcs.size()) {
+			partial_partition::completion stat
+				= pp.find_completion(rcs, optimal_status);
+
+			// If we find a completion, record it.
+			if (stat == partial_partition::completion::found) {
+				// Success, so fill in the remaining values and record
+				// and return. By returning we make sure the rest of
+				// this subtree is discarded.
+				optimal_value = lb;
+				for (size_t i = current_rcs; i < rcs.size(); ++i)
+					optimal_status[rcs[i]] = pp.get_status(rcs[i]);
+				std::cerr << "Improved solution found with cost " << lb
+					<< " (by completion)" << std::endl;
+			}
+			// If we know for certain that no completion exists
+			// we can safely increase the lower bound by one.
+			if (stat == partial_partition::completion::impossible) {
+				lb += 1;
+			}
+		}
+
 
 		// Try branching again.
-		++current_rcs;
-		if (pick_next(current_rcs, rcs, pp, lb, upper_bound)) {
+		if (pick_next(current_rcs, rcs, pp, lb, optimal_value)) {
 			// Recurse on the cut last (note that branches are executed on a
 			// stack and thus in reverse order). Also, if lb + 1 == ub and this
 			// vertex is NOT implicitly cut, there is no need to branch on
 			// the cut.
 			if (pp.get_status(rcs[current_rcs]) == mp::status::implicitly_cut
-					|| pp.get_guaranteed_lower_bound() + 1 < upper_bound)
+					|| pp.get_guaranteed_lower_bound() + 1 < optimal_value)
 				recurse(rcs[current_rcs], status::cut, call_stack, pp);
 
 			// First branch on the smaller component.
@@ -151,8 +186,6 @@ int bbpartitioner::make_step(std::stack<recursion_step> &call_stack,
 		pp.undo(step.rc, step.s);
 		--current_rcs;
 	}
-
-	return lb;
 }
 
 int bbpartitioner::solve(std::vector<int> &rcs, partial_partition &pp,
@@ -177,20 +210,13 @@ int bbpartitioner::solve(std::vector<int> &rcs, partial_partition &pp,
 	// effectively traversing the B&B tree.
 	long long progress_counter = 0;
 	while (!call_stack.empty()) {
-		int lb = make_step(call_stack, current_rcs, rcs, pp, optimal_value);
-		if (current_rcs == rcs.size()) {
-			if (optimal_value > lb) {
-				optimal_value = lb;
-				for (size_t i = 0; i < optimal_status.size(); ++i)
-					optimal_status[i] = pp.get_status(i);
-				std::cerr << "Improved solution found with cost " << lb
-					<< std::endl;
-				// If we are already hitting the suggested lower bound we
-				// can stop.
-				if (slb >= optimal_value) {
-					return optimal_value;
-				}
-			}
+		// Advance through the b&b tree. Main algorithm in here.
+		make_step(call_stack, current_rcs, rcs, pp, optimal_value, optimal_status);
+		
+		// If we are already hitting the suggested lower bound we
+		// can stop.
+		if (slb >= optimal_value) {
+			return optimal_value;
 		}
 
 		progress_counter++;

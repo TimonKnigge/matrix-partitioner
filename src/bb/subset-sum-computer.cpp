@@ -7,7 +7,7 @@ namespace mp {
 
 struct mask_and_sum {
 	int mask, sum;
-	bool operator<(const mask_and_sum &rhs) {
+	bool operator<(const mask_and_sum &rhs) const {
 		return sum < rhs.sum;
 	}
 };
@@ -121,7 +121,7 @@ bool ss_partition(const std::vector<int> &a, int s1max, int s2max,
 	long long mim_ops = (1LL << ((long long)(a.size() + 1LL) / 2LL));
 	long long dp_ops = (long long)(sum) * (long long)(a.size());
 
-	if (mim_ops < dp_ops)
+	if (a.size()  < 60 && mim_ops < dp_ops)
 		return ss_partition_mim(a, s1max, s2max, part);
 	else
 		return ss_partition_dp(a, s1max, s2max, part);

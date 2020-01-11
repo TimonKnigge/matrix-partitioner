@@ -581,7 +581,7 @@ partial_partition::completion partial_partition::find_completion(
 		// Meet in the middle -> O(n2^(n/2)) runtime
 		// DP table -> O(nA) runtime
 		// Just plug in the values and see if this estimate makes sense.
-		if (std::min(A * n, n * (1LL<<(n/2))) > COMPLETION_OPCOUNT)
+		if (std::min(A * n, n * (1LL<<std::min(40LL, (n/2)))) > COMPLETION_OPCOUNT)
 			return partial_partition::completion::inconclusive;
 	}
 	std::vector<int> free_comps;
